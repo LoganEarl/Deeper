@@ -1,9 +1,17 @@
+package baseNetwork;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
+/**
+ * Responsible for creating and maintaining a single server thread for sending messages and any number of client threads used
+ * to communicate with connected clients
+ *
+ * @author Logan Earl
+ */
 public class WebServer {
     private Thread serverThread;
     private boolean serverRunning = false;
@@ -11,8 +19,16 @@ public class WebServer {
     private OnMessageReceivedListener clientListener;
     private ClientMessageParser clientParser;
 
+    private static final String MESSAGE_DIVIDER = "<!EOM!>";
+
     private List<ClientConnection> connectedClients = new ArrayList<>();
 
+    /**
+     * Creates the server thread, but does not start it yet. To do that, use the startServer() method
+     * @param port the port to start the server on
+     * @param clientListener listener used to receive messages from connected clients
+     * @param parser parser used to instantiate and populate newly received client messages
+     */
     public WebServer(final int port, OnMessageReceivedListener clientListener, ClientMessageParser parser) {
         this.clientListener = clientListener;
         this.clientParser = parser;
@@ -35,14 +51,22 @@ public class WebServer {
         });
     }
 
+    /**
+     * Starts the server thread, allowing clients to connect.
+     */
     public void startServer() {
         if (serverThread != null && !serverRunning)
             serverThread.start();
     }
 
-    public void notifyClients(List<String> toNotify, ServerMessage message) {
+    /**
+     * sends the given message to the given clients.
+     * @param message the message to send to the given clients
+     * @param toNotify the identifiers of all clients to notify
+     */
+    public void notifyClients(ServerMessage message, String... toNotify) {
         for (ClientConnection conn : connectedClients)
-            if (toNotify.isEmpty() || toNotify.contains(conn.identifier))
+            if (toNotify.length == 0 || Arrays.asList(toNotify).contains(conn.identifier))
                 conn.sendMessage(message);
     }
 
@@ -81,16 +105,14 @@ public class WebServer {
                         out.flush();
                     }
                     if(in.available() > 0){
-                        StringBuilder message = new StringBuilder();
-                        char last = (char)in.read();
-                        while(last != '\n' && in.available() > 0){
-                            message.append(last);
-                            last = (char)in.read();
-                        }
-                        if(last != '\n')
-                            message.append(last);
+                        byte[] allRawMessages = in.readAllBytes();
+                        String allMessages = new String(allRawMessages);
+                        String[] messages = allMessages.split(MESSAGE_DIVIDER);
+
                         if(clientListener != null)
-                            clientListener.onClientMessage(identifier,clientParser.parseFromString(message.toString()));
+                            for(String message: messages)
+                                if(message.isEmpty())
+                                    clientListener.onClientMessage(identifier,clientParser.parseFromString(message));
                     }
                 }catch (Exception e){
 

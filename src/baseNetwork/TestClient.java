@@ -1,8 +1,12 @@
+package baseNetwork;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.net.Socket;
 
 public class TestClient {
+    private static final String MESSAGE_DIVIDER = "<!EOM!>";
+
     public static void main(String[] args) throws Exception{
         Socket socket = new Socket("localhost", 5555);
         BufferedInputStream in = new BufferedInputStream(socket.getInputStream());
