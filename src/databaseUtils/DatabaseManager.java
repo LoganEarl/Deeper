@@ -1,10 +1,9 @@
 package databaseUtils;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.List;
+import java.util.Map;
 
 public class DatabaseManager {
     public static final String SAVE_DIRECTORY = System.getProperty("user.dir").replace("\\", "/") + "/data/";
@@ -30,5 +29,42 @@ public class DatabaseManager {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public static void createTables(String fileName, List<DatabaseTable> tables){
+        try{
+            Connection conn = DriverManager.getConnection(getConnectionURL(fileName));
+            Statement stmt = conn.createStatement();
+
+            for(DatabaseTable table:tables){
+                StringBuilder sql = new StringBuilder("CREATE TABLE ").append(table.getTableName()).append(" (");
+
+                Map<String,String> columnDefinitions = table.getColumnDefinitions();
+                boolean first = true;
+                for(String columnName: columnDefinitions.keySet()){
+                    if(!first)
+                        sql.append(",");
+                    else
+                        first = false;
+                    sql.append(columnName).append(" ").append(columnDefinitions.get(columnName));
+                }
+                sql.append(")");
+                stmt.executeUpdate(sql.toString());
+            }
+            stmt.close();
+            conn.close();
+        }catch (Exception e){
+            System.out.println("Failed to create tables");
+            e.printStackTrace();
+        }
+    }
+
+    private static String getConnectionURL(String fileName){
+        return "jdbc:sqlite:" + SAVE_DIRECTORY + fileName;
+    }
+
+    public interface DatabaseTable{
+        String getTableName();
+        Map<String,String> getColumnDefinitions();
     }
 }
