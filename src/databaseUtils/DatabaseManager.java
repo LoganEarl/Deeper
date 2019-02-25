@@ -18,7 +18,6 @@ public class DatabaseManager {
     }
 
     public static void createNewDatabase(String fileName) {
-
         String url = "jdbc:sqlite:" + SAVE_DIRECTORY + fileName;
 
         try (Connection conn = DriverManager.getConnection(url)) {

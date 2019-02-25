@@ -105,7 +105,8 @@ public class WebServer {
                         out.flush();
                     }
                     if(in.available() > 0){
-                        byte[] allRawMessages = in.readAllBytes();
+                        byte[] allRawMessages = new byte[in.available()];
+                        in.read(allRawMessages);
                         String allMessages = new String(allRawMessages);
                         String[] messages = allMessages.split(MESSAGE_DIVIDER);
 
