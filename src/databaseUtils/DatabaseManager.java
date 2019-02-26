@@ -59,6 +59,8 @@ public class DatabaseManager {
         }
     }
 
+
+
     private static String getConnectionURL(String fileName){
         return "jdbc:sqlite:" + SAVE_DIRECTORY + fileName;
     }
@@ -66,5 +68,10 @@ public class DatabaseManager {
     public interface DatabaseTable{
         String getTableName();
         Map<String,String> getColumnDefinitions();
+    }
+
+    public interface DatabaseEntry{
+        boolean saveToDatabase(String databaseName);
+        boolean existsInDatabase(String databaseName);
     }
 }

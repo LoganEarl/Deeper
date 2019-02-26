@@ -1,7 +1,32 @@
 package clientManagement;
 
-public class Account {
-    public static Account getAccountByUsername(String userName){
-        return null;
+import databaseUtils.DatabaseManager;
+
+/**
+ * This class is used to persist and store account information to the database. An "account"
+ * is independent of a client, as an account can be accessed from different clients
+ */
+public class Account implements DatabaseManager.DatabaseEntry {
+    private String userName;
+    private String hashedPassword;
+    private String email;
+
+    public Account(String userName, String hashedPassword, AccountTable.AccountType type){
+        //TODO
+
+    }
+
+    public boolean checkPassword(String hashedPassword){
+        return hashedPassword.equals(this.hashedPassword);
+    }
+
+    @Override
+    public boolean saveToDatabase(String databaseName) {
+        return false;
+    }
+
+    @Override
+    public boolean existsInDatabase(String databaseName) {
+        return false;
     }
 }
