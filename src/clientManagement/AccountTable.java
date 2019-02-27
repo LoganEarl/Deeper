@@ -5,9 +5,19 @@ import databaseUtils.DatabaseManager;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Holds information relating to the creation of a SQL table that holds each account that has been created.
+ * Also can create and retrieve accounts from a given database file.
+ * @author Logan Earl
+ */
 public class AccountTable implements DatabaseManager.DatabaseTable {
-
+    /**
+     * the name of the table used to store accounts
+     */
     public static final String TABLE_NAME = "account";
+    /**
+     * A Map, containing the column names as keys and the associated data-type of the column as values
+     */
     public final Map<String, String> TABLE_DEFINITION = new HashMap<>();
 
     public AccountTable(){
@@ -23,7 +33,7 @@ public class AccountTable implements DatabaseManager.DatabaseTable {
     }
 
     public static Account getAccountByUsername(String userName, String databseName){
-        //TODO
+        //TODO look through the database for the client and return the account object
         return null;
     }
 

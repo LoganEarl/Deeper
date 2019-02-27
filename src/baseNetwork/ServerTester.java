@@ -25,8 +25,8 @@ public class ServerTester {
         }
 
         @Override
-        public String getMessageType() {
-            return "SimpleTextMessage";
+        public MessageType getMessageType() {
+            return MessageType.UNKNOWN_MESSAGE_FORMAT;
         }
 
         @Override

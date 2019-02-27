@@ -146,12 +146,11 @@ public class WebServer {
      * as well as information on which client sent the message.
      */
     public interface ClientMessage {
-        //TODO make a big consolidated list of message types
         /**
-         * gets what kind of message it is. There will eventually be a consolidated list of all message types and what each is responsible for
-         * @return the string value of the message type
+         * gets what kind of message it is.
+         * @return the type message that was received
          */
-        String getMessageType();
+        MessageType getMessageType();
 
         /**
          * gets the internet address of the client that sent the message
