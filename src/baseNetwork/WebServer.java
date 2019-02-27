@@ -113,7 +113,7 @@ public class WebServer {
                         if(clientListener != null)
                             for(String message: messages)
                                 if(message.isEmpty())
-                                    clientListener.onClientMessage(identifier,clientParser.parseFromString(message));
+                                    clientListener.onClientMessage(identifier,clientParser.parseFromString(message, identifier));
                     }
                 }catch (Exception e){
 
@@ -131,19 +131,52 @@ public class WebServer {
         }
     }
 
+    /**
+     * Interface for a message being sent from the server to clients. All messages must be able to be converted int a
+     * standard byte[] for transfer to the client. All messages must terminate with the following sequence of characters
+     * {@value MESSAGE_DIVIDER}
+     */
     public interface ServerMessage {
         byte[] getBytes();
     }
 
+    /**
+     * Interface for a message that was sent by the client to the server. The message is converted into this format by a
+     * {@link ClientMessageParser} provided to the server during its construction. The client message will have a type associated with it
+     * as well as information on which client sent the message.
+     */
     public interface ClientMessage {
-        byte[] getBytes();
+        //TODO make a big consolidated list of message types
+        /**
+         * gets what kind of message it is. There will eventually be a consolidated list of all message types and what each is responsible for
+         * @return the string value of the message type
+         */
+        String getMessageType();
+
+        /**
+         * gets the internet address of the client that sent the message
+         * @return the String value of the client that sent the message
+         */
+        String getClient();
     }
 
+    /**
+     * Parser provided to the WebServer during construction responsible for converting the raw string value of a received message into
+     * the appropriate ClientMessage object
+     */
     public interface ClientMessageParser{
-        ClientMessage parseFromString(String toParse);
+        ClientMessage parseFromString(String toParse, String sourceClient);
     }
 
+    /**
+     * Listener used to alert the program at large of a newly received message from a client.
+     */
     public interface OnMessageReceivedListener{
+        /**
+         * method called when a new message is received and has been parsed
+         * @param client the client's internet address
+         * @param message the message the client sent
+         */
         void onClientMessage(String client, ClientMessage message);
     }
 }

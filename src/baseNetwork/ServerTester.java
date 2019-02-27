@@ -13,14 +13,25 @@ public class ServerTester {
 
     private static class SimpleClientMessage implements WebServer.ClientMessage{
         private String message;
-        private SimpleClientMessage(String message){
+        private String sourceClient;
+
+        SimpleClientMessage(String message, String sourceClient) {
             this.message = message;
+            this.sourceClient = sourceClient;
         }
-        public byte[] getBytes(){
-            return message.getBytes();
-        }
+
         public String toString(){
             return message;
+        }
+
+        @Override
+        public String getMessageType() {
+            return "SimpleTextMessage";
+        }
+
+        @Override
+        public String getClient() {
+            return sourceClient;
         }
     }
 }
