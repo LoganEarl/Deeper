@@ -112,7 +112,7 @@ public class WebServer {
 
                         if(clientListener != null)
                             for(String message: messages)
-                                if(message.isEmpty())
+                                if(!message.isEmpty())
                                     clientListener.onClientMessage(identifier,clientParser.parseFromString(message));
                     }
                 }catch (Exception e){

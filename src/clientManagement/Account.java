@@ -11,6 +11,12 @@ public class Account implements DatabaseManager.DatabaseEntry {
     private String hashedPassword;
     private String email;
 
+    /**
+     * sole constructor
+     * @param userName the username of the account
+     * @param hashedPassword the hashed
+     * @param type
+     */
     public Account(String userName, String hashedPassword, AccountTable.AccountType type){
         //TODO
 

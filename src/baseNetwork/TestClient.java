@@ -13,7 +13,7 @@ public class TestClient {
         BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 
         for(int i = 0; i < 10; i++) {
-            out.write("Hello Serer!".getBytes());
+            out.write(("Hello Serer!" + MESSAGE_DIVIDER).getBytes());
             out.flush();
             Thread.sleep(1000);
         }
