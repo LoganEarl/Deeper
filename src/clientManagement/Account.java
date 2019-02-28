@@ -14,8 +14,8 @@ public class Account implements DatabaseManager.DatabaseEntry {
     /**
      * sole constructor
      * @param userName the username of the account
-     * @param hashedPassword the hashed
-     * @param type
+     * @param hashedPassword the hashed form of the password to store and use to authenticate
+     * @param type the level/privileges of the account to create
      */
     public Account(String userName, String hashedPassword, AccountTable.AccountType type){
         //TODO

@@ -10,6 +10,8 @@ public enum MessageType {
     LOGIN_MESSAGE("ClientLoginAttempt"),
     /**Simple text message used for debugging purposes*/
     DEBUG_MESSAGE("DebugMessage"),
+    /**Message used to update account information. Also used to create new accounts*/
+    ACCOUNT_UPDATE_MESSAGE("UPDATE_ACCOUNT_MESSAGE"),
     /**The default type of messages that turned out to be un-parsable*/
     UNKNOWN_MESSAGE_FORMAT("UnknownMessageFormat");
 
