@@ -1,3 +1,5 @@
 baseNetwork
 clientManagement
+clientManagement.clientMessages
+clientManagement.commands
 databaseUtils

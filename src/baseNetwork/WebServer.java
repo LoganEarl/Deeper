@@ -19,7 +19,8 @@ public class WebServer {
     private OnMessageReceivedListener clientListener;
     private ClientMessageParser clientParser;
 
-    private static final String MESSAGE_DIVIDER = "<!EOM!>";
+    /**Used to denote the end of a message*/
+    public static final String MESSAGE_DIVIDER = "<!EOM!>";
 
     private List<ClientConnection> connectedClients = new ArrayList<>();
 
@@ -157,6 +158,19 @@ public class WebServer {
          * @return the String value of the client that sent the message
          */
         String getClient();
+
+        /**
+         * client messages must have an empty constructor and will have to be constructed using this method.
+         * @param rawMessageBody the header-less content of a client message received by the server. Should contain all the necessary info to construct the message in
+         *                       a format specified in the concrete implementation
+         */
+        void constructFromString(String rawMessageBody);
+
+        /**
+         * used to determine if the message was constructed correctly
+         * @return true if a previous call to constructFromString succeeded. false otherwise
+         */
+        boolean wasCorrectlyParsed();
     }
 
     /**

@@ -6,13 +6,17 @@ package baseNetwork;
  * @author Logan Earl
  */
 public enum MessageType {
-    /**Type used to denote an attempted login from a client. May or may not succeed*/
-    LOGIN_MESSAGE("ClientLoginAttempt"),
-    /**Simple text message used for debugging purposes*/
-    DEBUG_MESSAGE("DebugMessage"),
-    /**Message used to update account information. Also used to create new accounts*/
-    ACCOUNT_UPDATE_MESSAGE("UPDATE_ACCOUNT_MESSAGE"),
-    /**The default type of messages that turned out to be un-parsable*/
+    /**Message sent from server to ask the client for information. ServerPromptMessage*/
+    SERVER_PROMPT_MESSAGE("ServerPromptMessage"),
+    /**message sent by the client to let the server know it is there. ClientGreeting*/
+    CLIENT_GREETING("ClientGreeting"),
+    /**Type used to denote an attempted login from a client. May or may not succeed. ClientLoginAttempt*/
+    CLIENT_LOGIN_MESSAGE("ClientLoginAttempt"),
+    /**Simple text message used for debugging purposes. DebugMessage*/
+    CLIENT_DEBUG_MESSAGE("DebugMessage"),
+    /**Message used to update account information. Also used to create new accounts. CLIENT_UPDATE_ACCOUNT_MESSAGE*/
+    CLIENT_ACCOUNT_UPDATE_MESSAGE("CLIENT_UPDATE_ACCOUNT_MESSAGE"),
+    /**The default type of messages that turned out to be un-parsable. UnknownMessageFormat*/
     UNKNOWN_MESSAGE_FORMAT("UnknownMessageFormat");
 
     private String messageType;
