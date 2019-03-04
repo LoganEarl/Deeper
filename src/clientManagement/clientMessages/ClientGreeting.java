@@ -1,5 +1,8 @@
 package clientManagement.clientMessages;
 
+import baseNetwork.MessageType;
+import baseNetwork.WebServer;
+
 public class ClientGreeting implements WebServer.ClientMessage{
     private String client;
 

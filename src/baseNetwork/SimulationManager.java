@@ -4,6 +4,7 @@ import clientManagement.AccountTable;
 import clientManagement.Client;
 import clientManagement.clientMessages.ClientAccountUpdateMessage;
 import clientManagement.clientMessages.ClientDebugMessage;
+import clientManagement.clientMessages.ClientGreeting;
 import clientManagement.clientMessages.ClientLoginMessage;
 import databaseUtils.DatabaseManager;
 
@@ -32,27 +33,21 @@ public class SimulationManager {
     private final WebServer.OnMessageReceivedListener clientListener = (client, message) -> {
         if (!clients.containsKey(client))
             clients.put(client, new Client(SimulationManager.this, client));
-            /*TODO figure out what to do with the client message and how to designate that functionality.
-                Chain of responsibility where we pass it to some sort of command parser? Or perhaps we just say fuck it
-                and make client messages double as commands and save us the brain damage. For an example, we could make the
-                ClientLoginMessage object just know to access the account database table and figure out if the client exists.
-                If they do, set the client status to ACTIVE in and start sending status updates to character location and whatnot. If not
-                then we gotta send them an account creation dialog message and update the client status to ACCOUNT_CREATION
-            */
+        clients.get(client).registerMessage(message);
     };
 
     private final WebServer.ClientMessageParser clientParser = (toParse, sourceClient) -> {
         int headerLastIndex = toParse.indexOf('\n');
-        if(headerLastIndex == -1 || headerLastIndex == toParse.length()-1)
+        if (headerLastIndex == -1 || headerLastIndex == toParse.length() - 1)
             return null;
 
         String rawMessageType = toParse.substring(0, headerLastIndex);
-        String rawMessageBody = toParse.substring(headerLastIndex+1);
+        String rawMessageBody = toParse.substring(headerLastIndex + 1);
         MessageType messageType = MessageType.valueOf(rawMessageType);
-        WebServer.ClientMessage message = null;
-        switch (messageType){
+        WebServer.ClientMessage message;
+        switch (messageType) {
             case CLIENT_GREETING:
-
+                message = new ClientGreeting(sourceClient);
                 break;
             case CLIENT_DEBUG_MESSAGE:
                 message = new ClientDebugMessage(sourceClient);
@@ -63,9 +58,9 @@ public class SimulationManager {
             case CLIENT_LOGIN_MESSAGE:
                 message = new ClientLoginMessage(sourceClient);
                 break;
-                default:
-                    message = new ClientDebugMessage(sourceClient);
-                    break;
+            default:
+                message = new ClientDebugMessage(sourceClient);
+                break;
         }
         message.constructFromString(rawMessageBody);
         return message;
@@ -81,7 +76,7 @@ public class SimulationManager {
         tables.add(new AccountTable());
 
         DatabaseManager.createNewDatabase(DB_NAME);
-        DatabaseManager.createTables(DB_NAME,tables);
+        DatabaseManager.createTables(DB_NAME, tables);
 
         server.startServer();
     }
@@ -112,6 +107,10 @@ public class SimulationManager {
 
     public WebServer getServer() {
         return this.server;
+    }
+
+    public String getDatabaseName(){
+        return DB_NAME;
     }
 
     /**

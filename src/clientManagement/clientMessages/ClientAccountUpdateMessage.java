@@ -12,7 +12,9 @@ import baseNetwork.WebServer;
  *     newUserName\n<br>
  *     oldHashedPassword\n<br>
  *     newHashedPassword\n<br>
- *     newEmailAddress[WebServer.MESSAGE_DIVIDER]
+ *     newEmailAddress[WebServer.MESSAGE_DIVIDER]<br><br>
+ *
+ *     note* if you do not want to update the user name, make the oldUserName and the newUserName identical
  *
  * @author Logan Earl
  */

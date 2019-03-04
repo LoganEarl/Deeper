@@ -3,6 +3,8 @@ package clientManagement;
 import baseNetwork.MessageType;
 import baseNetwork.SimulationManager;
 import baseNetwork.WebServer;
+import clientManagement.clientMessages.ClientAccountUpdateMessage;
+import clientManagement.clientMessages.ClientLoginMessage;
 import clientManagement.commands.PromptCommand;
 
 /**
@@ -31,12 +33,61 @@ public class Client {
 
     public void registerMessage(WebServer.ClientMessage message){
         if(message.getMessageType() == MessageType.CLIENT_LOGIN_MESSAGE && status == ClientStatus.UNAUTHENTICATED){
-            //TODO authenticate and change state if authenticated
+            tryLogIn((ClientLoginMessage) message);
         }
         if(message.getMessageType() == MessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE &&
                 (status == ClientStatus.ACCOUNT_CREATION || status == ClientStatus.ACTIVE)){
             //TODO authenticate login info if ACTIVE, else check if account exists already. If ACTIVE and account exists, update info, if ACCOUNT_CREATION and doesn't exist create new account. All else, send failure message
         }
+    }
+
+    private void tryLogIn(final ClientLoginMessage message){
+        provider.scheduleCommand(new SimulationManager.Command() {
+            boolean complete = false;
+            @Override
+            public void execute() {
+                Account myAccount = Account.getAccountByUsername(message.getUserName(), provider.getDatabaseName());
+                if(myAccount == null || !myAccount.checkPassword(message.getHashedPassword()))
+                    provider.scheduleCommand(new PromptCommand("Unknown Username/Password. Please try again", provider.getServer(), message.getClient()));
+                else{
+                    associatedAccount = myAccount;
+                    status = ClientStatus.ACTIVE;
+                }
+                complete = true;
+            }
+
+            @Override
+            public boolean isComplete() {
+                return complete;
+            }
+        });
+    }
+
+    private void tryUpdateInfo(ClientAccountUpdateMessage message){
+        provider.scheduleCommand(new SimulationManager.Command() {
+            @Override
+            public void execute() {
+                Account attemptedNewUser = Account.getAccountByUsername(message.getNewUserName(),provider.getDatabaseName());
+                if(associatedAccount == null || status == ClientStatus.INACTIVE || status == ClientStatus.UNAUTHENTICATED){
+                    provider.scheduleCommand(new PromptCommand("Unknown Username/Password. Please try again",
+                            provider.getServer(), message.getClient()));
+                }else if(attemptedNewUser != null && !associatedAccount.getUserName().equals(attemptedNewUser.getUserName())){
+                    provider.scheduleCommand(new PromptCommand("That username is already taken. Please try again",
+                            provider.getServer(), message.getClient()));
+                }else if(associatedAccount.checkPassword(message.getOldHashedPassword())){
+                    associatedAccount.setUserName(message.getNewUserName());
+                    associatedAccount.setHashedPassword(message.getNewHashedPassword());
+                    if(!message.getNewEmailAddress().isEmpty())
+                        associatedAccount.setEmail(message.getNewEmailAddress());
+                    //TODO set account type.
+                }
+            }
+
+            @Override
+            public boolean isComplete() {
+                return false;
+            }
+        });
     }
 
     public String getAddress(){

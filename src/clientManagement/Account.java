@@ -14,6 +14,7 @@ import java.util.Locale;
  */
 public class Account implements DatabaseManager.DatabaseEntry {
     private String userName;
+    private String newUserName;
     private String hashedPassword;
     private String email;
     private AccountTable.AccountType accountType;
@@ -39,6 +40,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
         this.hashedPassword = readEntry.getString(AccountTable.HASHED_PASSWORD);
         this.email = readEntry.getString(AccountTable.EMAIL);
         this.accountType = AccountTable.AccountType.fromInt(readEntry.getInt(AccountTable.ACCOUNT_TYPE));
+        newUserName = userName;
     }
 
     /**
@@ -52,6 +54,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
         this.hashedPassword = hashedPassword;
         this.accountType = type;
         this.email = "";
+        newUserName = userName;
     }
 
     /**
@@ -137,7 +140,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
             if(c == null)
                 return false;
             PreparedStatement deleteSQL = c.prepareStatement(DELETE_ACCOUNT_SQL);
-            deleteSQL.setString(0,this.userName);
+            deleteSQL.setString(0,this.newUserName);
             int result = deleteSQL.executeUpdate();
             deleteSQL.close();
             c.close();
@@ -154,7 +157,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
             if(c == null)
                 return false;
             PreparedStatement updateSQL = c.prepareStatement(UPDATE_ACCOUNT_SQL);
-            updateSQL.setString(0,this.userName);
+            updateSQL.setString(0,this.newUserName);
             updateSQL.setString(1,this.hashedPassword);
             updateSQL.setString(2,this.email);
             updateSQL.setInt(3,this.accountType.getSavableForm());
@@ -162,6 +165,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
             int result = updateSQL.executeUpdate();
             updateSQL.close();
             c.close();
+            this.userName = newUserName;
             return result > 0;
         }catch (SQLException e){
             return false;
@@ -179,7 +183,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        newUserName = userName;
     }
 
     public String getHashedPassword() {
