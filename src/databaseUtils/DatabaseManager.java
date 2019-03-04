@@ -8,9 +8,9 @@ import java.util.Map;
 public class DatabaseManager {
     public static final String SAVE_DIRECTORY = System.getProperty("user.dir").replace("\\", "/") + "/data/";
 
-    public static void createDirectories(){
+    public static void createDirectories() {
         File f = new File(SAVE_DIRECTORY);
-        if(!f.exists()) {
+        if (!f.exists()) {
             f.getParentFile().mkdirs();
             f.mkdirs();
         }
@@ -31,18 +31,28 @@ public class DatabaseManager {
         }
     }
 
-    public static void createTables(String fileName, List<DatabaseTable> tables){
-        try{
+    public static Connection getDatabaseConnection(String fileName) {
+        String url = "jdbc:sqlite:" + SAVE_DIRECTORY + fileName;
+
+        try {
+            return DriverManager.getConnection(url);
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    public static void createTables(String fileName, List<DatabaseTable> tables) {
+        try {
             Connection conn = DriverManager.getConnection(getConnectionURL(fileName));
             Statement stmt = conn.createStatement();
 
-            for(DatabaseTable table:tables){
-                StringBuilder sql = new StringBuilder("CREATE TABLE ").append(table.getTableName()).append(" (");
+            for (DatabaseTable table : tables) {
+                StringBuilder sql = new StringBuilder("CREATE TABLE IF NOT EXISTS ").append(table.getTableName()).append(" (");
 
-                Map<String,String> columnDefinitions = table.getColumnDefinitions();
+                Map<String, String> columnDefinitions = table.getColumnDefinitions();
                 boolean first = true;
-                for(String columnName: columnDefinitions.keySet()){
-                    if(!first)
+                for (String columnName : columnDefinitions.keySet()) {
+                    if (!first)
                         sql.append(",");
                     else
                         first = false;
@@ -53,25 +63,30 @@ public class DatabaseManager {
             }
             stmt.close();
             conn.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Failed to create tables");
             e.printStackTrace();
         }
     }
 
 
-
-    private static String getConnectionURL(String fileName){
+    private static String getConnectionURL(String fileName) {
         return "jdbc:sqlite:" + SAVE_DIRECTORY + fileName;
     }
 
-    public interface DatabaseTable{
+    public interface DatabaseTable {
         String getTableName();
-        Map<String,String> getColumnDefinitions();
+
+        Map<String, String> getColumnDefinitions();
     }
 
-    public interface DatabaseEntry{
+    public interface DatabaseEntry {
         boolean saveToDatabase(String databaseName);
+
+        boolean removeFromDatabase(String databaseName);
+
+        boolean updateInDatabase(String databaseName);
+
         boolean existsInDatabase(String databaseName);
     }
 }

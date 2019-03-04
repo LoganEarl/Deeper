@@ -15,26 +15,24 @@ public class AccountTable implements DatabaseManager.DatabaseTable {
      * the name of the table used to store accounts
      */
     public static final String TABLE_NAME = "account";
+    public static final String USER_NAME = "userName";
+    public static final String HASHED_PASSWORD = "hashedPassword";
+    public static final String EMAIL = "email";
+    public static final String ACCOUNT_TYPE = "accountType";
     /**
      * A Map, containing the column names as keys and the associated data-type of the column as values
      */
     public final Map<String, String> TABLE_DEFINITION = new HashMap<>();
 
     public AccountTable(){
-        TABLE_DEFINITION.put("userId","INT PRIMARY KEY NOT NULL");
-        TABLE_DEFINITION.put("userName","VARCHAR(16) NOT NULL");
-        TABLE_DEFINITION.put("hashedPassword","VARCHAR(20) NOT NULL");
-        TABLE_DEFINITION.put("email","TEXT");
-        TABLE_DEFINITION.put("accountType","INT NOT NULL");
+        TABLE_DEFINITION.put(USER_NAME,"VARCHAR(16) PRIMARY KEY NOT NULL");
+        TABLE_DEFINITION.put(HASHED_PASSWORD,"VARCHAR(20) NOT NULL");
+        TABLE_DEFINITION.put(EMAIL,"TEXT");
+        TABLE_DEFINITION.put(ACCOUNT_TYPE,"INT NOT NULL");
     }
 
     public String getTableName(){
         return TABLE_NAME;
-    }
-
-    public static Account getAccountByUsername(String userName, String databseName){
-        //TODO look through the database for the client and return the account object
-        return null;
     }
 
     @Override

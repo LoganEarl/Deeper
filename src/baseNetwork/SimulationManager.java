@@ -1,8 +1,14 @@
 package baseNetwork;
 
+import clientManagement.AccountTable;
 import clientManagement.Client;
+import clientManagement.clientMessages.ClientAccountUpdateMessage;
+import clientManagement.clientMessages.ClientDebugMessage;
+import clientManagement.clientMessages.ClientLoginMessage;
+import databaseUtils.DatabaseManager;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -18,6 +24,7 @@ import java.util.Queue;
 public class SimulationManager {
     private Map<String, Client> clients;
     private WebServer server;
+    private static final String DB_NAME = "testSim.db";
     //TODO needs a reference to the core database so it can access account info
 
     private Queue<Command> commandQueue = new LinkedList<>();
@@ -42,29 +49,40 @@ public class SimulationManager {
         String rawMessageType = toParse.substring(0, headerLastIndex);
         String rawMessageBody = toParse.substring(headerLastIndex+1);
         MessageType messageType = MessageType.valueOf(rawMessageType);
+        WebServer.ClientMessage message = null;
         switch (messageType){
             case CLIENT_GREETING:
 
                 break;
-
             case CLIENT_DEBUG_MESSAGE:
-
+                message = new ClientDebugMessage(sourceClient);
                 break;
+            case CLIENT_ACCOUNT_UPDATE_MESSAGE:
+                message = new ClientAccountUpdateMessage(sourceClient);
+                break;
+            case CLIENT_LOGIN_MESSAGE:
+                message = new ClientLoginMessage(sourceClient);
+                break;
+                default:
+                    message = new ClientDebugMessage(sourceClient);
+                    break;
         }
-
-        return null;
+        message.constructFromString(rawMessageBody);
+        return message;
     };
 
     public SimulationManager(int port) {
         server = new WebServer(port, clientListener, clientParser);
 
-        /*TODO set up the web server and maybe start it up in the constructor? That feels wrong for some reason
-
-
-         */
     }
 
     public void init() {
+        List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
+        tables.add(new AccountTable());
+
+        DatabaseManager.createNewDatabase(DB_NAME);
+        DatabaseManager.createTables(DB_NAME,tables);
+
         server.startServer();
     }
 
