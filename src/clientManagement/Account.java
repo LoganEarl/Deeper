@@ -17,7 +17,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
     private String newUserName;
     private String hashedPassword;
     private String email;
-    private AccountTable.AccountType accountType;
+    private AccountType accountType;
 
     private static final String GET_ACCOUNT_SQL = "SELECT * FROM " +
             AccountTable.TABLE_NAME + " WHERE " +
@@ -39,7 +39,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
         this.userName = readEntry.getString(AccountTable.USER_NAME);
         this.hashedPassword = readEntry.getString(AccountTable.HASHED_PASSWORD);
         this.email = readEntry.getString(AccountTable.EMAIL);
-        this.accountType = AccountTable.AccountType.fromInt(readEntry.getInt(AccountTable.ACCOUNT_TYPE));
+        this.accountType = AccountType.fromInt(readEntry.getInt(AccountTable.ACCOUNT_TYPE));
         newUserName = userName;
     }
 
@@ -49,7 +49,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
      * @param hashedPassword the hashed form of the password to store and use to authenticate
      * @param type the level/privileges of the account to create
      */
-    public Account(String userName, String hashedPassword, AccountTable.AccountType type){
+    public Account(String userName, String hashedPassword, AccountType type){
         this.userName = userName;
         this.hashedPassword = hashedPassword;
         this.accountType = type;
@@ -64,7 +64,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
      * @param email the email address of the client. Form www.*@*
      * @param type the level/privileges of the account to create
      */
-    public Account(String userName, String hashedPassword, String email, AccountTable.AccountType type){
+    public Account(String userName, String hashedPassword, String email, AccountType type){
         this(userName, hashedPassword, type);
         this.email = email;
     }
@@ -202,11 +202,36 @@ public class Account implements DatabaseManager.DatabaseEntry {
         this.email = email;
     }
 
-    public AccountTable.AccountType getAccountType() {
+    public AccountType getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(AccountTable.AccountType accountType) {
+    public void setAccountType(AccountType accountType) {
         this.accountType = accountType;
+    }
+
+    public enum AccountType {
+        BASIC(1), MODERATOR(2), ADMIN(3), GOD(5);
+
+        private int typeRep;
+        AccountType(int typeRep){
+            this.typeRep = typeRep;
+        }
+
+        public static AccountType fromInt(int i){
+            for(AccountType t: AccountType.values()){
+                if(t.typeRep == i)
+                    return t;
+            }
+            return BASIC;
+        }
+
+        public int getSavableForm(){
+            return typeRep;
+        }
+
+        public int compareToAcountType(AccountType that){
+            return this.typeRep - that.typeRep;
+        }
     }
 }

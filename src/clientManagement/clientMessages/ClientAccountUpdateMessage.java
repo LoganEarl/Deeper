@@ -15,6 +15,7 @@ import baseNetwork.WebServer;
  *     newEmailAddress[WebServer.MESSAGE_DIVIDER]<br><br>
  *
  *     note* if you do not want to update the user name, make the oldUserName and the newUserName identical
+ *     note* if you want to create a new account, leave the odUserName and oldHashedPassword fields blank
  *
  * @author Logan Earl
  */

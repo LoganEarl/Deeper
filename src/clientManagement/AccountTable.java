@@ -39,25 +39,4 @@ public class AccountTable implements DatabaseManager.DatabaseTable {
     public Map<String, String> getColumnDefinitions() {
         return TABLE_DEFINITION;
     }
-
-    public enum AccountType{
-        BASIC(-1), MODERATOR(-2), ADMIN(-3), GOD(-5);
-
-        private int typeRep;
-        AccountType(int typeRep){
-            this.typeRep = typeRep;
-        }
-
-        public static AccountType fromInt(int i){
-            for(AccountType t: AccountType.values()){
-                if(t.typeRep == i)
-                    return t;
-            }
-            return BASIC;
-        }
-
-        public int getSavableForm(){
-            return typeRep;
-        }
-    }
 }

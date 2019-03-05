@@ -8,6 +8,8 @@ package baseNetwork;
 public enum MessageType {
     /**Message sent from server to ask the client for information. ServerPromptMessage*/
     SERVER_PROMPT_MESSAGE("ServerPromptMessage"),
+
+
     /**message sent by the client to let the server know it is there. ClientGreeting*/
     CLIENT_GREETING("ClientGreeting"),
     /**Type used to denote an attempted login from a client. May or may not succeed. ClientLoginAttempt*/
@@ -16,6 +18,10 @@ public enum MessageType {
     CLIENT_DEBUG_MESSAGE("DebugMessage"),
     /**Message used to update account information. Also used to create new accounts. CLIENT_UPDATE_ACCOUNT_MESSAGE*/
     CLIENT_ACCOUNT_UPDATE_MESSAGE("CLIENT_UPDATE_ACCOUNT_MESSAGE"),
+    /**Message sent from the client to elevate the permission level of a different user*/
+    CLIENT_ELEVATE_USER_MESSAGE("ElevateUser"),
+
+
     /**The default type of messages that turned out to be un-parsable. UnknownMessageFormat*/
     UNKNOWN_MESSAGE_FORMAT("UnknownMessageFormat");
 
