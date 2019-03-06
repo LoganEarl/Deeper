@@ -43,6 +43,8 @@ public class DatabaseManager {
 
     public static void createTables(String fileName, List<DatabaseTable> tables) {
         try {
+            Class.forName("com.mysql.jdbc.Driver");
+
             Connection conn = DriverManager.getConnection(getConnectionURL(fileName));
             Statement stmt = conn.createStatement();
 

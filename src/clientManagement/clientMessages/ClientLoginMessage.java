@@ -12,6 +12,7 @@ import baseNetwork.WebServer;
  *     hashedPassword[WebServer.MESSAGE_DIVIDER]
  * @author Logan Earl
  */
+
 public class ClientLoginMessage implements WebServer.ClientMessage {
     /**the internet address of the client trying to log in*/
     private String client;

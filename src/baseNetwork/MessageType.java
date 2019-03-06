@@ -11,15 +11,15 @@ public enum MessageType {
 
 
     /**message sent by the client to let the server know it is there. ClientGreeting*/
-    CLIENT_GREETING("ClientGreeting"),
+    CLIENT_GREETING("connect"),
     /**Type used to denote an attempted login from a client. May or may not succeed. ClientLoginAttempt*/
-    CLIENT_LOGIN_MESSAGE("ClientLoginAttempt"),
+    CLIENT_LOGIN_MESSAGE("login"),
     /**Simple text message used for debugging purposes. DebugMessage*/
-    CLIENT_DEBUG_MESSAGE("DebugMessage"),
+    CLIENT_DEBUG_MESSAGE("debug"),
     /**Message used to update account information. Also used to create new accounts. CLIENT_UPDATE_ACCOUNT_MESSAGE*/
-    CLIENT_ACCOUNT_UPDATE_MESSAGE("CLIENT_UPDATE_ACCOUNT_MESSAGE"),
+    CLIENT_ACCOUNT_UPDATE_MESSAGE("updateaccount"),
     /**Message sent from the client to elevate the permission level of a different user*/
-    CLIENT_ELEVATE_USER_MESSAGE("ElevateUser"),
+    CLIENT_ELEVATE_USER_MESSAGE("elevateuser"),
 
 
     /**The default type of messages that turned out to be un-parsable. UnknownMessageFormat*/
@@ -42,7 +42,7 @@ public enum MessageType {
      */
     public MessageType parseFromString(String toParse) {
         for (MessageType m : MessageType.values())
-            if (m.messageType.equals(toParse))
+            if (m.messageType.equals(toParse.toLowerCase()))
                 return m;
         return UNKNOWN_MESSAGE_FORMAT;
     }

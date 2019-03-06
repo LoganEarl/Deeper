@@ -8,10 +8,7 @@ import clientManagement.clientMessages.ClientGreeting;
 import clientManagement.clientMessages.ClientLoginMessage;
 import databaseUtils.DatabaseManager;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Class holds a list of all clients and manages any requests they may make in a single thread in a synchronous matter.
@@ -23,7 +20,7 @@ import java.util.Queue;
  */
 
 public class SimulationManager {
-    private Map<String, Client> clients;
+    private Map<String, Client> clients = new HashMap<>();
     private WebServer server;
     private static final String DB_NAME = "testSim.db";
     //TODO needs a reference to the core database so it can access account info
