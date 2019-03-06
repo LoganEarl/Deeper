@@ -117,7 +117,7 @@ public class WebServer {
                                     clientListener.onClientMessage(identifier,clientParser.parseFromString(message, identifier));
                     }
                 }catch (Exception e){
-
+                    e.printStackTrace();
                 }
             }
             try {

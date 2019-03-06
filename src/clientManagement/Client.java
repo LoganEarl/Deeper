@@ -52,6 +52,7 @@ public class Client {
                 else{
                     associatedAccount = myAccount;
                     status = ClientStatus.ACTIVE;
+                    provider.scheduleCommand(new PromptCommand("Success, welcome " + associatedAccount.getUserName(), provider.getServer(), message.getClient()));
                 }
                 complete = true;
             }

@@ -6,6 +6,7 @@ import clientManagement.clientMessages.ClientAccountUpdateMessage;
 import clientManagement.clientMessages.ClientDebugMessage;
 import clientManagement.clientMessages.ClientGreeting;
 import clientManagement.clientMessages.ClientLoginMessage;
+import clientManagement.commands.PromptCommand;
 import databaseUtils.DatabaseManager;
 
 import java.util.*;
@@ -28,6 +29,8 @@ public class SimulationManager {
     private Queue<Command> commandQueue = new LinkedList<>();
 
     private final WebServer.OnMessageReceivedListener clientListener = (client, message) -> {
+        if(message == null || !message.wasCorrectlyParsed())
+            scheduleCommand(new PromptCommand("Poorly formatted command", server, client));
         if (!clients.containsKey(client))
             clients.put(client, new Client(SimulationManager.this, client));
         clients.get(client).registerMessage(message);
@@ -40,7 +43,7 @@ public class SimulationManager {
 
         String rawMessageType = toParse.substring(0, headerLastIndex);
         String rawMessageBody = toParse.substring(headerLastIndex + 1);
-        MessageType messageType = MessageType.valueOf(rawMessageType);
+        MessageType messageType = MessageType.parseFromString(rawMessageType);
         WebServer.ClientMessage message;
         switch (messageType) {
             case CLIENT_GREETING:
@@ -60,6 +63,7 @@ public class SimulationManager {
                 break;
         }
         message.constructFromString(rawMessageBody);
+
         return message;
     };
 

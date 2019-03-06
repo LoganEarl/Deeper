@@ -15,8 +15,14 @@ import baseNetwork.WebServer;
  *     newEmailAddress[WebServer.MESSAGE_DIVIDER]<br><br>
  *
  *     note* if you do not want to update the user name, make the oldUserName and the newUserName identical
- *     note* if you want to create a new account, leave the odUserName and oldHashedPassword fields blank
+ *     note* if you want to create a new account, leave the odUserName and oldHashedPassword fields blank<br><br>
  *
+ *     You can also use the following format for making new accounts<br><br>
+ *
+ *     [MessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE]\n<br>
+ *     newUserName\n<br>
+ *     newHashedPassword\n<br>
+ *     newEmailAddress[WebServer.MESSAGE_DIVIDER]<br><br>
  * @author Logan Earl
  */
 public class ClientAccountUpdateMessage implements WebServer.ClientMessage {
@@ -71,6 +77,14 @@ public class ClientAccountUpdateMessage implements WebServer.ClientMessage {
             this.oldHashedPassword = contents[2];
             this.newHashedPassword = contents[3];
             this.newEmailAddress = contents[4];
+            wasParsedCorrectly = true;
+        }
+        if(contents.length == 3){
+            this.oldUserName = "";
+            this.newUserName = contents[0];
+            this.oldHashedPassword = "";
+            this.newHashedPassword = contents[1];
+            this.newEmailAddress = contents[2];
             wasParsedCorrectly = true;
         }
     }

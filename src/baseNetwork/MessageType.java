@@ -17,9 +17,9 @@ public enum MessageType {
     /**Simple text message used for debugging purposes. DebugMessage*/
     CLIENT_DEBUG_MESSAGE("debug"),
     /**Message used to update account information. Also used to create new accounts. CLIENT_UPDATE_ACCOUNT_MESSAGE*/
-    CLIENT_ACCOUNT_UPDATE_MESSAGE("updateaccount"),
+    CLIENT_ACCOUNT_UPDATE_MESSAGE("update"),
     /**Message sent from the client to elevate the permission level of a different user*/
-    CLIENT_ELEVATE_USER_MESSAGE("elevateuser"),
+    CLIENT_ELEVATE_USER_MESSAGE("elevate"),
 
 
     /**The default type of messages that turned out to be un-parsable. UnknownMessageFormat*/
@@ -40,7 +40,7 @@ public enum MessageType {
      * @param toParse the message type from the message header
      * @return the type of the message or UNKNOWN_MESSAGE_FORMAT if it could not be determined
      */
-    public MessageType parseFromString(String toParse) {
+    public static MessageType parseFromString(String toParse) {
         for (MessageType m : MessageType.values())
             if (m.messageType.equals(toParse.toLowerCase()))
                 return m;

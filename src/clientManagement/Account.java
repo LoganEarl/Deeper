@@ -84,9 +84,9 @@ public class Account implements DatabaseManager.DatabaseEntry {
         else{
             try {
                 getSQL = c.prepareStatement(GET_ACCOUNT_SQL);
-                getSQL.setString(0,userName);
+                getSQL.setString(1,userName);
                 ResultSet accountSet = getSQL.executeQuery();
-                if(accountSet.first())
+                if(accountSet.next())
                     toReturn = new Account(accountSet);
                 else
                     toReturn = null;
@@ -117,10 +117,10 @@ public class Account implements DatabaseManager.DatabaseEntry {
                 if(c == null)
                     return false;
                 PreparedStatement saveSQL = c.prepareStatement(CREATE_ACCOUNT_SQL);
-                saveSQL.setString(0,this.userName);
-                saveSQL.setString(1,this.hashedPassword);
-                saveSQL.setString(2,this.email);
-                saveSQL.setInt(3,this.accountType.getSavableForm());
+                saveSQL.setString(1,this.userName);
+                saveSQL.setString(2,this.hashedPassword);
+                saveSQL.setString(3,this.email);
+                saveSQL.setInt(4,this.accountType.getSavableForm());
                 int result = saveSQL.executeUpdate();
                 saveSQL.close();
                 c.close();
@@ -140,7 +140,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
             if(c == null)
                 return false;
             PreparedStatement deleteSQL = c.prepareStatement(DELETE_ACCOUNT_SQL);
-            deleteSQL.setString(0,this.newUserName);
+            deleteSQL.setString(1,this.newUserName);
             int result = deleteSQL.executeUpdate();
             deleteSQL.close();
             c.close();
@@ -157,11 +157,11 @@ public class Account implements DatabaseManager.DatabaseEntry {
             if(c == null)
                 return false;
             PreparedStatement updateSQL = c.prepareStatement(UPDATE_ACCOUNT_SQL);
-            updateSQL.setString(0,this.newUserName);
-            updateSQL.setString(1,this.hashedPassword);
-            updateSQL.setString(2,this.email);
-            updateSQL.setInt(3,this.accountType.getSavableForm());
-            updateSQL.setString(4,this.userName);
+            updateSQL.setString(1,this.newUserName);
+            updateSQL.setString(2,this.hashedPassword);
+            updateSQL.setString(3,this.email);
+            updateSQL.setInt(4,this.accountType.getSavableForm());
+            updateSQL.setString(5,this.userName);
             int result = updateSQL.executeUpdate();
             updateSQL.close();
             c.close();

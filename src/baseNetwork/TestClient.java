@@ -44,6 +44,9 @@ public class TestClient {
                     messageToSend.append("\n");
                 messageToSend.append(word);
             }
+            if(messageToSend.toString().indexOf('\n') == -1)
+                messageToSend.append('\n');
+
             messageToSend.append(WebServer.MESSAGE_DIVIDER);
             out.write(messageToSend.toString().getBytes());
             out.flush();
