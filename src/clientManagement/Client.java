@@ -32,7 +32,7 @@ public class Client {
     }
 
     public void registerMessage(WebServer.ClientMessage message){
-        if(message.getMessageType() == MessageType.CLIENT_LOGIN_MESSAGE && status == ClientStatus.UNAUTHENTICATED){
+        if(message.getMessageType() == MessageType.CLIENT_LOGIN_MESSAGE){
             tryLogIn((ClientLoginMessage) message);
         }
         if(message.getMessageType() == MessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE &&
@@ -76,6 +76,7 @@ public class Client {
                     Account newAccount = new Account(message.getNewUserName(), message.getNewHashedPassword(), message.getNewEmailAddress(), Account.AccountType.BASIC);
                     newAccount.saveToDatabase(provider.getDatabaseName());
                     associatedAccount = newAccount;
+                    provider.scheduleCommand(new PromptCommand("Success, new account created", provider.getServer(),message.getClient()));
                 //they are not logged in
                 } else if(associatedAccount == null || status == ClientStatus.INACTIVE || status == ClientStatus.UNAUTHENTICATED){
                     provider.scheduleCommand(new PromptCommand("Unknown Username/Password. Please try again",
@@ -91,6 +92,11 @@ public class Client {
                     if(!message.getNewEmailAddress().isEmpty())
                         associatedAccount.setEmail(message.getNewEmailAddress());
                     associatedAccount.updateInDatabase(provider.getDatabaseName());
+                    provider.scheduleCommand(new PromptCommand("Success. Account information has been updated",
+                            provider.getServer(),message.getClient()));
+                }else{
+                    provider.scheduleCommand(new PromptCommand("Unable to update info, old UserName/Password combination does not match any users",
+                            provider.getServer(),message.getClient()));
                 }
                 complete = true;
             }

@@ -30,10 +30,12 @@ public class SimulationManager {
 
     private final WebServer.OnMessageReceivedListener clientListener = (client, message) -> {
         if(message == null || !message.wasCorrectlyParsed())
-            scheduleCommand(new PromptCommand("Poorly formatted command", server, client));
-        if (!clients.containsKey(client))
-            clients.put(client, new Client(SimulationManager.this, client));
-        clients.get(client).registerMessage(message);
+            scheduleCommand(new PromptCommand("Unable to parse command", server, client));
+        else {
+            if (!clients.containsKey(client))
+                clients.put(client, new Client(SimulationManager.this, client));
+            clients.get(client).registerMessage(message);
+        }
     };
 
     private final WebServer.ClientMessageParser clientParser = (toParse, sourceClient) -> {
@@ -76,6 +78,7 @@ public class SimulationManager {
         List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
         tables.add(new AccountTable());
 
+        DatabaseManager.createDirectories();
         DatabaseManager.createNewDatabase(DB_NAME);
         DatabaseManager.createTables(DB_NAME, tables);
 
