@@ -29,22 +29,29 @@ public class SimulationManager {
     private Queue<Command> commandQueue = new LinkedList<>();
 
     private final WebServer.OnMessageReceivedListener clientListener = (client, message) -> {
-        if(message == null || !message.wasCorrectlyParsed())
+        if(!message.wasCorrectlyParsed())
             scheduleCommand(new PromptCommand("Unable to parse command", server, client));
         else {
             if (!clients.containsKey(client))
                 clients.put(client, new Client(SimulationManager.this, client));
-            clients.get(client).registerMessage(message);
+            if(!clients.get(client).registerMessage(message))
+                scheduleCommand(new PromptCommand("Unable to process that command at this time",server,client));
         }
     };
 
     private final WebServer.ClientMessageParser clientParser = (toParse, sourceClient) -> {
-        int headerLastIndex = toParse.indexOf('\n');
-        if (headerLastIndex == -1 || headerLastIndex == toParse.length() - 1)
-            return null;
+        String rawMessageType;
+        String rawMessageBody;
 
-        String rawMessageType = toParse.substring(0, headerLastIndex);
-        String rawMessageBody = toParse.substring(headerLastIndex + 1);
+        int headerLastIndex = toParse.indexOf('\n');
+        if (headerLastIndex == -1 || headerLastIndex == toParse.length() - 1) {
+            rawMessageType = toParse;
+            rawMessageBody = "";
+        }else{
+            rawMessageType = toParse.substring(0, headerLastIndex);
+            rawMessageBody = toParse.substring(headerLastIndex + 1);
+        }
+
         MessageType messageType = MessageType.parseFromString(rawMessageType);
         WebServer.ClientMessage message;
         switch (messageType) {

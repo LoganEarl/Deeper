@@ -4,8 +4,11 @@ import baseNetwork.MessageType;
 import baseNetwork.SimulationManager;
 import baseNetwork.WebServer;
 import clientManagement.clientMessages.ClientAccountUpdateMessage;
+import clientManagement.clientMessages.ClientElevateUserMessage;
 import clientManagement.clientMessages.ClientLoginMessage;
 import clientManagement.commands.PromptCommand;
+
+import java.util.Locale;
 
 /**
  * Class that provides the link between an account and a client connection
@@ -31,14 +34,21 @@ public class Client {
         this.status = newStatus;
     }
 
-    public void registerMessage(WebServer.ClientMessage message){
+    public boolean registerMessage(WebServer.ClientMessage message){
+        boolean handledMessage = false;
         if(message.getMessageType() == MessageType.CLIENT_LOGIN_MESSAGE){
             tryLogIn((ClientLoginMessage) message);
-        }
-        if(message.getMessageType() == MessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE &&
+            handledMessage = true;
+        }else if(message.getMessageType() == MessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE &&
                 (status == ClientStatus.UNAUTHENTICATED || status == ClientStatus.ACTIVE)){
             tryUpdateInfo((ClientAccountUpdateMessage) message);
+            handledMessage = true;
+        }else if(message.getMessageType() == MessageType.CLIENT_ELEVATE_USER_MESSAGE &&
+                (status == ClientStatus.ACTIVE && associatedAccount != null)){
+            tryElevateUser((ClientElevateUserMessage)message);
+            handledMessage = true;
         }
+        return handledMessage;
     }
 
     private void tryLogIn(final ClientLoginMessage message){
@@ -97,6 +107,46 @@ public class Client {
                 }else{
                     provider.scheduleCommand(new PromptCommand("Unable to update info, old UserName/Password combination does not match any users",
                             provider.getServer(),message.getClient()));
+                }
+                complete = true;
+            }
+
+            @Override
+            public boolean isComplete() {
+                return complete;
+            }
+        });
+    }
+
+    private void tryElevateUser(ClientElevateUserMessage message){
+        provider.scheduleCommand(new SimulationManager.Command() {
+            private boolean complete = false;
+            @Override
+            public void execute() {
+                Account userToElevate = Account.getAccountByUsername(message.getTargetUserName(),provider.getDatabaseName());
+                if(userToElevate == null){
+                    provider.scheduleCommand(new PromptCommand("Unable to find user " + message.getTargetUserName(),
+                            provider.getServer(),message.getClient()));
+                } else if (associatedAccount.getAccountType() == Account.AccountType.GOD){
+                    userToElevate.setAccountType(message.getNewAccountType());
+                    userToElevate.updateInDatabase(provider.getDatabaseName());
+                    provider.scheduleCommand(new PromptCommand(String.format(Locale.US,"Oh powerful one, you have changed %s's permission level to %d",
+                            message.getTargetUserName(),message.getNewAccountType().getSavableForm()),
+                            provider.getServer(),message.getClient()));
+                }else {
+                    if (associatedAccount.getAccountType().compareToAcountType(userToElevate.getAccountType()) <= 0) {
+                        provider.scheduleCommand(new PromptCommand("Cannot change permissions of user greater than yourself",
+                                provider.getServer(), message.getClient()));
+                    } else if (associatedAccount.getAccountType().compareToAcountType(message.getNewAccountType()) <= 0) {
+                        provider.scheduleCommand(new PromptCommand("Cannot assign privileges to user greater than or equal to your own",
+                                provider.getServer(), message.getClient()));
+                    } else {
+                        userToElevate.setAccountType(message.getNewAccountType());
+                        userToElevate.updateInDatabase(provider.getDatabaseName());
+                        provider.scheduleCommand(new PromptCommand(String.format(Locale.US,"You have changed %s's permission level to %d",
+                                message.getTargetUserName(),message.getNewAccountType().getSavableForm()),
+                                provider.getServer(),message.getClient()));
+                    }
                 }
                 complete = true;
             }

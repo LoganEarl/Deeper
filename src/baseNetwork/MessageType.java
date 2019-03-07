@@ -20,6 +20,8 @@ public enum MessageType {
     CLIENT_ACCOUNT_UPDATE_MESSAGE("update"),
     /**Message sent from the client to elevate the permission level of a different user*/
     CLIENT_ELEVATE_USER_MESSAGE("elevate"),
+    /**Message sent from the user to log themselves or others out. Can only log out users with lesser permission level*/
+    CLIENT_LOGOUT_MESSAGE("logout"),
 
 
     /**The default type of messages that turned out to be un-parsable. UnknownMessageFormat*/
