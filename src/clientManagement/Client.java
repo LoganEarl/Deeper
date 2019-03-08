@@ -6,9 +6,11 @@ import baseNetwork.WebServer;
 import clientManagement.clientMessages.ClientAccountUpdateMessage;
 import clientManagement.clientMessages.ClientElevateUserMessage;
 import clientManagement.clientMessages.ClientLoginMessage;
+import clientManagement.clientMessages.ClientLogoutMessage;
 import clientManagement.commands.PromptCommand;
 
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Class that provides the link between an account and a client connection
@@ -47,6 +49,9 @@ public class Client {
                 (status == ClientStatus.ACTIVE && associatedAccount != null)){
             tryElevateUser((ClientElevateUserMessage)message);
             handledMessage = true;
+        }else if(message.getMessageType() == MessageType.CLIENT_LOGOUT_MESSAGE){
+            tryLogOut((ClientLogoutMessage)message);
+            handledMessage = true;
         }
         return handledMessage;
     }
@@ -70,6 +75,42 @@ public class Client {
             @Override
             public boolean isComplete() {
                 return complete;
+            }
+        });
+    }
+
+    private void tryLogOut(ClientLogoutMessage message){
+        provider.scheduleCommand(new SimulationManager.Command() {
+            private boolean isComplete = false;
+            @Override
+            public void execute() {
+                if(message.getTargetUserName().isEmpty()){
+                    status = ClientStatus.UNAUTHENTICATED;
+                    associatedAccount = null;
+                    provider.scheduleCommand(new PromptCommand("You have been logged out",provider.getServer(),message.getClient()));
+                }else{
+                    Client targetedClient = null;
+                    Map<String,Client> connectedClients = provider.getClients();
+                    for(Client c: connectedClients.values()){
+                        if(c.associatedAccount != null && c.associatedAccount.getUserName().equals(message.getTargetUserName()))
+                            targetedClient = c;
+                    }
+                    if(targetedClient == null){
+                        provider.scheduleCommand(new PromptCommand("There is no client logged in with that name",provider.getServer(),message.getClient()));
+                    }else if(associatedAccount.getAccountType().compareToAcountType(targetedClient.associatedAccount.getAccountType()) <= 0){
+                        provider.scheduleCommand(new PromptCommand("You cannot kick " + associatedAccount.getUserName() + " as they have greater or equal privileges to yourself",provider.getServer(),message.getClient()));
+                    }else{
+                        provider.scheduleCommand(new PromptCommand("Got em', you have kicked " + targetedClient.associatedAccount.getUserName() + " from the server",provider.getServer(),message.getClient()));
+                        provider.scheduleCommand(new PromptCommand("Ouch, you have been kicked by " + associatedAccount.getUserName(),provider.getServer(),targetedClient.address));
+                        targetedClient.status = ClientStatus.UNAUTHENTICATED;
+                        targetedClient.associatedAccount = null;
+                    }
+                }
+            }
+
+            @Override
+            public boolean isComplete() {
+                return isComplete;
             }
         });
     }

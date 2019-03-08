@@ -124,6 +124,10 @@ public class SimulationManager {
         return DB_NAME;
     }
 
+    public Map<String,Client> getClients(){
+        return clients;
+    }
+
     /**
      * Interface for a command that a client wants executed, such as a login attempt
      */
