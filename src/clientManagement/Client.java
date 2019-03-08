@@ -106,6 +106,7 @@ public class Client {
                         targetedClient.associatedAccount = null;
                     }
                 }
+                isComplete = true;
             }
 
             @Override

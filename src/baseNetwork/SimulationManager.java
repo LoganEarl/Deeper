@@ -2,10 +2,7 @@ package baseNetwork;
 
 import clientManagement.AccountTable;
 import clientManagement.Client;
-import clientManagement.clientMessages.ClientAccountUpdateMessage;
-import clientManagement.clientMessages.ClientDebugMessage;
-import clientManagement.clientMessages.ClientGreeting;
-import clientManagement.clientMessages.ClientLoginMessage;
+import clientManagement.clientMessages.*;
 import clientManagement.commands.PromptCommand;
 import databaseUtils.DatabaseManager;
 
@@ -67,6 +64,11 @@ public class SimulationManager {
             case CLIENT_LOGIN_MESSAGE:
                 message = new ClientLoginMessage(sourceClient);
                 break;
+            case CLIENT_LOGOUT_MESSAGE:
+                message = new ClientLogoutMessage(sourceClient);
+                break;
+            case CLIENT_ELEVATE_USER_MESSAGE:
+                message = new ClientElevateUserMessage(sourceClient);
             default:
                 message = new ClientDebugMessage(sourceClient);
                 break;
