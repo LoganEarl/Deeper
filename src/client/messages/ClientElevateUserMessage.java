@@ -1,8 +1,8 @@
-package clientManagement.clientMessages;
+package client.messages;
 
-import baseNetwork.MessageType;
-import baseNetwork.WebServer;
-import clientManagement.Account;
+import network.MessageType;
+import network.WebServer;
+import client.Account;
 
 /**
  * Instantiated form of a client's attempt to update another account's permission level. Client must already be logged in and have a permission

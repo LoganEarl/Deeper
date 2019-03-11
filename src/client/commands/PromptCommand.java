@@ -1,8 +1,8 @@
-package clientManagement.commands;
+package client.commands;
 
-import baseNetwork.MessageType;
-import baseNetwork.WebServer;
-import baseNetwork.SimulationManager;
+import network.MessageType;
+import network.WebServer;
+import network.SimulationManager;
 
 public class PromptCommand implements SimulationManager.Command, WebServer.ServerMessage {
     private boolean complete = false;

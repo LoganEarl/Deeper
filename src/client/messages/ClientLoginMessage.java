@@ -1,7 +1,7 @@
-package clientManagement.clientMessages;
+package client.messages;
 
-import baseNetwork.MessageType;
-import baseNetwork.WebServer;
+import network.MessageType;
+import network.WebServer;
 
 /**
  * Instantiated form of a client's attempt to login. Still needs to be verified but contains all the info to do so.<br>

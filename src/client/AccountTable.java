@@ -1,13 +1,12 @@
-package clientManagement;
+package client;
 
-import databaseUtils.DatabaseManager;
+import database.DatabaseManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Holds information relating to the creation of a SQL table that holds each account that has been created.
- * Also can create and retrieve accounts from a given database file.
  * @author Logan Earl
  */
 public class AccountTable implements DatabaseManager.DatabaseTable {

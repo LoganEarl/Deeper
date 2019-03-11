@@ -1,13 +1,13 @@
-package clientManagement;
+package client;
 
-import baseNetwork.MessageType;
-import baseNetwork.SimulationManager;
-import baseNetwork.WebServer;
-import clientManagement.clientMessages.ClientAccountUpdateMessage;
-import clientManagement.clientMessages.ClientElevateUserMessage;
-import clientManagement.clientMessages.ClientLoginMessage;
-import clientManagement.clientMessages.ClientLogoutMessage;
-import clientManagement.commands.PromptCommand;
+import network.MessageType;
+import network.SimulationManager;
+import network.WebServer;
+import client.messages.ClientAccountUpdateMessage;
+import client.messages.ClientElevateUserMessage;
+import client.messages.ClientLoginMessage;
+import client.messages.ClientLogoutMessage;
+import client.commands.PromptCommand;
 
 import java.util.Locale;
 import java.util.Map;

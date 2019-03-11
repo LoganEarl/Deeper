@@ -1,10 +1,10 @@
-package baseNetwork;
+package network;
 
-import clientManagement.AccountTable;
-import clientManagement.Client;
-import clientManagement.clientMessages.*;
-import clientManagement.commands.PromptCommand;
-import databaseUtils.DatabaseManager;
+import client.AccountTable;
+import client.Client;
+import client.messages.*;
+import client.commands.PromptCommand;
+import database.DatabaseManager;
 
 import java.util.*;
 
@@ -12,7 +12,7 @@ import java.util.*;
  * Class holds a list of all clients and manages any requests they may make in a single thread in a synchronous matter.
  * Also responsible for managing the process of sending responses to client requests if needed. Maintains a WebServer object and
  * will eventually maintain a WorldSimulation object as well and will facilitate communication between the two.<br> <br>
- * Specifically, clients will be receiving messages and creating commands to be executed by their baseNetwork.SimulationManager.
+ * Specifically, clients will be receiving messages and creating commands to be executed by their network.SimulationManager.
  *
  * @author Logan Earl
  */

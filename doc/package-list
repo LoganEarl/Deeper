@@ -1,5 +1,5 @@
-baseNetwork
-clientManagement
-clientManagement.clientMessages
-clientManagement.commands
-databaseUtils
+network
+client
+client.messages
+client.commands
+database

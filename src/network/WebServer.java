@@ -1,4 +1,4 @@
-package baseNetwork;
+package network;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

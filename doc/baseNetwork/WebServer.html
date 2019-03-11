@@ -48,11 +48,11 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../baseNetwork/TestClient.html" title="class in baseNetwork"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../baseNetwork/WebServer.ClientMessage.html" title="interface in baseNetwork"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../network/TestClient.html" title="class in network"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../network/WebServer.ClientMessage.html" title="interface in network"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
-<li><a href="../index.html?baseNetwork/WebServer.html" target="_top">Frames</a></li>
+<li><a href="../index.html?network/WebServer.html" target="_top">Frames</a></li>
 <li><a href="WebServer.html" target="_top">No&nbsp;Frames</a></li>
 </ul>
 <ul class="navList" id="allclasses_navbar_top">
@@ -91,7 +91,7 @@ var activeTableTab = "activeTableTab";
 <!-- ========= END OF TOP NAVBAR ========= -->
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="subTitle">baseNetwork</div>
+<div class="subTitle">network</div>
 <h2 title="Class WebServer" class="title">Class WebServer</h2>
 </div>
 <div class="contentContainer">
@@ -99,7 +99,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>baseNetwork.WebServer</li>
+<li>network.WebServer</li>
 </ul>
 </li>
 </ul>
@@ -132,26 +132,26 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static interface&nbsp;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.ClientMessage.html" title="interface in baseNetwork">WebServer.ClientMessage</a></span></code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.ClientMessage.html" title="interface in network">WebServer.ClientMessage</a></span></code>
 <div class="block">Interface for a message that was sent by the client to the server.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>static interface&nbsp;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.ClientMessageParser.html" title="interface in baseNetwork">WebServer.ClientMessageParser</a></span></code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.ClientMessageParser.html" title="interface in network">WebServer.ClientMessageParser</a></span></code>
 <div class="block">Parser provided to the WebServer during construction responsible for converting the raw string value of a received message into
  the appropriate ClientMessage object</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static interface&nbsp;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.OnMessageReceivedListener.html" title="interface in baseNetwork">WebServer.OnMessageReceivedListener</a></span></code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.OnMessageReceivedListener.html" title="interface in network">WebServer.OnMessageReceivedListener</a></span></code>
 <div class="block">Listener used to alert the program at large of a newly received message from a client.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>static interface&nbsp;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.ServerMessage.html" title="interface in baseNetwork">WebServer.ServerMessage</a></span></code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.ServerMessage.html" title="interface in network">WebServer.ServerMessage</a></span></code>
 <div class="block">Interface for a message being sent from the server to clients.</div>
 </td>
 </tr>
@@ -172,7 +172,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.html#MESSAGE_DIVIDER">MESSAGE_DIVIDER</a></span></code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.html#MESSAGE_DIVIDER">MESSAGE_DIVIDER</a></span></code>
 <div class="block">Used to denote the end of a message</div>
 </td>
 </tr>
@@ -191,9 +191,9 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.html#WebServer-int-baseNetwork.WebServer.OnMessageReceivedListener-baseNetwork.WebServer.ClientMessageParser-">WebServer</a></span>(int&nbsp;port,
-         <a href="../baseNetwork/WebServer.OnMessageReceivedListener.html" title="interface in baseNetwork">WebServer.OnMessageReceivedListener</a>&nbsp;clientListener,
-         <a href="../baseNetwork/WebServer.ClientMessageParser.html" title="interface in baseNetwork">WebServer.ClientMessageParser</a>&nbsp;parser)</code>
+<td class="colOne"><code><span class="memberNameLink"><a href="../network/WebServer.html#WebServer-int-network.WebServer.OnMessageReceivedListener-network.WebServer.ClientMessageParser-">WebServer</a></span>(int&nbsp;port,
+         <a href="../network/WebServer.OnMessageReceivedListener.html" title="interface in network">WebServer.OnMessageReceivedListener</a>&nbsp;clientListener,
+         <a href="../network/WebServer.ClientMessageParser.html" title="interface in network">WebServer.ClientMessageParser</a>&nbsp;parser)</code>
 <div class="block">Creates the server thread, but does not start it yet.</div>
 </td>
 </tr>
@@ -214,14 +214,14 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.html#notifyClients-baseNetwork.WebServer.ServerMessage-java.lang.String...-">notifyClients</a></span>(<a href="../baseNetwork/WebServer.ServerMessage.html" title="interface in baseNetwork">WebServer.ServerMessage</a>&nbsp;message,
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.html#notifyClients-network.WebServer.ServerMessage-java.lang.String...-">notifyClients</a></span>(<a href="../network/WebServer.ServerMessage.html" title="interface in network">WebServer.ServerMessage</a>&nbsp;message,
              java.lang.String...&nbsp;toNotify)</code>
 <div class="block">sends the given message to the given clients.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.html#startServer--">startServer</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.html#startServer--">startServer</a></span>()</code>
 <div class="block">Starts the server thread, allowing clients to connect.</div>
 </td>
 </tr>
@@ -257,7 +257,7 @@ extends java.lang.Object</pre>
 <div class="block">Used to denote the end of a message</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../constant-values.html#baseNetwork.WebServer.MESSAGE_DIVIDER">Constant Field Values</a></dd>
+<dd><a href="../constant-values.html#network.WebServer.MESSAGE_DIVIDER">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -269,15 +269,15 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="WebServer-int-baseNetwork.WebServer.OnMessageReceivedListener-baseNetwork.WebServer.ClientMessageParser-">
+<a name="WebServer-int-network.WebServer.OnMessageReceivedListener-network.WebServer.ClientMessageParser-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>WebServer</h4>
 <pre>public&nbsp;WebServer(int&nbsp;port,
-                 <a href="../baseNetwork/WebServer.OnMessageReceivedListener.html" title="interface in baseNetwork">WebServer.OnMessageReceivedListener</a>&nbsp;clientListener,
-                 <a href="../baseNetwork/WebServer.ClientMessageParser.html" title="interface in baseNetwork">WebServer.ClientMessageParser</a>&nbsp;parser)</pre>
+                 <a href="../network/WebServer.OnMessageReceivedListener.html" title="interface in network">WebServer.OnMessageReceivedListener</a>&nbsp;clientListener,
+                 <a href="../network/WebServer.ClientMessageParser.html" title="interface in network">WebServer.ClientMessageParser</a>&nbsp;parser)</pre>
 <div class="block">Creates the server thread, but does not start it yet. To do that, use the startServer() method</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -305,13 +305,13 @@ extends java.lang.Object</pre>
 <div class="block">Starts the server thread, allowing clients to connect.</div>
 </li>
 </ul>
-<a name="notifyClients-baseNetwork.WebServer.ServerMessage-java.lang.String...-">
+<a name="notifyClients-network.WebServer.ServerMessage-java.lang.String...-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>notifyClients</h4>
-<pre>public&nbsp;void&nbsp;notifyClients(<a href="../baseNetwork/WebServer.ServerMessage.html" title="interface in baseNetwork">WebServer.ServerMessage</a>&nbsp;message,
+<pre>public&nbsp;void&nbsp;notifyClients(<a href="../network/WebServer.ServerMessage.html" title="interface in network">WebServer.ServerMessage</a>&nbsp;message,
                           java.lang.String...&nbsp;toNotify)</pre>
 <div class="block">sends the given message to the given clients.</div>
 <dl>
@@ -348,11 +348,11 @@ extends java.lang.Object</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../baseNetwork/TestClient.html" title="class in baseNetwork"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../baseNetwork/WebServer.ClientMessage.html" title="interface in baseNetwork"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../network/TestClient.html" title="class in network"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../network/WebServer.ClientMessage.html" title="interface in network"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
-<li><a href="../index.html?baseNetwork/WebServer.html" target="_top">Frames</a></li>
+<li><a href="../index.html?network/WebServer.html" target="_top">Frames</a></li>
 <li><a href="WebServer.html" target="_top">No&nbsp;Frames</a></li>
 </ul>
 <ul class="navList" id="allclasses_navbar_bottom">

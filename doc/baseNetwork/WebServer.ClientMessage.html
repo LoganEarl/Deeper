@@ -48,11 +48,11 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../baseNetwork/WebServer.html" title="class in baseNetwork"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../baseNetwork/WebServer.ClientMessageParser.html" title="interface in baseNetwork"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../network/WebServer.html" title="class in network"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../network/WebServer.ClientMessageParser.html" title="interface in network"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
-<li><a href="../index.html?baseNetwork/WebServer.ClientMessage.html" target="_top">Frames</a></li>
+<li><a href="../index.html?network/WebServer.ClientMessage.html" target="_top">Frames</a></li>
 <li><a href="WebServer.ClientMessage.html" target="_top">No&nbsp;Frames</a></li>
 </ul>
 <ul class="navList" id="allclasses_navbar_top">
@@ -91,7 +91,7 @@ var activeTableTab = "activeTableTab";
 <!-- ========= END OF TOP NAVBAR ========= -->
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="subTitle">baseNetwork</div>
+<div class="subTitle">network</div>
 <h2 title="Interface WebServer.ClientMessage" class="title">Interface WebServer.ClientMessage</h2>
 </div>
 <div class="contentContainer">
@@ -100,17 +100,17 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Known Implementing Classes:</dt>
-<dd><a href="../clientManagement/clientMessages/ClientAccountUpdateMessage.html" title="class in clientManagement.clientMessages">ClientAccountUpdateMessage</a>, <a href="../clientManagement/clientMessages/ClientLoginMessage.html" title="class in clientManagement.clientMessages">ClientLoginMessage</a></dd>
+<dd><a href="../client/clientMessages/ClientAccountUpdateMessage.html" title="class in client.messages">ClientAccountUpdateMessage</a>, <a href="../client/clientMessages/ClientLoginMessage.html" title="class in client.messages">ClientLoginMessage</a></dd>
 </dl>
 <dl>
 <dt>Enclosing class:</dt>
-<dd><a href="../baseNetwork/WebServer.html" title="class in baseNetwork">WebServer</a></dd>
+<dd><a href="../network/WebServer.html" title="class in network">WebServer</a></dd>
 </dl>
 <hr>
 <br>
 <pre>public static interface <span class="typeNameLabel">WebServer.ClientMessage</span></pre>
 <div class="block">Interface for a message that was sent by the client to the server. The message is converted into this format by a
- <a href="../baseNetwork/WebServer.ClientMessageParser.html" title="interface in baseNetwork"><code>WebServer.ClientMessageParser</code></a> provided to the server during its construction. The client message will have a type associated with it
+ <a href="../network/WebServer.ClientMessageParser.html" title="interface in network"><code>WebServer.ClientMessageParser</code></a> provided to the server during its construction. The client message will have a type associated with it
  as well as information on which client sent the message.</div>
 </li>
 </ul>
@@ -132,25 +132,25 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.ClientMessage.html#constructFromString-java.lang.String-">constructFromString</a></span>(java.lang.String&nbsp;rawMessageBody)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.ClientMessage.html#constructFromString-java.lang.String-">constructFromString</a></span>(java.lang.String&nbsp;rawMessageBody)</code>
 <div class="block">client messages must have an empty constructor and will have to be constructed using this method.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.ClientMessage.html#getClient--">getClient</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.ClientMessage.html#getClient--">getClient</a></span>()</code>
 <div class="block">gets the internet address of the client that sent the message</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
-<td class="colFirst"><code><a href="../baseNetwork/MessageType.html" title="enum in baseNetwork">MessageType</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.ClientMessage.html#getMessageType--">getMessageType</a></span>()</code>
+<td class="colFirst"><code><a href="../network/MessageType.html" title="enum in network">MessageType</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.ClientMessage.html#getMessageType--">getMessageType</a></span>()</code>
 <div class="block">gets what kind of message it is.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../baseNetwork/WebServer.ClientMessage.html#wasCorrectlyParsed--">wasCorrectlyParsed</a></span>()</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../network/WebServer.ClientMessage.html#wasCorrectlyParsed--">wasCorrectlyParsed</a></span>()</code>
 <div class="block">used to determine if the message was constructed correctly</div>
 </td>
 </tr>
@@ -175,7 +175,7 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <h4>getMessageType</h4>
-<pre><a href="../baseNetwork/MessageType.html" title="enum in baseNetwork">MessageType</a>&nbsp;getMessageType()</pre>
+<pre><a href="../network/MessageType.html" title="enum in network">MessageType</a>&nbsp;getMessageType()</pre>
 <div class="block">gets what kind of message it is.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -253,11 +253,11 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../baseNetwork/WebServer.html" title="class in baseNetwork"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../baseNetwork/WebServer.ClientMessageParser.html" title="interface in baseNetwork"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../network/WebServer.html" title="class in network"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../network/WebServer.ClientMessageParser.html" title="interface in network"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
-<li><a href="../index.html?baseNetwork/WebServer.ClientMessage.html" target="_top">Frames</a></li>
+<li><a href="../index.html?network/WebServer.ClientMessage.html" target="_top">Frames</a></li>
 <li><a href="WebServer.ClientMessage.html" target="_top">No&nbsp;Frames</a></li>
 </ul>
 <ul class="navList" id="allclasses_navbar_bottom">

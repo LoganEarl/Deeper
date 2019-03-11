@@ -1,7 +1,7 @@
-package clientManagement.clientMessages;
+package client.messages;
 
-import baseNetwork.MessageType;
-import baseNetwork.WebServer;
+import network.MessageType;
+import network.WebServer;
 
 /**
  * Instantiated form of a clients logout attempt. Can also be used to log out other players<br>

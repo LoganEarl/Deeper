@@ -48,11 +48,11 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../clientManagement/AccountTable.AccountType.html" title="enum in clientManagement"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../clientManagement/Client.ClientStatus.html" title="enum in clientManagement"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../client/AccountTable.AccountType.html" title="enum in client"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../client/Client.ClientStatus.html" title="enum in client"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
-<li><a href="../index.html?clientManagement/Client.html" target="_top">Frames</a></li>
+<li><a href="../index.html?client/Client.html" target="_top">Frames</a></li>
 <li><a href="Client.html" target="_top">No&nbsp;Frames</a></li>
 </ul>
 <ul class="navList" id="allclasses_navbar_top">
@@ -91,7 +91,7 @@ var activeTableTab = "activeTableTab";
 <!-- ========= END OF TOP NAVBAR ========= -->
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="subTitle">clientManagement</div>
+<div class="subTitle">client</div>
 <h2 title="Class Client" class="title">Class Client</h2>
 </div>
 <div class="contentContainer">
@@ -99,7 +99,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>clientManagement.Client</li>
+<li>client.Client</li>
 </ul>
 </li>
 </ul>
@@ -131,7 +131,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>static class&nbsp;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../clientManagement/Client.ClientStatus.html" title="enum in clientManagement">Client.ClientStatus</a></span></code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../client/Client.ClientStatus.html" title="enum in client">Client.ClientStatus</a></span></code>
 <div class="block">Enumeration of possible client states</div>
 </td>
 </tr>
@@ -150,7 +150,7 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../clientManagement/Client.html#Client-baseNetwork.SimulationManager-java.lang.String-">Client</a></span>(<a href="../baseNetwork/SimulationManager.html" title="class in baseNetwork">SimulationManager</a>&nbsp;provider,
+<td class="colOne"><code><span class="memberNameLink"><a href="../client/Client.html#Client-network.SimulationManager-java.lang.String-">Client</a></span>(<a href="../network/SimulationManager.html" title="class in network">SimulationManager</a>&nbsp;provider,
       java.lang.String&nbsp;address)</code>&nbsp;</td>
 </tr>
 </table>
@@ -170,15 +170,15 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.lang.String</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../clientManagement/Client.html#getAddress--">getAddress</a></span>()</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../client/Client.html#getAddress--">getAddress</a></span>()</code>&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../clientManagement/Client.html#registerMessage-baseNetwork.WebServer.ClientMessage-">registerMessage</a></span>(<a href="../baseNetwork/WebServer.ClientMessage.html" title="interface in baseNetwork">WebServer.ClientMessage</a>&nbsp;message)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../client/Client.html#registerMessage-network.WebServer.ClientMessage-">registerMessage</a></span>(<a href="../network/WebServer.ClientMessage.html" title="interface in network">WebServer.ClientMessage</a>&nbsp;message)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../clientManagement/Client.html#setStatus-clientManagement.Client.ClientStatus-">setStatus</a></span>(<a href="../clientManagement/Client.ClientStatus.html" title="enum in clientManagement">Client.ClientStatus</a>&nbsp;newStatus)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../client/Client.html#setStatus-client.Client.ClientStatus-">setStatus</a></span>(<a href="../client/Client.ClientStatus.html" title="enum in client">Client.ClientStatus</a>&nbsp;newStatus)</code>&nbsp;</td>
 </tr>
 </table>
 <ul class="blockList">
@@ -202,13 +202,13 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="Client-baseNetwork.SimulationManager-java.lang.String-">
+<a name="Client-network.SimulationManager-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>Client</h4>
-<pre>public&nbsp;Client(<a href="../baseNetwork/SimulationManager.html" title="class in baseNetwork">SimulationManager</a>&nbsp;provider,
+<pre>public&nbsp;Client(<a href="../network/SimulationManager.html" title="class in network">SimulationManager</a>&nbsp;provider,
               java.lang.String&nbsp;address)</pre>
 </li>
 </ul>
@@ -220,22 +220,22 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="setStatus-clientManagement.Client.ClientStatus-">
+<a name="setStatus-client.Client.ClientStatus-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setStatus</h4>
-<pre>public&nbsp;void&nbsp;setStatus(<a href="../clientManagement/Client.ClientStatus.html" title="enum in clientManagement">Client.ClientStatus</a>&nbsp;newStatus)</pre>
+<pre>public&nbsp;void&nbsp;setStatus(<a href="../client/Client.ClientStatus.html" title="enum in client">Client.ClientStatus</a>&nbsp;newStatus)</pre>
 </li>
 </ul>
-<a name="registerMessage-baseNetwork.WebServer.ClientMessage-">
+<a name="registerMessage-network.WebServer.ClientMessage-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>registerMessage</h4>
-<pre>public&nbsp;void&nbsp;registerMessage(<a href="../baseNetwork/WebServer.ClientMessage.html" title="interface in baseNetwork">WebServer.ClientMessage</a>&nbsp;message)</pre>
+<pre>public&nbsp;void&nbsp;registerMessage(<a href="../network/WebServer.ClientMessage.html" title="interface in network">WebServer.ClientMessage</a>&nbsp;message)</pre>
 </li>
 </ul>
 <a name="getAddress--">
@@ -274,11 +274,11 @@ extends java.lang.Object</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../clientManagement/AccountTable.AccountType.html" title="enum in clientManagement"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../clientManagement/Client.ClientStatus.html" title="enum in clientManagement"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../client/AccountTable.AccountType.html" title="enum in client"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../client/Client.ClientStatus.html" title="enum in client"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
-<li><a href="../index.html?clientManagement/Client.html" target="_top">Frames</a></li>
+<li><a href="../index.html?client/Client.html" target="_top">Frames</a></li>
 <li><a href="Client.html" target="_top">No&nbsp;Frames</a></li>
 </ul>
 <ul class="navList" id="allclasses_navbar_bottom">

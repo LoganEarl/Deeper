@@ -1,6 +1,6 @@
-package clientManagement;
+package client;
 
-import databaseUtils.DatabaseManager;
+import database.DatabaseManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

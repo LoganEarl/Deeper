@@ -1,4 +1,4 @@
-package baseNetwork;
+package network;
 
 /**
  * Contains the types of messages that can be sent from clients. If any message type turns out to be un-parsable
