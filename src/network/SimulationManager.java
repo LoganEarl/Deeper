@@ -2,8 +2,8 @@ package network;
 
 import client.AccountTable;
 import client.Client;
-import client.messages.*;
 import client.commands.PromptCommand;
+import client.messages.*;
 import database.DatabaseManager;
 
 import java.util.*;

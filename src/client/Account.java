@@ -112,22 +112,8 @@ public class Account implements DatabaseManager.DatabaseEntry {
     public boolean saveToDatabase(String databaseName) {
         Account account = getAccountByUsername(this.userName,databaseName);
         if(account == null){
-            try {
-                Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-                if(c == null)
-                    return false;
-                PreparedStatement saveSQL = c.prepareStatement(CREATE_ACCOUNT_SQL);
-                saveSQL.setString(1,this.userName);
-                saveSQL.setString(2,this.hashedPassword);
-                saveSQL.setString(3,this.email);
-                saveSQL.setInt(4,this.accountType.getSavableForm());
-                int result = saveSQL.executeUpdate();
-                saveSQL.close();
-                c.close();
-                return result > 0;
-            }catch (SQLException e){
-                return false;
-            }
+            return DatabaseManager.executeStatement(CREATE_ACCOUNT_SQL,databaseName,
+                    userName,hashedPassword,email,accountType.getSavableForm()) > 0;
         }else{
             return updateInDatabase(databaseName);
         }
@@ -135,41 +121,13 @@ public class Account implements DatabaseManager.DatabaseEntry {
 
     @Override
     public boolean removeFromDatabase(String databaseName) {
-        try {
-            Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-            if(c == null)
-                return false;
-            PreparedStatement deleteSQL = c.prepareStatement(DELETE_ACCOUNT_SQL);
-            deleteSQL.setString(1,this.newUserName);
-            int result = deleteSQL.executeUpdate();
-            deleteSQL.close();
-            c.close();
-            return result > 0;
-        }catch (SQLException e){
-            return false;
-        }
+        return DatabaseManager.executeStatement(DELETE_ACCOUNT_SQL,databaseName, newUserName) > 0;
     }
 
     @Override
     public boolean updateInDatabase(String databaseName) {
-        try {
-            Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-            if(c == null)
-                return false;
-            PreparedStatement updateSQL = c.prepareStatement(UPDATE_ACCOUNT_SQL);
-            updateSQL.setString(1,this.newUserName);
-            updateSQL.setString(2,this.hashedPassword);
-            updateSQL.setString(3,this.email);
-            updateSQL.setInt(4,this.accountType.getSavableForm());
-            updateSQL.setString(5,this.userName);
-            int result = updateSQL.executeUpdate();
-            updateSQL.close();
-            c.close();
-            this.userName = newUserName;
-            return result > 0;
-        }catch (SQLException e){
-            return false;
-        }
+        return DatabaseManager.executeStatement(UPDATE_ACCOUNT_SQL,databaseName,
+                newUserName,hashedPassword,email,accountType.getSavableForm(),userName) > 0;
     }
 
     @Override

@@ -82,6 +82,28 @@ public class DatabaseManager {
         Map<String, String> getColumnDefinitions();
     }
 
+    public static int executeStatement(String sql, String databaseName, Object... args){
+        try {
+            Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+            if(c == null)
+                return -1;
+            PreparedStatement statement = c.prepareStatement(sql);
+            for(int i = 0; i < args.length;i++){
+                if(args[i] instanceof Integer)
+                    statement.setInt(i+1,(Integer)args[i]);
+                else if (args[i] instanceof String)
+                    statement.setString(i+1, (String)args[i]);
+            }
+
+            int result = statement.executeUpdate();
+            statement.close();
+            c.close();
+            return result;
+        }catch (SQLException e){
+            return -1;
+        }
+    }
+
     public interface DatabaseEntry {
         boolean saveToDatabase(String databaseName);
 

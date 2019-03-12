@@ -1,8 +1,8 @@
 package client.messages;
 
+import client.Account;
 import network.MessageType;
 import network.WebServer;
-import client.Account;
 
 /**
  * Instantiated form of a client's attempt to update another account's permission level. Client must already be logged in and have a permission
