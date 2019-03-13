@@ -5,6 +5,8 @@ import database.DatabaseManager.DatabaseTable;
 import java.util.Map;
 
 public class ItemInstanceTable implements DatabaseTable {
+    public static final String ITEM_ID = "itemID";
+
     @Override
     public String getTableName() {
         return null;
