@@ -25,7 +25,7 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     public static final String MAX_LITERS = "maxLiters";
     /**The maximum storage potential of the container in number of items stored*/
     public static final String MAX_NUMBER = "maxItems";
-    /**Stores how difficult the lock is to pick*/
+    /**Stores how difficult the lock is to pick. 0 means it has no lock*/
     public static final String LOCK_DIFFICULTY = "lockDifficulty";
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
