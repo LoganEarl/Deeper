@@ -6,6 +6,7 @@ import world.room.RoomTable;
 
 import java.lang.annotation.Target;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -28,7 +29,7 @@ public class ItemInstanceTable implements DatabaseTable {
     public static final String DISPLAY_NAME = "displayName";
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new HashMap<>();
+    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public ItemInstanceTable(){
         TABLE_DEFINITION.put(ITEM_ID,"INT PRIMARY KEY NOT NULL");

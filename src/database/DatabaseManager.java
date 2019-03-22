@@ -42,6 +42,7 @@ public class DatabaseManager {
     }
 
     public static void createTables(String fileName, List<DatabaseTable> tables) {
+        String curTableName = "";
         try {
             Class.forName("com.mysql.jdbc.Driver");
 
@@ -49,6 +50,7 @@ public class DatabaseManager {
             Statement stmt = conn.createStatement();
 
             for (DatabaseTable table : tables) {
+                curTableName = table.getTableName();
                 StringBuilder sql = new StringBuilder("CREATE TABLE IF NOT EXISTS ").append(table.getTableName()).append(" (");
 
                 Map<String, String> columnDefinitions = table.getColumnDefinitions();
@@ -66,7 +68,7 @@ public class DatabaseManager {
             stmt.close();
             conn.close();
         } catch (Exception e) {
-            System.out.println("Failed to create tables");
+            System.out.println("Failed to create tables, table: " + curTableName);
             e.printStackTrace();
         }
     }

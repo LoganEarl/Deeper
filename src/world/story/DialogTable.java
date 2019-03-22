@@ -43,15 +43,15 @@ public class DialogTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(DIALOG_ID, "INT PRIMARY KEY NOT NULL");
         TABLE_DEFINITION.put(TEXT_TO_SAY, "TEXT");
         TABLE_DEFINITION.put(GESTURE_COMMAND, "VARCHAR(32)");
-        TABLE_DEFINITION.put(ARC_NAME, String.format(Locale.US,"VARCHAR(32) FOREIGN KEY REFERENCES %s(%s)",
-                StoryArcTable.TABLE_NAME, StoryArcTable.ARC_NAME));
+        TABLE_DEFINITION.put(ARC_NAME, String.format(Locale.US,"VARCHAR(32), FOREIGN KEY (%s) REFERENCES %s(%s)",
+                ARC_NAME, StoryArcTable.TABLE_NAME, StoryArcTable.ARC_NAME));
         TABLE_DEFINITION.put(MIN_STORY_NUM, "INT");
         TABLE_DEFINITION.put(MAX_STORY_NUM, "INT");
-        TABLE_DEFINITION.put(NEXT_DIALOG, String.format(Locale.US,"INT FOREIGN KEY REFERENCES %s(%s)",
-                DialogTable.TABLE_NAME, DialogTable.DIALOG_ID));
+        TABLE_DEFINITION.put(NEXT_DIALOG, String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s)",
+                NEXT_DIALOG, DialogTable.TABLE_NAME, DialogTable.DIALOG_ID));
         TABLE_DEFINITION.put(DIALOG_DELAY, "INT");
-        TABLE_DEFINITION.put(OFFERS_QUEST_ID , String.format(Locale.US,"INT FOREIGN KEY REFERENCES %s(%s)",
-                QuestTable.TABLE_NAME, QuestTable.QUEST_ID));
+        TABLE_DEFINITION.put(OFFERS_QUEST_ID , String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s)",
+                OFFERS_QUEST_ID, QuestTable.TABLE_NAME, QuestTable.QUEST_ID));
         TABLE_DEFINITION.put(ARC_NUM_ON_COMPLETION, "INT");
     }
 

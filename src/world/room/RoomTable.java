@@ -3,6 +3,7 @@ package world.room;
 import database.DatabaseManager;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ public class RoomTable implements DatabaseManager.DatabaseTable {
     public static final String ROOM_EAST_NAME = "roomEastName";
     public static final String ROOM_WEST_NAME = "roomWestName";
 
-    public final Map<String, String> TABLE_DEFINITION = new HashMap<>();
+    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public RoomTable(){
         TABLE_DEFINITION.put(ROOM_NAME,"VARCHAR(32) PRIMARY KEY NOT NULL");

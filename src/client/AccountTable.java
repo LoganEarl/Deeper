@@ -3,6 +3,7 @@ package client;
 import database.DatabaseManager;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -21,7 +22,7 @@ public class AccountTable implements DatabaseManager.DatabaseTable {
     /**
      * A Map, containing the column names as keys and the associated data-type of the column as values
      */
-    public final Map<String, String> TABLE_DEFINITION = new HashMap<>();
+    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public AccountTable(){
         TABLE_DEFINITION.put(USER_NAME,"VARCHAR(16) PRIMARY KEY NOT NULL");

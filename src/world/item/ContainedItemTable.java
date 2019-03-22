@@ -3,6 +3,8 @@ package world.item;
 import database.DatabaseManager;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -18,11 +20,13 @@ public class ContainedItemTable implements DatabaseManager.DatabaseTable {
     public static final String ITEM_ID = ItemInstanceTable.ITEM_ID; //foreign key
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new HashMap<>();
+    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public ContainedItemTable(){
-        TABLE_DEFINITION.put(CONTAINER_ID, "INT");
-        TABLE_DEFINITION.put(ITEM_ID, "INT");
+        TABLE_DEFINITION.put(CONTAINER_ID, String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s) NOT NULL",
+                CONTAINER_ID, ContainerInstanceTable.TABLE_NAME, ContainerInstanceTable.CONTAINER_ID));
+        TABLE_DEFINITION.put(ITEM_ID, String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s) NOT NULL",
+                ITEM_ID, ItemInstanceTable.TABLE_NAME, ItemInstanceTable.ITEM_ID));
     }
 
     @Override

@@ -53,8 +53,8 @@ public class QuestTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(TYPE, "VARCHAR(32)");
         TABLE_DEFINITION.put(ARGS, "TEXT");
         TABLE_DEFINITION.put(TIME_LIMIT, "INT");
-        TABLE_DEFINITION.put(ARC_NAME, String.format(Locale.US,"VARCHAR(32) FOREIGN KEY REFERENCES %s(%s)",
-                StoryArcTable.TABLE_NAME, StoryArcTable.ARC_NAME));
+        TABLE_DEFINITION.put(ARC_NAME, String.format(Locale.US,"VARCHAR(32), FOREIGN KEY (%s) REFERENCES %s(%s)",
+                ARC_NAME, StoryArcTable.TABLE_NAME, StoryArcTable.ARC_NAME));
         TABLE_DEFINITION.put(ARC_COMPLETION_NUM, "INT");
         TABLE_DEFINITION.put(ARC_FAILURE_NUM,"INT");
 

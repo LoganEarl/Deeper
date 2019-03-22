@@ -3,6 +3,7 @@ package world.item;
 import database.DatabaseManager;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -52,7 +53,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     public static final String TYPE_MISC = "misc";
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new HashMap<>();
+    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public ItemStatTable(){
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");

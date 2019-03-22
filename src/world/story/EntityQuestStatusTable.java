@@ -34,10 +34,10 @@ public class EntityQuestStatusTable implements DatabaseManager.DatabaseTable {
     public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public EntityQuestStatusTable(){
-        TABLE_DEFINITION.put(ENTITY_ID, String.format(Locale.US,"VARCHAR(32) FOREIGN KEY REFERENCES %s(%s)",
-                EntityTable.TABLE_NAME, EntityTable.ENTITY_ID));
-        TABLE_DEFINITION.put(QUEST_ID, String.format(Locale.US,"INT FOREIGN KEY REFERENCES %s(%s)",
-                QuestTable.TABLE_NAME, QuestTable.QUEST_ID));
+        TABLE_DEFINITION.put(ENTITY_ID, String.format(Locale.US,"VARCHAR(32), FOREIGN KEY (%s) REFERENCES %s(%s)",
+                ENTITY_ID, EntityTable.TABLE_NAME, EntityTable.ENTITY_ID));
+        TABLE_DEFINITION.put(QUEST_ID, String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s)",
+                QUEST_ID, QuestTable.TABLE_NAME, QuestTable.QUEST_ID));
         TABLE_DEFINITION.put(CURRENT_STATUS,String.format(Locale.US,"VARCHAR(16), PRIMARY KEY (%s,%s)",ENTITY_ID,QUEST_ID));
     }
 

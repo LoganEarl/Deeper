@@ -5,6 +5,10 @@ import client.Client;
 import client.commands.PromptCommand;
 import client.messages.*;
 import database.DatabaseManager;
+import world.entity.EntityTable;
+import world.item.*;
+import world.room.RoomTable;
+import world.story.StoryArcTable;
 
 import java.util.*;
 
@@ -86,6 +90,16 @@ public class SimulationManager {
     public void init() {
         List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
         tables.add(new AccountTable());
+        tables.add(new ItemStatTable());
+        tables.add(new ContainerStatTable());
+        tables.add(new RoomTable());
+        tables.add(new EntityTable());
+        tables.add(new StoryArcTable());
+
+        tables.add(new ItemInstanceTable());
+        tables.add(new ContainerInstanceTable());
+        tables.add(new ContainedItemTable());
+        tables.add(new ContainedItemTable());
 
         DatabaseManager.createDirectories();
         DatabaseManager.createNewDatabase(DB_NAME);

@@ -5,6 +5,7 @@ import world.entity.EntityTable;
 import world.room.RoomTable;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -38,17 +39,19 @@ public class ContainerInstanceTable implements DatabaseManager.DatabaseTable {
     public static final String STATE_UNLOCKED = "unlocked";
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new HashMap<>();
+    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public ContainerInstanceTable(){
         TABLE_DEFINITION.put(CONTAINER_ID, "INT PRIMARY KEY NOT NULL");
-        TABLE_DEFINITION.put(CONTAINER_NAME, String.format(Locale.US,"VARCHAR(32) FOREIGN KEY REFERENCES %s(%s) NOT NULL",
-                ContainerStatTable.TABLE_NAME, ContainerStatTable.CONTAINER_NAME));
-        TABLE_DEFINITION.put(ENTITY_ID, String.format(Locale.US,"VARCHAR(32) FOREIGN KEY REFERENCES %s(%s)",
-                EntityTable.TABLE_NAME, EntityTable.TABLE_NAME));
+        TABLE_DEFINITION.put(CONTAINER_NAME, "VARCHAR(32) NOT NULL");
+        TABLE_DEFINITION.put(ENTITY_ID,"VARCHAR(32)");
         TABLE_DEFINITION.put(ROOM_NAME,"VARCHAR(32)");
         TABLE_DEFINITION.put(CONTAINER_STATE, "VARCHAR(16)");
         TABLE_DEFINITION.put(LOCK_NUMBER,"INT");
+        TABLE_DEFINITION.put(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                CONTAINER_NAME, ContainerStatTable.TABLE_NAME, ContainerStatTable.CONTAINER_NAME),"");
+        TABLE_DEFINITION.put(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                ENTITY_ID, EntityTable.TABLE_NAME, EntityTable.ENTITY_ID),"");
     }
 
     @Override
