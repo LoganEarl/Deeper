@@ -29,7 +29,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     public static final String MIN_DAMAGE = "minDmg";
     /**The maximum damage roll, inclusive. Ignored if itemType is not {@value TYPE_WEAPON}*/
     public static final String MAX_DAMAGE = "maxDmg";
-    /**The addition to the chance to initially hit the target, similar to the D&D model. Ignored if itemType is not {@value TYPE_WEAPON}*/
+    /**The addition to the chance to initially hit the target, similar to the D&amp;D model. Ignored if itemType is not {@value TYPE_WEAPON}*/
     public static final String HIT_CHANCE = "hitChance";    //d10 + hitChance against AC
     /**The amount of AC contributed by the item. Ignored if itemType is not {@value TYPE_ARMOR}*/
     public static final String ARMOR_CLASS = "armorClass";

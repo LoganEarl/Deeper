@@ -20,7 +20,7 @@ public class RoomTable implements DatabaseManager.DatabaseTable {
     public static final String ROOM_DESCRIPTION = "roomDescription";
     /**The visibility of the room. If not visible, will not show up as a traversable direction to nearby rooms. Visibility is determined like so<br>
      * 0 = visible<br>
-     * >0 = invisible, difficulty to detect hidden room<br>
+     * &gt; 0 = invisible, difficulty to detect hidden room<br>
      * -1 = invisible, cannot be discovered with skill*/
     public static final String ROOM_VISIBILITY = "roomVisibility";
 

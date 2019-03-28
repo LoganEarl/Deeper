@@ -140,7 +140,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
     /**
      * gets the room's visibility status.
      * @return Will be 0 if visible like normal. Will be -1 if invisible with no hope of discovering it with a skill.
-     * if >0 the number represents the difficulty of discovering the room with a skill. Recommended for hidden loot and the like
+     * if &gt;0 the number represents the difficulty of discovering the room with a skill. Recommended for hidden loot and the like
      */
     public int getVisibilityCode() {
         return visibilityCode;
