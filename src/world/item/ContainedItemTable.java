@@ -2,10 +2,7 @@ package world.item;
 
 import database.DatabaseManager;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Contains the schema for a small table meant to store what item instances are stored in what container
@@ -19,14 +16,19 @@ public class ContainedItemTable implements DatabaseManager.DatabaseTable {
     /**References the item that is stored in the container*/
     public static final String ITEM_ID = ItemInstanceTable.ITEM_ID; //foreign key
 
-    /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final List<String> CONSTRAINTS = new ArrayList<>();
 
     public ContainedItemTable(){
-        TABLE_DEFINITION.put(CONTAINER_ID, String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s) NOT NULL",
+        TABLE_DEFINITION.put(CONTAINER_ID, "INT NOT NULL");
+        TABLE_DEFINITION.put(ITEM_ID, "INT NOT NULL");
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 CONTAINER_ID, ContainerInstanceTable.TABLE_NAME, ContainerInstanceTable.CONTAINER_ID));
-        TABLE_DEFINITION.put(ITEM_ID, String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s) NOT NULL",
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ITEM_ID, ItemInstanceTable.TABLE_NAME, ItemInstanceTable.ITEM_ID));
+        CONSTRAINTS.add(String.format(Locale.US,"PRIMARY KEY (%s, %s)",
+                CONTAINER_ID, ITEM_ID));
+
     }
 
     @Override
@@ -37,5 +39,10 @@ public class ContainedItemTable implements DatabaseManager.DatabaseTable {
     @Override
     public Map<String, String> getColumnDefinitions() {
         return TABLE_DEFINITION;
+    }
+
+    @Override
+    public List getConstraints() {
+        return CONSTRAINTS;
     }
 }

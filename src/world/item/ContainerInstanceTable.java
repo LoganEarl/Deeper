@@ -4,10 +4,7 @@ import database.DatabaseManager;
 import world.entity.EntityTable;
 import world.room.RoomTable;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Table definition for a SQL table that holds all the specific instances of containers.
@@ -38,8 +35,8 @@ public class ContainerInstanceTable implements DatabaseManager.DatabaseTable {
     /**Value stored in the {@value CONTAINER_STATE} field, means the container is unlocked*/
     public static final String STATE_UNLOCKED = "unlocked";
 
-    /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final List<String> CONSTRAINTS = new ArrayList<>();
 
     public ContainerInstanceTable(){
         TABLE_DEFINITION.put(CONTAINER_ID, "INT PRIMARY KEY NOT NULL");
@@ -48,10 +45,11 @@ public class ContainerInstanceTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(ROOM_NAME,"VARCHAR(32)");
         TABLE_DEFINITION.put(CONTAINER_STATE, "VARCHAR(16)");
         TABLE_DEFINITION.put(LOCK_NUMBER,"INT");
-        TABLE_DEFINITION.put(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
-                CONTAINER_NAME, ContainerStatTable.TABLE_NAME, ContainerStatTable.CONTAINER_NAME),"");
-        TABLE_DEFINITION.put(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
-                ENTITY_ID, EntityTable.TABLE_NAME, EntityTable.ENTITY_ID),"");
+
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                CONTAINER_NAME, ContainerStatTable.TABLE_NAME, ContainerStatTable.CONTAINER_NAME));
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                ENTITY_ID, EntityTable.TABLE_NAME, EntityTable.ENTITY_ID));
     }
 
     @Override
@@ -62,5 +60,10 @@ public class ContainerInstanceTable implements DatabaseManager.DatabaseTable {
     @Override
     public Map<String, String> getColumnDefinitions() {
         return TABLE_DEFINITION;
+    }
+
+    @Override
+    public List getConstraints() {
+        return CONSTRAINTS;
     }
 }

@@ -4,10 +4,7 @@ import database.DatabaseManager;
 import world.item.ContainerStatTable;
 import world.room.RoomTable;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Holds the database schema for a table containing all the information relevant to a player or npc entity.
@@ -54,8 +51,8 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
     /**A foreign key to the room the entity is standing in*/
     public static final String ROOM_NAME = RoomTable.ROOM_NAME;
 
-    /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final List<String> CONSTRAINTS = new ArrayList<>();
 
     public EntityTable(){
         TABLE_DEFINITION.put(ENTITY_ID, "VARCHAR(32) PRIMARY KEY NOT NULL");
@@ -71,7 +68,9 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(INT,"INT");
         TABLE_DEFINITION.put(WIS,"INT");
         TABLE_DEFINITION.put(CONTROLLER_TYPE,"VARCHAR(16)");
-        TABLE_DEFINITION.put(ROOM_NAME, String.format(Locale.US,"VARCHAR(32) NOT NULL, FOREIGN KEY (%s) REFERENCES %s(%s)",
+        TABLE_DEFINITION.put(ROOM_NAME, "VARCHAR(32)");
+
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));
     }
 
@@ -84,5 +83,10 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
     @Override
     public Map<String, String> getColumnDefinitions() {
         return TABLE_DEFINITION;
+    }
+
+    @Override
+    public List getConstraints() {
+        return CONSTRAINTS;
     }
 }

@@ -3,9 +3,7 @@ package world.story;
 import database.DatabaseManager;
 import world.entity.EntityTable;
 
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Contains the SQL schema for creating a table for storing quest information. Quests are instanced, so this does not have any way to link a quest to a player, only
@@ -43,8 +41,8 @@ public class QuestTable implements DatabaseManager.DatabaseTable {
     public static final String TYPE_LEVEL = "level";
     public static final String TYPE_DEFEND = "defend";
 
-    /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final List<String> CONSTRAINTS = new ArrayList<>();
 
     public QuestTable(){
         TABLE_DEFINITION.put(QUEST_ID, "INT PRIMARY KEY NOT NULL");
@@ -53,11 +51,12 @@ public class QuestTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(TYPE, "VARCHAR(32)");
         TABLE_DEFINITION.put(ARGS, "TEXT");
         TABLE_DEFINITION.put(TIME_LIMIT, "INT");
-        TABLE_DEFINITION.put(ARC_NAME, String.format(Locale.US,"VARCHAR(32), FOREIGN KEY (%s) REFERENCES %s(%s)",
-                ARC_NAME, StoryArcTable.TABLE_NAME, StoryArcTable.ARC_NAME));
+        TABLE_DEFINITION.put(ARC_NAME, "VARCHAR(32)");
         TABLE_DEFINITION.put(ARC_COMPLETION_NUM, "INT");
         TABLE_DEFINITION.put(ARC_FAILURE_NUM,"INT");
 
+        CONSTRAINTS.add(String.format(Locale.US,"VARCHAR(32), FOREIGN KEY (%s) REFERENCES %s(%s)",
+                ARC_NAME, StoryArcTable.TABLE_NAME, StoryArcTable.ARC_NAME));
     }
 
     @Override
@@ -68,5 +67,10 @@ public class QuestTable implements DatabaseManager.DatabaseTable {
     @Override
     public Map<String, String> getColumnDefinitions() {
         return TABLE_DEFINITION;
+    }
+
+    @Override
+    public List<String> getConstraints() {
+        return CONSTRAINTS;
     }
 }

@@ -3,9 +3,7 @@ package world.story;
 import database.DatabaseManager;
 import world.entity.EntityTable;
 
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Contains the schema for a database table used to contain dialog options
@@ -36,23 +34,27 @@ public class DialogTable implements DatabaseManager.DatabaseTable {
     /**The number to be assigned to the associated arc after this dialog is complete. nullable*/
     public static final String ARC_NUM_ON_COMPLETION = "arcNumOnCompletion";
 
-    /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final List<String> CONSTRAINTS = new ArrayList<>();
 
     public DialogTable(){
         TABLE_DEFINITION.put(DIALOG_ID, "INT PRIMARY KEY NOT NULL");
         TABLE_DEFINITION.put(TEXT_TO_SAY, "TEXT");
         TABLE_DEFINITION.put(GESTURE_COMMAND, "VARCHAR(32)");
-        TABLE_DEFINITION.put(ARC_NAME, String.format(Locale.US,"VARCHAR(32), FOREIGN KEY (%s) REFERENCES %s(%s)",
-                ARC_NAME, StoryArcTable.TABLE_NAME, StoryArcTable.ARC_NAME));
+        TABLE_DEFINITION.put(ARC_NAME, "VARCHAR(32)");
         TABLE_DEFINITION.put(MIN_STORY_NUM, "INT");
         TABLE_DEFINITION.put(MAX_STORY_NUM, "INT");
-        TABLE_DEFINITION.put(NEXT_DIALOG, String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s)",
-                NEXT_DIALOG, DialogTable.TABLE_NAME, DialogTable.DIALOG_ID));
+        TABLE_DEFINITION.put(NEXT_DIALOG,"INT");
         TABLE_DEFINITION.put(DIALOG_DELAY, "INT");
-        TABLE_DEFINITION.put(OFFERS_QUEST_ID , String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s)",
-                OFFERS_QUEST_ID, QuestTable.TABLE_NAME, QuestTable.QUEST_ID));
+        TABLE_DEFINITION.put(OFFERS_QUEST_ID , "INT");
         TABLE_DEFINITION.put(ARC_NUM_ON_COMPLETION, "INT");
+
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                ARC_NAME, StoryArcTable.TABLE_NAME, StoryArcTable.ARC_NAME));
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                NEXT_DIALOG, DialogTable.TABLE_NAME, DialogTable.DIALOG_ID));
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                OFFERS_QUEST_ID, QuestTable.TABLE_NAME, QuestTable.QUEST_ID));
     }
 
     @Override
@@ -63,5 +65,10 @@ public class DialogTable implements DatabaseManager.DatabaseTable {
     @Override
     public Map<String, String> getColumnDefinitions() {
         return TABLE_DEFINITION;
+    }
+
+    @Override
+    public List getConstraints() {
+        return CONSTRAINTS;
     }
 }

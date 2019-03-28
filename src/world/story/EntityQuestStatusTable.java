@@ -3,10 +3,7 @@ package world.story;
 import database.DatabaseManager;
 import world.entity.EntityTable;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Contains the table schema for a table relating players and quests. Used to store what quests are active for a player and what the status of each quest is for that player
@@ -30,15 +27,19 @@ public class EntityQuestStatusTable implements DatabaseManager.DatabaseTable {
     /**Quest status denoting that the quest has been completed and the player has gotten the reward. */
     public static final String REWARDED = "rewarded";
 
-    /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final List<String> CONSTRAINTS = new ArrayList<>();
 
     public EntityQuestStatusTable(){
-        TABLE_DEFINITION.put(ENTITY_ID, String.format(Locale.US,"VARCHAR(32), FOREIGN KEY (%s) REFERENCES %s(%s)",
+        TABLE_DEFINITION.put(ENTITY_ID,"VARCHAR(32) NOT NULL");
+        TABLE_DEFINITION.put(QUEST_ID, "INT NOT NULL");
+        TABLE_DEFINITION.put(CURRENT_STATUS, "VARCHAR(16)");
+
+        CONSTRAINTS.add( String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ENTITY_ID, EntityTable.TABLE_NAME, EntityTable.ENTITY_ID));
-        TABLE_DEFINITION.put(QUEST_ID, String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s)",
+        CONSTRAINTS.add(String.format(Locale.US,"INT, FOREIGN KEY (%s) REFERENCES %s(%s)",
                 QUEST_ID, QuestTable.TABLE_NAME, QuestTable.QUEST_ID));
-        TABLE_DEFINITION.put(CURRENT_STATUS,String.format(Locale.US,"VARCHAR(16), PRIMARY KEY (%s,%s)",ENTITY_ID,QUEST_ID));
+        CONSTRAINTS.add(String.format(Locale.US,"PRIMARY KEY (%s,%s)",ENTITY_ID,QUEST_ID));
     }
 
     @Override
@@ -49,5 +50,10 @@ public class EntityQuestStatusTable implements DatabaseManager.DatabaseTable {
     @Override
     public Map<String, String> getColumnDefinitions() {
         return TABLE_DEFINITION;
+    }
+
+    @Override
+    public List getConstraints() {
+        return CONSTRAINTS;
     }
 }

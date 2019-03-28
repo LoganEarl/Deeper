@@ -5,9 +5,7 @@ import world.entity.EntityTable;
 import world.room.RoomTable;
 
 import java.lang.annotation.Target;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Table definition for a SQL table that holds all the specific instances of items.
@@ -28,8 +26,8 @@ public class ItemInstanceTable implements DatabaseTable {
     /**The default displayed name of the item is the value stored under ITEM_NAME, but if this contains a value, it is used instead. Used for specifically named weapons and items*/
     public static final String DISPLAY_NAME = "displayName";
 
-    /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final List<String> CONSTRAINTS = new ArrayList<>();
 
     public ItemInstanceTable(){
         TABLE_DEFINITION.put(ITEM_ID,"INT PRIMARY KEY NOT NULL");
@@ -37,6 +35,9 @@ public class ItemInstanceTable implements DatabaseTable {
         TABLE_DEFINITION.put(ENTITY_ID, "VARCHAR(32)");
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32)");
         TABLE_DEFINITION.put(DISPLAY_NAME,"VARCHAR(32)");
+
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME));
     }
 
     @Override
@@ -47,5 +48,10 @@ public class ItemInstanceTable implements DatabaseTable {
     @Override
     public Map<String, String> getColumnDefinitions() {
         return TABLE_DEFINITION;
+    }
+
+    @Override
+    public List getConstraints() {
+        return CONSTRAINTS;
     }
 }

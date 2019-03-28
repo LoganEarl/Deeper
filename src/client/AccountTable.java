@@ -2,9 +2,7 @@ package client;
 
 import database.DatabaseManager;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Holds information relating to the creation of a SQL table that holds each account that has been created.
@@ -19,10 +17,9 @@ public class AccountTable implements DatabaseManager.DatabaseTable {
     public static final String HASHED_PASSWORD = "hashedPassword";
     public static final String EMAIL = "email";
     public static final String ACCOUNT_TYPE = "accountType";
-    /**
-     * A Map, containing the column names as keys and the associated data-type of the column as values
-     */
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+
+    private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final List<String> CONSTRAINTS = new ArrayList<>();
 
     public AccountTable(){
         TABLE_DEFINITION.put(USER_NAME,"VARCHAR(16) PRIMARY KEY NOT NULL");
@@ -38,5 +35,10 @@ public class AccountTable implements DatabaseManager.DatabaseTable {
     @Override
     public Map<String, String> getColumnDefinitions() {
         return TABLE_DEFINITION;
+    }
+
+    @Override
+    public List<String> getConstraints() {
+        return null;
     }
 }

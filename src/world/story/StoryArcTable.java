@@ -2,7 +2,9 @@ package world.story;
 
 import database.DatabaseManager;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,8 +26,7 @@ public class StoryArcTable implements DatabaseManager.DatabaseTable {
     /**Flag that is used to denote the main story. Only one arc should have a value of true here*/
     public static final String IS_PRIMARY_STORY = "isPrimaryStory";
 
-    /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public StoryArcTable(){
         TABLE_DEFINITION.put(ARC_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
@@ -43,5 +44,10 @@ public class StoryArcTable implements DatabaseManager.DatabaseTable {
     @Override
     public Map<String, String> getColumnDefinitions() {
         return TABLE_DEFINITION;
+    }
+
+    @Override
+    public List getConstraints() {
+        return null;
     }
 }
