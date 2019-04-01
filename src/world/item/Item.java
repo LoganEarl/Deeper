@@ -10,7 +10,7 @@ import java.util.Locale;
 import static world.item.ItemInstanceTable.*;
 //TODO finish this. lots of work this
 public class Item implements DatabaseManager.DatabaseEntry {
-    private static final String SAVE_SQL = String.format(Locale.US,"INSERT INTO %s (%s %s %s %s %s) VALUES (? ? ? ? ?)",
+    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s %s %s %s %s) VALUES (? ? ? ? ?)",
             TABLE_NAME, ITEM_ID, ENTITY_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
@@ -90,21 +90,27 @@ public class Item implements DatabaseManager.DatabaseEntry {
 
     @Override
     public boolean saveToDatabase(String databaseName) {
-        return false;
+        Item item = getItemByItemID(itemID,databaseName);
+        if(item == null)
+            return DatabaseManager.executeStatement(CREATE_SQL, databaseName,
+                    itemID, entityID, roomName, itemName, displayName) > 0;
+        else
+            return updateInDatabase(databaseName);
     }
 
     @Override
     public boolean removeFromDatabase(String databaseName) {
-        return false;
+        return DatabaseManager.executeStatement(DELETE_SQL,databaseName,itemID) > 0;
     }
 
     @Override
     public boolean updateInDatabase(String databaseName) {
-        return false;
+        return DatabaseManager.executeStatement(UPDATE_SQL,databaseName,
+                entityID, roomName, itemID, displayName) > 0;
     }
 
     @Override
     public boolean existsInDatabase(String databaseName) {
-        return false;
+        return getItemByItemID(itemID,databaseName) != null;
     }
 }
