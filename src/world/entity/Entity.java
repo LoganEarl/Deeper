@@ -24,11 +24,11 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
     private int strength;
     private int dexterity;
-    private int intelegence;
+    private int intelligence;
     private int wisdom;
 
     private String controllerType;
-    private Room room;
+    private String roomName;
 
     private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,ENTITY_ID);
     private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s %s %s %s %s %s %s %s %s %s %s %s %s %s) VALUES (? ? ? ? ? ? ? ? ? ? ? ? ? ?)",
@@ -37,7 +37,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=? %s=? %s=? %s=? %s=? %s=? %s=? %s=? %s=? %s=? %s=? %s=? %s=? WHERE %s=?",
             TABLE_NAME, DISPLAY_NAME, HP,MAX_HP,MP,MAX_MP,STAMINA,MAX_STAMINA,STR,DEX,INT,WIS,CONTROLLER_TYPE,ROOM_NAME,ENTITY_ID);
 
-    private Entity(ResultSet readEntry, String databaseName) throws SQLException {
+    private Entity(ResultSet readEntry) throws SQLException {
         entityID = readEntry.getString(ENTITY_ID);
         displayName = readEntry.getString(DISPLAY_NAME);
 
@@ -49,11 +49,11 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         maxStamina = readEntry.getInt(MAX_STAMINA);
         strength = readEntry.getInt(STR);
         dexterity = readEntry.getInt(DEX);
-        intelegence = readEntry.getInt(INT);
+        intelligence = readEntry.getInt(INT);
         wisdom = readEntry.getInt(WIS);
 
         controllerType = readEntry.getString(CONTROLLER_TYPE);
-        room = Room.getRoomByRoomName(readEntry.getString(ROOM_NAME),databaseName);
+        roomName = readEntry.getString(ROOM_NAME);
     }
 
     public static Entity getEntityByEntityID(String entityID, String databaseName){
@@ -68,7 +68,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
                 getSQL.setString(1,entityID);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next())
-                    toReturn = new Entity(accountSet, databaseName);
+                    toReturn = new Entity(accountSet);
                 else
                     toReturn = null;
                 getSQL.close();
@@ -82,21 +82,28 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
     @Override
     public boolean saveToDatabase(String databaseName) {
-        return false;
+        Entity entity = getEntityByEntityID(entityID,databaseName);
+        if(entity == null){
+            return DatabaseManager.executeStatement(CREATE_SQL,databaseName,
+                    entityID,displayName, hp,maxHP,mp,maxMP,stamina,maxStamina,strength,dexterity, intelligence,wisdom,controllerType,roomName) > 0;
+        }else{
+            return updateInDatabase(databaseName);
+        }
     }
 
     @Override
     public boolean removeFromDatabase(String databaseName) {
-        return false;
+        return DatabaseManager.executeStatement(DELETE_SQL,databaseName, entityID) > 0;
     }
 
     @Override
     public boolean updateInDatabase(String databaseName) {
-        return false;
+        return DatabaseManager.executeStatement(UPDATE_SQL,databaseName,
+                displayName, hp,maxHP,mp,maxMP,stamina,maxStamina,strength,dexterity, intelligence,wisdom,controllerType,roomName) > 0;
     }
 
     @Override
     public boolean existsInDatabase(String databaseName) {
-        return false;
+        return getEntityByEntityID(entityID,databaseName) != null;
     }
 }
