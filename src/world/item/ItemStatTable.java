@@ -2,10 +2,11 @@ package world.item;
 
 import database.DatabaseManager;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Contains the definition for a SQL table that holds the stats for different types of items. Does not hold the
@@ -70,6 +71,44 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(ITEM_TYPE,"VARCHAR(16)");
     }
 
+    private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);
+
+    public static Map<String,String> getStatsForItem(String itemName, String databaseName){
+        Map<String,String> stats = new HashMap<>();
+
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+        PreparedStatement getSQL;
+        Map<String, String> itemStats = new HashMap<>();
+        if(c == null)
+            return null;
+        else{
+            try {
+                getSQL = c.prepareStatement(GET_SQL);
+                getSQL.setString(1,itemName);
+                ResultSet accountSet = getSQL.executeQuery();
+                if(accountSet.next()) {
+                    itemStats.put(ITEM_NAME, accountSet.getString(ITEM_NAME));
+                    itemStats.put(ITEM_DESCRIPTION, accountSet.getString(ITEM_DESCRIPTION));
+                    itemStats.put(WEIGHT, accountSet.getString(WEIGHT));
+                    itemStats.put(SIZE, accountSet.getString(SIZE));
+                    itemStats.put(MIN_DAMAGE, accountSet.getString(MIN_DAMAGE));
+                    itemStats.put(MAX_DAMAGE, accountSet.getString(MAX_DAMAGE));
+                    itemStats.put(HIT_CHANCE, accountSet.getString(HIT_CHANCE));
+                    itemStats.put(ARMOR_CLASS, accountSet.getString(ARMOR_CLASS));
+                    itemStats.put(HP_REGEN, accountSet.getString(HP_REGEN));
+                    itemStats.put(MP_REGEN, accountSet.getString(MP_REGEN));
+                    itemStats.put(ITEM_TYPE, accountSet.getString(ITEM_TYPE));
+                }else
+                    itemStats = null;
+                getSQL.close();
+                c.close();
+            }catch (SQLException e){
+                itemStats = null;
+            }
+        }
+        return itemStats;
+    }
+
     @Override
     public String getTableName() {
         return TABLE_NAME;
@@ -81,7 +120,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List getConstraints() {
+    public List<String> getConstraints() {
         return null;
     }
 }

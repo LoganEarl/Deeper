@@ -6,10 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+
 import static world.item.ItemInstanceTable.*;
 //TODO finish this. lots of work this. It needs to be able to read its stats
 public class Item implements DatabaseManager.DatabaseEntry {
@@ -31,13 +29,16 @@ public class Item implements DatabaseManager.DatabaseEntry {
     private String roomName;
     private String itemName;
     private String displayName;
+    private String databaseName;
+    private Map<String,String> itemStats;
 
-    private Item(ResultSet entry) throws SQLException{
+    private Item(ResultSet entry, String databaseName) throws SQLException{
         itemID = entry.getInt(ITEM_ID);
         entityID = entry.getString(ENTITY_ID);
         roomName = entry.getString(ROOM_NAME);
         itemName = entry.getString(ITEM_NAME);
         displayName = entry.getString(DISPLAY_NAME);
+        this.databaseName = databaseName;
     }
 
     public static Item getItemByNameRoom(String itemName, String roomName, String databaseName){
@@ -52,9 +53,9 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setString(1,itemName);
                 getSQL.setString(2,roomName);
                 ResultSet accountSet = getSQL.executeQuery();
-                if(accountSet.next())
-                    toReturn = new Item(accountSet);
-                else
+                if(accountSet.next()) {
+                    toReturn = new Item(accountSet,databaseName);
+                }else
                     toReturn = null;
                 getSQL.close();
                 c.close();
@@ -78,7 +79,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setInt(1,itemID);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next())
-                    toReturn = new Item(accountSet);
+                    toReturn = new Item(accountSet,databaseName);
                 else
                     toReturn = null;
                 getSQL.close();
@@ -102,7 +103,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setInt(1,containerID);
                 ResultSet accountSet = getSQL.executeQuery();
                 while(accountSet.next()) {
-                    foundItems.add(new Item(accountSet));
+                    foundItems.add(new Item(accountSet,databaseName));
                 }
                 getSQL.close();
                 c.close();
@@ -137,5 +138,33 @@ public class Item implements DatabaseManager.DatabaseEntry {
     @Override
     public boolean existsInDatabase(String databaseName) {
         return getItemByID(itemID,databaseName) != null;
+    }
+
+    public String getItemName(){
+        return itemName;
+    }
+
+    private void initStats(){
+        if(itemStats == null)
+            itemStats = ItemStatTable.getStatsForItem(itemName,databaseName);
+    }
+
+    public String getItemDescription(){
+        initStats();
+        String s = itemStats.get(ItemStatTable.ITEM_DESCRIPTION);
+        if(s != null)
+            return s;
+        return "";
+    }
+
+    public double getItemWeight(){
+        initStats();
+        String s = itemStats.get(ItemStatTable.WEIGHT);
+        if(s != null) {
+            try {
+                return Double.parseDouble(s);
+            }catch (Exception ignored){}
+        }
+        return 0.0;
     }
 }
