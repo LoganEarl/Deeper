@@ -152,19 +152,72 @@ public class Item implements DatabaseManager.DatabaseEntry {
     public String getItemDescription(){
         initStats();
         String s = itemStats.get(ItemStatTable.ITEM_DESCRIPTION);
-        if(s != null)
-            return s;
-        return "";
+        return s == null? "":s;
     }
 
-    public double getItemWeight(){
-        initStats();
-        String s = itemStats.get(ItemStatTable.WEIGHT);
+    private double getCastDouble(String tag){
+        String s = itemStats.get(tag);
         if(s != null) {
             try {
                 return Double.parseDouble(s);
             }catch (Exception ignored){}
         }
         return 0.0;
+    }
+
+    private int getCastInt(String tag){
+        String s = itemStats.get(tag);
+        if(s != null) {
+            try {
+                return Integer.parseInt(s);
+            }catch (Exception ignored){}
+        }
+        return 0;
+    }
+
+    public double getWeight(){
+        initStats();
+        return getCastDouble(ItemStatTable.WEIGHT);
+    }
+
+    public double getSize(){
+        initStats();
+        return getCastDouble(ItemStatTable.SIZE);
+    }
+
+    public int getMinDamage(){
+        initStats();
+        return getCastInt(ItemStatTable.MIN_DAMAGE);
+    }
+
+    public int getMaxDamage(){
+        initStats();
+        return getCastInt(ItemStatTable.MAX_DAMAGE);
+    }
+
+    public int getHitChance(){
+        initStats();
+        return getCastInt(ItemStatTable.HIT_CHANCE);
+    }
+
+    public int getArmorClass(){
+        initStats();
+        return getCastInt(ItemStatTable.ARMOR_CLASS);
+    }
+
+    public int getHPRegen(){
+        initStats();
+        return getCastInt(ItemStatTable.HP_REGEN);
+    }
+
+    public int getMPRegen(){
+        initStats();
+        return getCastInt(ItemStatTable.MP_REGEN);
+    }
+
+    public String getItemType(){
+        initStats();
+        String s = itemStats.get(ItemStatTable.ITEM_DESCRIPTION);
+        return s == null? "":s;
     }
 }
