@@ -9,7 +9,13 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static world.item.ItemInstanceTable.*;
-//TODO finish this. lots of work this. It needs to be able to read its stats
+
+/**
+ * Holds data for a standard item, whether it be a sword, a chair, or a potion. The type of item is decided by the value returned by getItemType() and will be one of the TYPE_* constants
+ * declared in ItemStatTable. They are not declared here as item instances do not have their own stat definitions. Stats are determined by the item name, as such all Iron Swords will have
+ * the same stats.
+ * @author Logan Earl
+ */
 public class Item implements DatabaseManager.DatabaseEntry {
     private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s %s %s %s %s) VALUES (? ? ? ? ?)",
             TABLE_NAME, ITEM_ID, ENTITY_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME);
@@ -19,8 +25,8 @@ public class Item implements DatabaseManager.DatabaseEntry {
             TABLE_NAME, ENTITY_ID, ROOM_NAME, ITEM_ID, DISPLAY_NAME, ITEM_ID);
     private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
-    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE (%s=? AND %s=?)",
-            TABLE_NAME, ITEM_NAME, ROOM_NAME);
+    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM (%s LEFT JOIN %s) WHERE (%s=? AND %s=? AND %s=NULL AND %s=NULL)",
+            TABLE_NAME, ContainedItemTable.TABLE_NAME, ITEM_NAME, ROOM_NAME, ENTITY_ID, ContainedItemTable.CONTAINER_ID);
     private static final String GET_OF_CONTAINER_ID_SQL = String.format(Locale.US, "SELECT * FROM (%s, %s) WHERE %s=?",
             ContainedItemTable.TABLE_NAME, ItemInstanceTable.TABLE_NAME, ContainedItemTable.CONTAINER_ID);
 
@@ -41,6 +47,13 @@ public class Item implements DatabaseManager.DatabaseEntry {
         this.databaseName = databaseName;
     }
 
+    /**
+     * used to get the first item in the given room with the given item name
+     * @param itemName the name of the item
+     * @param roomName the name of the room to search
+     * @param databaseName the name of the database containing the item
+     * @return an Item instance or null if not found
+     */
     public static Item getItemByNameRoom(String itemName, String roomName, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL = null;
@@ -66,7 +79,12 @@ public class Item implements DatabaseManager.DatabaseEntry {
         return toReturn;
     }
 
-
+    /**
+     * gets an item by the item ID
+     * @param itemID the unique identifier of the item
+     * @param databaseName the database containing the item
+     * @return the instantiated item or null if not found
+     */
     public static Item getItemByID(int itemID, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
@@ -91,6 +109,12 @@ public class Item implements DatabaseManager.DatabaseEntry {
         return toReturn;
     }
 
+    /**
+     * gets all items that are contained by the given container id
+     * @param containerID the unique identifier of the container
+     * @param databaseName the name of the database containing the data being searched for
+     * @return a list of all items in the container
+     */
     public static List<Item> getItemsOfContainerID(int containerID, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
@@ -140,6 +164,16 @@ public class Item implements DatabaseManager.DatabaseEntry {
         return getItemByID(itemID,databaseName) != null;
     }
 
+    /**
+     * @return the display name of the item if it has one. The normal item name otherwise
+     */
+    public String getDisplayableName(){
+        return displayName != null && !displayName.isEmpty()? displayName: itemName;
+    }
+
+    /**
+     * @return the name of the item, as it's unique identifier in the ItemStatTable. Not affected by the item having a display name
+     */
     public String getItemName(){
         return itemName;
     }

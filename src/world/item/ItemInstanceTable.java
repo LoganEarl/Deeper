@@ -8,7 +8,15 @@ import java.lang.annotation.Target;
 import java.util.*;
 
 /**
- * Table definition for a SQL table that holds all the specific instances of items.
+ * Table definition for a SQL table that holds all the specific instances of items.<br>
+ * Note for retrieving items from the database, item locations follow a hierarchy.<br>
+ *     1. Check the containedItemsTable for the item. If it is there, ignore all other values.
+ *     This means the item is in that container and the container's location should be used instead<br>
+ *     2. Check the value stored under {@value ENTITY_ID}, if it is there ignore all other values.
+ *     This means that the given entity is holding the item<br>
+ *     3. Check the value stored under {@value ROOM_NAME}, if it is there that means that the item is
+ *     laying around on the floor of that room. If this value in turn is null
+ *     then that means the item had no location, and cannot be found by players.<br>
  * @author Logan Earl
  */
 public class ItemInstanceTable implements DatabaseTable {
