@@ -25,10 +25,12 @@ public class Item implements DatabaseManager.DatabaseEntry {
             TABLE_NAME, ENTITY_ID, ROOM_NAME, ITEM_ID, DISPLAY_NAME, ITEM_ID);
     private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
-    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM (%s LEFT JOIN %s) WHERE (%s=? AND %s=? AND %s=NULL AND %s=NULL)",
-            TABLE_NAME, ContainedItemTable.TABLE_NAME, ITEM_NAME, ROOM_NAME, ENTITY_ID, ContainedItemTable.CONTAINER_ID);
-    private static final String GET_OF_CONTAINER_ID_SQL = String.format(Locale.US, "SELECT * FROM (%s, %s) WHERE %s=?",
-            ContainedItemTable.TABLE_NAME, ItemInstanceTable.TABLE_NAME, ContainedItemTable.CONTAINER_ID);
+    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE (%s=? AND %s=? AND %s=NULL AND %s=NULL)",
+            TABLE_NAME, ITEM_NAME, ROOM_NAME, ENTITY_ID, CONTAINER_ID);
+    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=? AND %s=NULL AND %s=NULL)",
+            TABLE_NAME, ROOM_NAME, ENTITY_ID, CONTAINER_ID);
+    private static final String GET_OF_CONTAINER_ID_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?",
+            ItemInstanceTable.TABLE_NAME, CONTAINER_ID);
 
     private int itemID;
     private String entityID;
@@ -77,6 +79,35 @@ public class Item implements DatabaseManager.DatabaseEntry {
             }
         }
         return toReturn;
+    }
+
+    /**
+     * gets all the items in the given room
+     * @param roomName the room name to check for items
+     * @param databaseName the database containing the items
+     * @return a list of all items in the room
+     */
+    public static List<Item> getItemsInRoom(String roomName, String databaseName){
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+        PreparedStatement getSQL;
+        List<Item> foundItems = new LinkedList<>();
+        if(c == null)
+            return Collections.emptyList();
+        else{
+            try {
+                getSQL = c.prepareStatement(GET_ROOM_SQL);
+                getSQL.setString(1,roomName);
+                ResultSet accountSet = getSQL.executeQuery();
+                while(accountSet.next()) {
+                    foundItems.add(new Item(accountSet,databaseName));
+                }
+                getSQL.close();
+                c.close();
+            }catch (SQLException e){
+                foundItems = Collections.emptyList();
+            }
+        }
+        return foundItems;
     }
 
     /**

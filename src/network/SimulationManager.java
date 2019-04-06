@@ -98,8 +98,6 @@ public class SimulationManager {
 
         tables.add(new ItemInstanceTable());
         tables.add(new ContainerInstanceTable());
-        tables.add(new ContainedItemTable());
-        tables.add(new ContainedItemTable());
 
         DatabaseManager.createDirectories();
         DatabaseManager.createNewDatabase(DB_NAME);

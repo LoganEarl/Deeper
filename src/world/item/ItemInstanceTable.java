@@ -25,7 +25,9 @@ public class ItemInstanceTable implements DatabaseTable {
 
     /**The unique identifier of this item. stored as an int*/
     public static final String ITEM_ID = "itemID";
-    /**The unique identifier of the entity holding this item. Use the ROOM_NAME value if this is null. Always check the ContainedItemTable first as the item may be stored*/
+    /**The unique identifier of the container that the item is in. If null, check the value under ENTITY_ID, then ROOM_NAME. Foreign key to the ContainerInstanceTable*/
+    public static final String CONTAINER_ID = ContainerInstanceTable.CONTAINER_ID;
+    /**The unique identifier of the entity holding this item. Use the ROOM_NAME value if this is null. Always check the Container field first as the item may be stored*/
     public static final String ENTITY_ID = EntityTable.ENTITY_ID;
     /**If the item is not stored in a container and is not being held, this contains the room it is laying about in*/
     public static final String ROOM_NAME = RoomTable.ROOM_NAME;
@@ -39,6 +41,7 @@ public class ItemInstanceTable implements DatabaseTable {
 
     public ItemInstanceTable(){
         TABLE_DEFINITION.put(ITEM_ID,"INT PRIMARY KEY NOT NULL");
+        TABLE_DEFINITION.put(CONTAINER_ID,"INT");
         TABLE_DEFINITION.put(ROOM_NAME, "VARCHAR(32)");
         TABLE_DEFINITION.put(ENTITY_ID, "VARCHAR(32)");
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32)");
@@ -46,6 +49,8 @@ public class ItemInstanceTable implements DatabaseTable {
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME));
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                CONTAINER_ID, ContainerInstanceTable.TABLE_NAME, ContainerInstanceTable.CONTAINER_ID));
     }
 
     @Override
@@ -59,7 +64,7 @@ public class ItemInstanceTable implements DatabaseTable {
     }
 
     @Override
-    public List getConstraints() {
+    public List<String> getConstraints() {
         return CONSTRAINTS;
     }
 }
