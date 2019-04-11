@@ -50,6 +50,33 @@ public class Item implements DatabaseManager.DatabaseEntry {
     }
 
     /**
+     * constructor for a new item. !Automatically persists itself! to avoid the possibility of more than one item with the same id
+     * @param itemName the name of the item, used to get the item's stats
+     * @param databaseName the name of the database containing the item's stats. item is stored in that database
+     */
+    public Item(String itemName, String databaseName){
+        this(itemName, "", databaseName);
+    }
+
+    /**
+     * constructor for a new item. !Automatically persists itself! to avoid the possibility of more than one item with the same id
+     * @param itemName the name of the item, used to get the item's stats
+     * @param displayName the custom displayed name for the item
+     * @param databaseName the name of the database containing the item's stats. item is stored in that database
+     */
+    public Item(String itemName, String displayName, String databaseName){
+        int id = new Long(System.currentTimeMillis()).hashCode();
+        while(getItemByID(id, databaseName) != null)
+            id++;
+        this.itemID = id;
+        this.displayName = displayName;
+        this.itemStats = ItemStatTable.getStatsForItem(itemName,databaseName);
+        if(itemStats == null)
+            throw new IllegalArgumentException("No stats exists for item name (" + itemName + ") in database (" + databaseName + ")");
+        saveToDatabase(databaseName);
+    }
+
+    /**
      * used to get the first item in the given room with the given item name
      * @param itemName the name of the item
      * @param roomName the name of the room to search

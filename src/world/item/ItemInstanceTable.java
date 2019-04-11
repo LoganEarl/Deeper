@@ -35,6 +35,8 @@ public class ItemInstanceTable implements DatabaseTable {
     public static final String ITEM_NAME = ItemStatTable.ITEM_NAME;
     /**The default displayed name of the item is the value stored under ITEM_NAME, but if this contains a value, it is used instead. Used for specifically named weapons and items*/
     public static final String DISPLAY_NAME = "displayName";
+    /**The code this item can unlock. If attempting to unlock a container, this will be compared to the lock number of the container. If they match, the item can serve as a key to it*/
+    public static final String LOCK_NUMBER = ContainerInstanceTable.LOCK_NUMBER;
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
     private final List<String> CONSTRAINTS = new ArrayList<>();
@@ -46,6 +48,7 @@ public class ItemInstanceTable implements DatabaseTable {
         TABLE_DEFINITION.put(ENTITY_ID, "VARCHAR(32)");
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32)");
         TABLE_DEFINITION.put(DISPLAY_NAME,"VARCHAR(32)");
+        TABLE_DEFINITION.put(LOCK_NUMBER, "INT");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME));
