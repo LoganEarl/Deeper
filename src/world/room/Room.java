@@ -1,11 +1,13 @@
 package world.room;
 
 import database.DatabaseManager;
+import world.item.Item;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 
 import static world.room.RoomTable.*;
@@ -103,6 +105,15 @@ public class Room implements DatabaseManager.DatabaseEntry {
     @Override
     public boolean existsInDatabase(String databaseName) {
         return getRoomByRoomName(roomName,databaseName) != null;
+    }
+
+    public String displayRoom(String databseName){
+        String itemSlot = "";
+        List<Item> items = Item.getItemsInRoom(roomName, databseName);
+
+
+        return String.format(Locale.US,
+                "%s\n%s\n\n",roomName, roomDescription);
     }
 
     public String getRoomName() {

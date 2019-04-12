@@ -285,4 +285,9 @@ public class Item implements DatabaseManager.DatabaseEntry {
         String s = itemStats.get(ItemStatTable.ITEM_DESCRIPTION);
         return s == null? "":s;
     }
+
+    @Override
+    public String toString(){
+        return displayName;
+    }
 }
