@@ -74,8 +74,6 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);
 
     public static Map<String,String> getStatsForItem(String itemName, String databaseName){
-        Map<String,String> stats = new HashMap<>();
-
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
         Map<String, String> itemStats = new HashMap<>();

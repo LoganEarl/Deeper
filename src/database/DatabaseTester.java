@@ -1,6 +1,7 @@
 package database;
 
 import client.AccountTable;
+import org.sqlite.core.DB;
 import world.entity.EntityTable;
 import world.item.*;
 import world.room.Room;
@@ -31,8 +32,17 @@ public class DatabaseTester {
 
         Room r = Room.getRoomByRoomName("The Origin", DB_NAME);
         if(r != null) {
+            System.out.println("In Room");
             List<Item> inRoom = Item.getItemsInRoom(r.getRoomName(), DB_NAME);
+            for(Item i : inRoom){
+                System.out.println(i.getDisplayableName());
+            }
 
+            System.out.println("In Container");
+            inRoom = Item.getItemsOfContainerID(1, DB_NAME);
+            for(Item i : inRoom){
+                System.out.println(i.getDisplayableName());
+            }
         }
     }
 }

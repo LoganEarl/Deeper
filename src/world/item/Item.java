@@ -25,9 +25,9 @@ public class Item implements DatabaseManager.DatabaseEntry {
             TABLE_NAME, ENTITY_ID, ROOM_NAME, ITEM_ID, DISPLAY_NAME, ITEM_ID);
     private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
-    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE (%s=? AND %s=? AND %s=NULL AND %s=NULL)",
+    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE (%s=? AND %s=? AND %s IS NULL AND %s IS NULL)",
             TABLE_NAME, ITEM_NAME, ROOM_NAME, ENTITY_ID, CONTAINER_ID);
-    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=? AND %s=NULL AND %s=NULL)",
+    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=? AND %s IS NULL AND %s IS NULL)",
             TABLE_NAME, ROOM_NAME, ENTITY_ID, CONTAINER_ID);
     private static final String GET_OF_CONTAINER_ID_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?",
             ItemInstanceTable.TABLE_NAME, CONTAINER_ID);
@@ -38,6 +38,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
     private String itemName;
     private String displayName;
     private String databaseName;
+    private int lockNumber;
     private Map<String,String> itemStats;
 
     private Item(ResultSet entry, String databaseName) throws SQLException{
@@ -46,6 +47,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
         roomName = entry.getString(ROOM_NAME);
         itemName = entry.getString(ITEM_NAME);
         displayName = entry.getString(DISPLAY_NAME);
+        lockNumber = entry.getInt(LOCK_NUMBER);
         this.databaseName = databaseName;
     }
 
@@ -311,6 +313,10 @@ public class Item implements DatabaseManager.DatabaseEntry {
         initStats();
         String s = itemStats.get(ItemStatTable.ITEM_DESCRIPTION);
         return s == null? "":s;
+    }
+
+    public int getLockNumber(){
+        return lockNumber;
     }
 
     @Override
