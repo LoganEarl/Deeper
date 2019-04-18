@@ -3,11 +3,6 @@ package world.item;
 import database.DatabaseManager;
 import world.entity.EntityTable;
 import world.room.RoomTable;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
