@@ -38,6 +38,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
     private String itemName;
     private String displayName;
     private String databaseName;
+    private int containerID;
     private int lockNumber;
     private Map<String,String> itemStats;
 
@@ -46,6 +47,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
         entityID = entry.getString(ENTITY_ID);
         roomName = entry.getString(ROOM_NAME);
         itemName = entry.getString(ITEM_NAME);
+        containerID = entry.getInt(CONTAINER_ID);
         displayName = entry.getString(DISPLAY_NAME);
         lockNumber = entry.getInt(LOCK_NUMBER);
         this.databaseName = databaseName;
@@ -67,7 +69,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
      * @param databaseName the name of the database containing the item's stats. item is stored in that database
      */
     public Item(String itemName, String displayName, String databaseName){
-        int id = new Long(System.currentTimeMillis()).hashCode();
+        int id = Long.valueOf(System.currentTimeMillis()).hashCode();
         while(getItemByID(id, databaseName) != null)
             id++;
         this.itemID = id;
@@ -274,7 +276,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
         return getCastDouble(ItemStatTable.WEIGHT);
     }
 
-    public double getSize(){
+    public double getVolume(){
         initStats();
         return getCastDouble(ItemStatTable.SIZE);
     }
@@ -317,6 +319,20 @@ public class Item implements DatabaseManager.DatabaseEntry {
 
     public int getLockNumber(){
         return lockNumber;
+    }
+
+    public int getContainerID(){
+        return containerID;
+    }
+
+    /**
+     * stores the item in the container with the given ID. NOTE!!!, this ignores any constraints that the container may have. Do not manually place items inside of containers with this method. Instead, use the tryStoreItem() of the container. This method will null out the entityID and the roomName of the item, to show the location of the item is dependant on that of the container it is stored in. Persists changes automatically
+     */
+    public void setContainerID(int containerID){
+        this.containerID = containerID;
+        this.entityID = "";
+        this.roomName = "";
+        updateInDatabase(databaseName);
     }
 
     @Override

@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -38,12 +39,21 @@ public class Container implements DatabaseManager.DatabaseEntry {
 
     private Map<String,String> containerStats;
 
-    private Container(ResultSet entry, String databaseName) throws SQLException {
+    private Container(ResultSet entry, String databaseName) throws Exception {
         containerID = entry.getInt(CONTAINER_ID);
         containerName = entry.getString(CONTAINER_NAME);
+        if(containerName == null || containerName.isEmpty() || ContainerStatTable.getStatsForContainer(containerName,databaseName) == null)
+            throw new IllegalArgumentException("Passed in an entry without a container name");
+
         entityID = entry.getString(ENTITY_ID);
-        roomName = entry.getString(ROOM_NAME);
+        if(entityID == null || entityID.isEmpty()) {
+            entityID = "";
+            roomName = entry.getString(ROOM_NAME);
+        }else
+            roomName = "";
         containerState = entry.getString(CONTAINER_STATE);
+        if (containerState == null || containerState.isEmpty())
+            containerState = STATE_UNLOCKED;
         lockNumber = entry.getInt(LOCK_NUMBER);
         this.databaseName = databaseName;
     }
@@ -71,7 +81,7 @@ public class Container implements DatabaseManager.DatabaseEntry {
                     toReturn = null;
                 getSQL.close();
                 c.close();
-            }catch (SQLException e){
+            }catch (Exception e){
                 toReturn = null;
             }
         }
@@ -104,6 +114,15 @@ public class Container implements DatabaseManager.DatabaseEntry {
         return getContainerByContainerID(containerID,databaseName) != null;
     }
 
+    /**
+     * shortcut to Item.getItemsOfContainerID().
+     * @return all items stored in this container
+     * @see Item
+     */
+    public List<Item> getStoredItems(){
+        return Item.getItemsOfContainerID(containerID,databaseName);
+    }
+
     public int getContainerID() {
         return containerID;
     }
@@ -126,5 +145,109 @@ public class Container implements DatabaseManager.DatabaseEntry {
 
     public String getDatabaseName() {
         return databaseName;
+    }
+
+    public String getContainerDescription(){
+        initStats();
+        String s =  containerStats.get(ContainerStatTable.CONTAINER_DESCRIPTION);
+        return s == null? "":s;
+    }
+
+    /**
+     * gets if this container can store the given item without exceeding its storage constraints
+     * @param i the item to check against the storage constraints
+     * @return true if the item fits in the container
+     */
+    public boolean canHoldItem(Item i){
+        double totalKgs = 0, totalLiters = 0;
+        List<Item> heldItems = getStoredItems();
+        for(Item stored : heldItems){
+            totalKgs += stored.getWeight();
+            totalLiters += stored.getVolume();
+        }
+        return (getMaxItems() != ContainerStatTable.CODE_NOT_USED && getMaxItems() < heldItems.size()+1) ||
+                (getMaxKilograms() != ContainerStatTable.CODE_NOT_USED && getMaxKilograms() < totalKgs + i.getWeight()) ||
+                (getMaxLiters() != ContainerStatTable.CODE_NOT_USED && getMaxLiters() < totalLiters + i.getVolume());
+    }
+
+    /**
+     * attempts to set the lock state of this container with the given item. The lockNumbers of the items are compared. If they match and the container is lockable, the container lock state will be set successfully. Otherwise not. If the state changed, the database is updated with the new lock state.
+     * @param i the item used to
+     * @return true if the container could be updated. false if not a lockable container, the item was not a key, or the lock numbers did not match
+     */
+    public boolean setLockedWithItem(Item i, boolean wantToBeLocked){
+        if(!getIsLockable() || i.getLockNumber() == 0)
+            return false;
+        if(getLockNumber() == i.getLockNumber()){
+            if(wantToBeLocked)
+                containerState = STATE_LOCKED;
+            else
+                containerState = STATE_UNLOCKED;
+            updateInDatabase(databaseName);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * will attempt to store the given item in this container. Will fail to do id this container is locked or cannot hold the item due to container constraints.
+     * @param toStore the item to store in teh container
+     * @return true if the item was stored successfully
+     */
+    public boolean tryStoreItem(Item toStore){
+        if(containerState.equals(STATE_LOCKED) || !canHoldItem(toStore))
+            return false;
+        toStore.setContainerID(containerID);
+        return true;
+    }
+
+    public double getMaxKilograms(){
+        initStats();
+        return getCastDouble(ContainerStatTable.MAX_KGS,containerStats);
+    }
+
+    public double getMaxLiters(){
+        initStats();
+        return getCastDouble(ContainerStatTable.MAX_LITERS,containerStats);
+    }
+
+    public int getMaxItems(){
+        initStats();
+        return getCastInt(ContainerStatTable.MAX_NUMBER,containerStats);
+    }
+
+    public int getLockDifficulty(){
+        initStats();
+        return getCastInt(ContainerStatTable.LOCK_DIFFICULTY, containerStats);
+    }
+
+    public boolean getIsLockable(){
+        initStats();
+        return getLockDifficulty() != ContainerStatTable.CODE_NOT_USED;
+    }
+
+    private void initStats(){
+        if(containerStats == null)
+            containerStats = ContainerStatTable.getStatsForContainer(containerName,databaseName);
+    }
+
+    private double getCastDouble(String tag, Map<String,String> stats){
+        String s = stats.get(tag);
+        if(s != null) {
+            try {
+                return Double.parseDouble(s);
+            }catch (Exception ignored){}
+        }
+        return 0.0;
+    }
+
+    private int getCastInt(String tag, Map<String,String> stats){
+        String s = stats.get(tag);
+        if(s != null) {
+            try {
+                return Integer.parseInt(s);
+            }catch (Exception ignored){}
+        }
+        return 0;
     }
 }

@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Table definition for a SQL table that holds all the specific instances of items.<br>
  * Note for retrieving items from the database, item locations follow a hierarchy.<br>
- *     1. Check the containedItemsTable for the item. If it is there, ignore all other values.
+ *     1. Check the {@value CONTAINER_ID} , if it is there ignore all other values
  *     This means the item is in that container and the container's location should be used instead<br>
  *     2. Check the value stored under {@value ENTITY_ID}, if it is there ignore all other values.
  *     This means that the given entity is holding the item<br>
@@ -34,7 +34,7 @@ public class ItemInstanceTable implements DatabaseTable {
     public static final String ITEM_NAME = ItemStatTable.ITEM_NAME;
     /**The default displayed name of the item is the value stored under ITEM_NAME, but if this contains a value, it is used instead. Used for specifically named weapons and items*/
     public static final String DISPLAY_NAME = "displayName";
-    /**The code this item can unlock. If attempting to unlock a container, this will be compared to the lock number of the container. If they match, the item can serve as a key to it*/
+    /**The code this item can unlock. If attempting to unlock a container, this will be compared to the lock number of the container. If they match, the item can serve as a key to it. If 0 or NULL it is not a key*/
     public static final String LOCK_NUMBER = ContainerInstanceTable.LOCK_NUMBER;
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();

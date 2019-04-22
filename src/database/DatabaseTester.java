@@ -39,10 +39,39 @@ public class DatabaseTester {
             }
 
             System.out.println("In Container");
-            inRoom = Item.getItemsOfContainerID(1, DB_NAME);
+            Container container = Container.getContainerByContainerID(1,DB_NAME);
+            if(container == null){
+                System.out.println("Failed to find container with ID:1");
+                return;
+            }
+
+            List<Item> inContainer = container.getStoredItems();
+            for(Item i : inContainer){
+                System.out.println(i.getDisplayableName());
+            }
+
+            System.out.println("Attempting to move items in room into container");
+
+            for(Item i: inRoom){
+                if(container.tryStoreItem(i)){
+                    System.out.printf("Stored the %s in the %s\n", i.getDisplayableName(), container.getContainerName());
+                }else{
+                    System.out.printf("Could not store the the %s in the %s\n", i.getDisplayableName(), container.getContainerName());
+                }
+            }
+
+            System.out.println("In Room");
+            inRoom = Item.getItemsInRoom(r.getRoomName(), DB_NAME);
             for(Item i : inRoom){
                 System.out.println(i.getDisplayableName());
             }
+
+            System.out.println("In Container");
+            inContainer = container.getStoredItems();
+            for(Item i : inContainer){
+                System.out.println(i.getDisplayableName());
+            }
+
         }
     }
 }

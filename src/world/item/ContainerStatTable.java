@@ -18,6 +18,8 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     /**The name of the table used to store container stats*/
     public static final String TABLE_NAME = "containerStats";
 
+    /**If the MAX_KGS, MAX_LITERS, MAX_NUMBER, or LOCK_DIFFICULTY has this value the value is not applicable or not used*/
+    public static final int CODE_NOT_USED = -1;
     /**The name of the container*/
     public static final String CONTAINER_NAME = "containerName";
     /**The description of the container*/
@@ -28,7 +30,7 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     public static final String MAX_LITERS = "maxLiters";
     /**The maximum storage potential of the container in number of items stored*/
     public static final String MAX_NUMBER = "maxItems";
-    /**Stores how difficult the lock is to pick. 0 means it has no lock*/
+    /**Stores how difficult the lock is to pick. {@value CODE_NOT_USED} means it has no lock*/
     public static final String LOCK_DIFFICULTY = "lockDifficulty";
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
