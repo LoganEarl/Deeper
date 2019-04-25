@@ -102,6 +102,12 @@ public class DatabaseManager {
                     statement.setInt(i + 1, (Integer) args[i]);
                 else if (args[i] instanceof String)
                     statement.setString(i + 1, (String) args[i]);
+                else if(args[i] instanceof  Double)
+                    statement.setDouble(i+1, (Double)args[i]);
+                else if(args[i] instanceof  Float)
+                    statement.setDouble(i+1, (Float)args[i]);
+                else if(args[i] == null)
+                    statement.setNull(i+1,Types.VARCHAR);
             }
 
             int result = statement.executeUpdate();

@@ -21,8 +21,8 @@ public class Item implements DatabaseManager.DatabaseEntry {
             TABLE_NAME, ITEM_ID, ENTITY_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
-    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=? WHERE %s=?",
-            TABLE_NAME, ENTITY_ID, ROOM_NAME, ITEM_ID, DISPLAY_NAME, ITEM_ID);
+    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
+            TABLE_NAME, ENTITY_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, ITEM_ID);
     private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
     private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE (%s=? AND %s=? AND %s IS NULL AND %s IS NULL)",
@@ -42,13 +42,19 @@ public class Item implements DatabaseManager.DatabaseEntry {
     private int lockNumber;
     private Map<String,String> itemStats;
 
-    private Item(ResultSet entry, String databaseName) throws SQLException{
+    private Item(ResultSet entry, String databaseName) throws Exception{
         itemID = entry.getInt(ITEM_ID);
         entityID = entry.getString(ENTITY_ID);
         roomName = entry.getString(ROOM_NAME);
+        if(roomName == null)
+            roomName = "";
         itemName = entry.getString(ITEM_NAME);
+        if(itemName == null || itemName.isEmpty() || ItemStatTable.getStatsForItem(itemName,databaseName) == null)
+            throw new IllegalArgumentException("Passed in an entry without a container name");
         containerID = entry.getInt(CONTAINER_ID);
         displayName = entry.getString(DISPLAY_NAME);
+        if(displayName == null)
+            displayName = "";
         lockNumber = entry.getInt(LOCK_NUMBER);
         this.databaseName = databaseName;
     }
@@ -74,6 +80,8 @@ public class Item implements DatabaseManager.DatabaseEntry {
             id++;
         this.itemID = id;
         this.displayName = displayName;
+        if(this.displayName == null)
+            this.displayName = "";
         this.itemStats = ItemStatTable.getStatsForItem(itemName,databaseName);
         if(itemStats == null)
             throw new IllegalArgumentException("No stats exists for item name (" + itemName + ") in database (" + databaseName + ")");
@@ -105,7 +113,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                     toReturn = null;
                 getSQL.close();
                 c.close();
-            }catch (SQLException e){
+            }catch (Exception e){
                 toReturn = null;
             }
         }
@@ -134,7 +142,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 }
                 getSQL.close();
                 c.close();
-            }catch (SQLException e){
+            }catch (Exception e){
                 foundItems = Collections.emptyList();
             }
         }
@@ -164,7 +172,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                     toReturn = null;
                 getSQL.close();
                 c.close();
-            }catch (SQLException e){
+            }catch (Exception e){
                 toReturn = null;
             }
         }
@@ -193,7 +201,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 }
                 getSQL.close();
                 c.close();
-            }catch (SQLException e){
+            }catch (Exception e){
                 foundItems = Collections.emptyList();
             }
         }
@@ -218,7 +226,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
     @Override
     public boolean updateInDatabase(String databaseName) {
         return DatabaseManager.executeStatement(UPDATE_SQL,databaseName,
-                entityID, roomName, itemID, displayName) > 0;
+                entityID, roomName, itemName, displayName, containerID, itemID) > 0;
     }
 
     @Override

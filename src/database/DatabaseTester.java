@@ -31,47 +31,74 @@ public class DatabaseTester {
         DatabaseManager.createTables(DB_NAME, tables);
 
         Room r = Room.getRoomByRoomName("The Origin", DB_NAME);
-        if(r != null) {
-            System.out.println("In Room");
-            List<Item> inRoom = Item.getItemsInRoom(r.getRoomName(), DB_NAME);
-            for(Item i : inRoom){
-                System.out.println(i.getDisplayableName());
-            }
+        Container c = Container.getContainerByContainerID(1,DB_NAME);
+        if(r != null && c != null) {
 
-            System.out.println("In Container");
-            Container container = Container.getContainerByContainerID(1,DB_NAME);
-            if(container == null){
-                System.out.println("Failed to find container with ID:1");
-                return;
-            }
-
-            List<Item> inContainer = container.getStoredItems();
-            for(Item i : inContainer){
-                System.out.println(i.getDisplayableName());
-            }
+            displayRoomContents(r);
+            displayContainerContents(c);
 
             System.out.println("Attempting to move items in room into container");
+            List<Item> inRoom = Item.getItemsInRoom(r.getRoomName(),DB_NAME);
 
             for(Item i: inRoom){
-                if(container.tryStoreItem(i)){
-                    System.out.printf("Stored the %s in the %s\n", i.getDisplayableName(), container.getContainerName());
+                if(c.tryStoreItem(i)){
+                    System.out.printf("Stored the %s in the %s\n", i.getDisplayableName(), c.getContainerName());
                 }else{
-                    System.out.printf("Could not store the the %s in the %s\n", i.getDisplayableName(), container.getContainerName());
+                    System.out.printf("Could not store the the %s in the %s\n", i.getDisplayableName(), c.getContainerName());
                 }
             }
 
-            System.out.println("In Room");
-            inRoom = Item.getItemsInRoom(r.getRoomName(), DB_NAME);
-            for(Item i : inRoom){
-                System.out.println(i.getDisplayableName());
+            displayRoomContents(r);
+            displayContainerContents(c);
+
+            System.out.println("Attempting to unlock the container with the key");
+            Item i = Item.getItemByID(3,DB_NAME);
+            if(c.setLockedWithItem(i,false))
+                System.out.println("Unlocked!");
+            else
+                System.out.println("Failed to unlock");
+
+            System.out.println("Attempting to move items in room into container");
+            inRoom = Item.getItemsInRoom(r.getRoomName(),DB_NAME);
+
+            for(Item j: inRoom){
+                if(c.tryStoreItem(i)){
+                    System.out.printf("Stored the %s in the %s\n", j.getDisplayableName(), c.getContainerName());
+                }else{
+                    System.out.printf("Could not store the the %s in the %s\n", j.getDisplayableName(), c.getContainerName());
+                }
             }
 
-            System.out.println("In Container");
-            inContainer = container.getStoredItems();
-            for(Item i : inContainer){
-                System.out.println(i.getDisplayableName());
-            }
+            displayRoomContents(r);
+            displayContainerContents(c);
 
+            System.out.println("Attempting to lock the container with the key");
+            i = Item.getItemByID(3,DB_NAME);
+            if(c.setLockedWithItem(i,true))
+                System.out.println("Locked!");
+            else
+                System.out.println("Failed to lock");
+        }
+    }
+
+    private static void displayRoomContents(Room r){
+        System.out.println("In Room");
+        List<Item> inRoom = Item.getItemsInRoom(r.getRoomName(), DB_NAME);
+        for(Item i : inRoom){
+            System.out.println(i.getDisplayableName());
+        }
+    }
+
+    private static void displayContainerContents(Container c){
+        if(c == null){
+            System.out.println("Failed to find container with ID:1");
+            return;
+        }
+
+        System.out.println("In Container");
+        List<Item> inContainer = c.getStoredItems();
+        for(Item i : inContainer){
+            System.out.println(i.getDisplayableName());
         }
     }
 }
