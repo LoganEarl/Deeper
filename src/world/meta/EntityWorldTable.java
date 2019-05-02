@@ -3,10 +3,7 @@ package world.meta;
 import database.DatabaseManager;
 import world.entity.EntityTable;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A table made to record what world each entity is in. Each world is it's own database file,
@@ -20,6 +17,8 @@ public class EntityWorldTable implements DatabaseManager.DatabaseTable {
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
     public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+
+
 
     public EntityWorldTable(){
         TABLE_DEFINITION.put(ENTITY_ID, "VARCHAR(32) PRIMARY KEY NOT NULL");
@@ -38,6 +37,7 @@ public class EntityWorldTable implements DatabaseManager.DatabaseTable {
 
     @Override
     public List<String> getConstraints() {
-        return Collections.emptyList();
+        return Collections.singletonList(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+        WORLD_ID, WorldTable.TABLE_NAME, WorldTable.WORLD_ID));
     }
 }

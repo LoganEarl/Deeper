@@ -173,6 +173,7 @@ public class Container implements DatabaseManager.DatabaseEntry {
     /**
      * attempts to set the lock state of this container with the given item. The lockNumbers of the items are compared. If they match and the container is lockable, the container lock state will be set successfully. Otherwise not. If the state changed, the database is updated with the new lock state.
      * @param i the item used to
+     * @param wantToBeLocked true if the container should be locked
      * @return true if the container could be updated. false if not a lockable container, the item was not a key, or the lock numbers did not match
      */
     public boolean setLockedWithItem(Item i, boolean wantToBeLocked){
