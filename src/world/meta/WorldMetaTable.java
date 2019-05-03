@@ -1,20 +1,19 @@
 package world.meta;
 
 import database.DatabaseManager;
+import world.room.RoomTable;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class WorldTable implements DatabaseManager.DatabaseTable {
-    public static final String TABLE_NAME = "world";
+/**
+ * Each world template needs a bit of extra info when instantiating the world. Templates have these tables, but they are removed from
+ * the instantiated worlds during construction. The information stored in this table is stored in the Global meta database instead of
+ * in the individual databases, so that the data can be accessed once the simulated world is over.
+ */
+public class WorldMetaTable implements DatabaseManager.DatabaseTable {
+    public static final String TABLE_NAME = "meta";
 
-    public static final String WORLD_ID = "worldID";
     public static final String WORLD_NAME = "worldName";
-    public static final String WORLD_STATUS = "worldStatus";
-    public static final String WORLD_END_TIME = "worldEndTime";
-    public static final String WORLD_START_TIME = "worldStartTIme";
     public static final String PREFERRED_DURATION_MINUTES = "durationMinutes";
     public static final String ENTRY_PORTAL_ROOM_NAME = "entryPortalRoomName";
     public static final String EXIT_PORTAL_ROOM_NAME = "exitPortalRoomName";
@@ -24,17 +23,20 @@ public class WorldTable implements DatabaseManager.DatabaseTable {
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
     public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
-    public WorldTable(){
-        TABLE_DEFINITION.put(WORLD_ID, "INT PRIMARY KEY NOT NULL");
-        TABLE_DEFINITION.put(WORLD_NAME,"VARCHAR(32) NOT NULL");
-        TABLE_DEFINITION.put(WORLD_STATUS,"VARCHAR(16) NOT NULL");
-        TABLE_DEFINITION.put(WORLD_START_TIME,"BIGINT");
-        TABLE_DEFINITION.put(WORLD_END_TIME, "BIGINT");
+    public final List<String> CONSTRAINTS = new ArrayList<>();
+
+    public WorldMetaTable(){
+        TABLE_DEFINITION.put(WORLD_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
         TABLE_DEFINITION.put(PREFERRED_DURATION_MINUTES, "INT NOT NULL");
         TABLE_DEFINITION.put(ENTRY_PORTAL_ROOM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
         TABLE_DEFINITION.put(EXIT_PORTAL_ROOM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
         TABLE_DEFINITION.put(PORTAL_SIZE, "INT NOT NULL");
         TABLE_DEFINITION.put(ESTIMATED_DIFFICULTY, "INT");
+
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                ENTRY_PORTAL_ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                EXIT_PORTAL_ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));
     }
 
     @Override
@@ -49,6 +51,6 @@ public class WorldTable implements DatabaseManager.DatabaseTable {
 
     @Override
     public List<String> getConstraints() {
-        return Collections.emptyList();
+        return CONSTRAINTS;
     }
 }
