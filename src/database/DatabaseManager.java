@@ -6,19 +6,27 @@ import java.util.List;
 import java.util.Map;
 
 public class DatabaseManager {
-    public static final String SAVE_DIRECTORY = System.getProperty("user.dir").replace("\\", "/") + "/data/";
+    public static final String DATA_DIRECTORY = System.getProperty("user.dir").replace("\\", "/") + "/data/";
+    public static final String TEMPLATE_DIRECTORY = DATA_DIRECTORY + "template/";
 
     public static void createDirectories() {
-        File f = new File(SAVE_DIRECTORY);
+        File f = new File(DATA_DIRECTORY);
+        if (!f.exists()) {
+            f.getParentFile().mkdirs();
+            f.mkdirs();
+        }
+        createTemplateDirectories();
+    }
+
+    private static void createTemplateDirectories(){
+        File f = new File(TEMPLATE_DIRECTORY);
         if (!f.exists()) {
             f.getParentFile().mkdirs();
             f.mkdirs();
         }
     }
 
-    public static void createNewDatabase(String fileName) {
-        String url = "jdbc:sqlite:" + SAVE_DIRECTORY + fileName;
-
+    private static void createDatabase(String url){
         try (Connection conn = DriverManager.getConnection(url)) {
             if (conn != null) {
                 DatabaseMetaData meta = conn.getMetaData();
@@ -31,8 +39,16 @@ public class DatabaseManager {
         }
     }
 
+    public static void createNewTemplate(String templateFileName){
+        createDatabase(getTemplateConnectionURL(templateFileName));
+    }
+
+    public static void createNewWorldDatabase(String fileName) {
+        createDatabase(getWorldConnectionURL(fileName));
+    }
+
     public static Connection getDatabaseConnection(String fileName) {
-        String url = "jdbc:sqlite:" + SAVE_DIRECTORY + fileName;
+        String url = "jdbc:sqlite:" + DATA_DIRECTORY + fileName;
 
         try {
             return DriverManager.getConnection(url);
@@ -41,12 +57,11 @@ public class DatabaseManager {
         }
     }
 
-    public static void createTables(String fileName, List<DatabaseTable> tables) {
+    private static void createTables(String url, List<DatabaseTable> tables){
         String curTableName = "";
-        try {
+        try{
             Class.forName("com.mysql.jdbc.Driver");
-
-            Connection conn = DriverManager.getConnection(getConnectionURL(fileName));
+            Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement();
 
             for (DatabaseTable table : tables) {
@@ -78,9 +93,20 @@ public class DatabaseManager {
         }
     }
 
+    public static void createWorldTables(String fileName, List<DatabaseTable> tables) {
+        createTables(getWorldConnectionURL(fileName),tables);
+    }
 
-    private static String getConnectionURL(String fileName) {
-        return "jdbc:sqlite:" + SAVE_DIRECTORY + fileName;
+    public static void createTemplateTables(String fileName, List<DatabaseTable> tables){
+        createTables(getTemplateConnectionURL(fileName), tables);
+    }
+
+    private static String getWorldConnectionURL(String fileName) {
+        return "jdbc:sqlite:" + DATA_DIRECTORY + fileName;
+    }
+
+    private static String getTemplateConnectionURL(String fileName) {
+        return "jdbc:sqlite:" + TEMPLATE_DIRECTORY + fileName;
     }
 
     public interface DatabaseTable {
@@ -106,6 +132,8 @@ public class DatabaseManager {
                     statement.setDouble(i+1, (Double)args[i]);
                 else if(args[i] instanceof  Float)
                     statement.setDouble(i+1, (Float)args[i]);
+                else if(args[i] instanceof  Long)
+                    statement.setLong(i+1, (Long)args[i]);
                 else if(args[i] == null)
                     statement.setNull(i+1,Types.VARCHAR);
             }

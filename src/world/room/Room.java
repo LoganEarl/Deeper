@@ -30,10 +30,10 @@ public class Room implements DatabaseManager.DatabaseEntry {
     private int visibilityCode;
 
     private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,ROOM_NAME);
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s %s %s %s %s %s %s %s %s) VALUES (? ? ? ? ? ? ? ?)",
+    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             TABLE_NAME, ROOM_NAME, ROOM_DESCRIPTION, ROOM_VISIBILITY, ROOM_UP_NAME, ROOM_DOWN_NAME, ROOM_NORTH_NAME, ROOM_SOUTH_NAME, ROOM_EAST_NAME, ROOM_WEST_NAME);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,ROOM_NAME);
-    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=? %s=? %s=? %s=? %s=? %s=? %s=? %s=? WHERE %s=?",
+    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
             TABLE_NAME, ROOM_DESCRIPTION, ROOM_VISIBILITY, ROOM_UP_NAME, ROOM_DOWN_NAME, ROOM_NORTH_NAME, ROOM_SOUTH_NAME, ROOM_EAST_NAME, ROOM_WEST_NAME, ROOM_NAME);
 
     private Room(ResultSet readEntry) throws SQLException{

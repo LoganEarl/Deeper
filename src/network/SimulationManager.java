@@ -100,8 +100,8 @@ public class SimulationManager {
         tables.add(new ContainerInstanceTable());
 
         DatabaseManager.createDirectories();
-        DatabaseManager.createNewDatabase(DB_NAME);
-        DatabaseManager.createTables(DB_NAME, tables);
+        DatabaseManager.createNewWorldDatabase(DB_NAME);
+        DatabaseManager.createWorldTables(DB_NAME, tables);
 
         server.startServer();
     }

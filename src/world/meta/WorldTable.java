@@ -14,7 +14,7 @@ public class WorldTable implements DatabaseManager.DatabaseTable {
     public static final String WORLD_NAME = "worldName";
     public static final String WORLD_STATUS = "worldStatus";
     public static final String WORLD_END_TIME = "worldEndTime";
-    public static final String WORLD_START_TIME = "worldStartTIme";
+    public static final String WORLD_START_TIME = "worldStartTime";
     public static final String PREFERRED_DURATION_MINUTES = "durationMinutes";
     public static final String ENTRY_PORTAL_ROOM_NAME = "entryPortalRoomName";
     public static final String EXIT_PORTAL_ROOM_NAME = "exitPortalRoomName";
@@ -31,8 +31,8 @@ public class WorldTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(WORLD_START_TIME,"BIGINT");
         TABLE_DEFINITION.put(WORLD_END_TIME, "BIGINT");
         TABLE_DEFINITION.put(PREFERRED_DURATION_MINUTES, "INT NOT NULL");
-        TABLE_DEFINITION.put(ENTRY_PORTAL_ROOM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
-        TABLE_DEFINITION.put(EXIT_PORTAL_ROOM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
+        TABLE_DEFINITION.put(ENTRY_PORTAL_ROOM_NAME, "VARCHAR(32) NOT NULL");
+        TABLE_DEFINITION.put(EXIT_PORTAL_ROOM_NAME, "VARCHAR(32) NOT NULL");
         TABLE_DEFINITION.put(PORTAL_SIZE, "INT NOT NULL");
         TABLE_DEFINITION.put(ESTIMATED_DIFFICULTY, "INT");
     }

@@ -1,7 +1,7 @@
-package database;
+package world.test;
 
 import client.AccountTable;
-import org.sqlite.core.DB;
+import database.DatabaseManager;
 import world.entity.EntityTable;
 import world.item.*;
 import world.room.Room;
@@ -11,7 +11,7 @@ import world.story.StoryArcTable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DatabaseTester {
+public class WorldTester {
     private static final String DB_NAME = "testSim.db";
 
     public static void main(String[] args){
@@ -27,8 +27,8 @@ public class DatabaseTester {
         tables.add(new ContainerInstanceTable());
 
         DatabaseManager.createDirectories();
-        DatabaseManager.createNewDatabase(DB_NAME);
-        DatabaseManager.createTables(DB_NAME, tables);
+        DatabaseManager.createNewWorldDatabase(DB_NAME);
+        DatabaseManager.createWorldTables(DB_NAME, tables);
 
         Room r = Room.getRoomByRoomName("The Origin", DB_NAME);
         Container c = Container.getContainerByContainerID(1,DB_NAME);

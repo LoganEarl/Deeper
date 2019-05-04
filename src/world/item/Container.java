@@ -20,7 +20,7 @@ import static world.item.ContainerInstanceTable.*;
  * @author Logan Earl
  */
 public class Container implements DatabaseManager.DatabaseEntry {
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s %s %s %s %s %s) VALUES (? ? ? ? ? ?)",
+    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)",
             TABLE_NAME, CONTAINER_ID, CONTAINER_NAME, ENTITY_ID, ROOM_NAME, CONTAINER_STATE, LOCK_NUMBER);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?",
             TABLE_NAME, CONTAINER_ID);

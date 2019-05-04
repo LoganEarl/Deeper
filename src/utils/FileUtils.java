@@ -1,30 +1,29 @@
 package utils;
 
 import java.io.*;
+import java.nio.channels.FileChannel;
 
 public class FileUtils {
-    public static void copyFile(String fromFilePath, String toFilePath){
-        File fin = new File(fromFilePath);
-        File fout = new File(toFilePath);
+    public static void copyFile(File sourceFile, File destFile) throws IOException {
+        if(!destFile.exists()) {
+            destFile.createNewFile();
+        }
+
+        FileChannel source = null;
+        FileChannel destination = null;
 
         try {
-            if (fin.exists()) {
-                if (!fout.exists()) {
-                    fout.getParentFile().mkdirs();
-                    fout.mkdirs();
-                }
+            source = new FileInputStream(sourceFile).getChannel();
+            destination = new FileOutputStream(destFile).getChannel();
+            destination.transferFrom(source, 0, source.size());
+        }
+        finally {
+            if(source != null) {
+                source.close();
             }
-
-            FileInputStream in = new FileInputStream(fin);
-            FileOutputStream out = new FileOutputStream(fout);
-            while(in.available() > 0){
-                byte[] buff = new byte[in.available()];
-                in.read(buff);
-                out.write(buff);
+            if(destination != null) {
+                destination.close();
             }
-
-            in.close();
-            out.close();
-        }catch (IOException ignored){}
+        }
     }
 }

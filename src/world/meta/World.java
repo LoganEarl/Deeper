@@ -3,11 +3,10 @@ package world.meta;
 import database.DatabaseManager;
 import utils.FileUtils;
 
+import javax.xml.crypto.Data;
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.IOException;
+import java.sql.*;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Locale;
@@ -24,13 +23,15 @@ import static world.meta.WorldTable.*;
 public class World implements DatabaseManager.DatabaseEntry {
     public static final String META_DATABASE_NAME = "meta.db";
 
+    private static final String DROP_META_TABLE_SQL = String.format(Locale.US, "DROP TABLE %s", WorldMetaTable.TABLE_NAME);
+    private static final String GET_FROM_TEMPLATE = String.format(Locale.US, "SELECT * FROM %s", WorldMetaTable.TABLE_NAME);
     private static final String GET_ENTITY_SQL = String.format(Locale.US, "SELECT * FROM %s INNER JOIN %s WHERE %s=?", EntityWorldTable.TABLE_NAME, TABLE_NAME, EntityWorldTable.ENTITY_ID);
     private static final String GET_ALL_SQL = String.format(Locale.US, "SELECT * FROM %s", TABLE_NAME);
     private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME, WORLD_ID);
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s %s %s %s %s %s %s %s %s %s) VALUES (? ? ? ? ? ? ? ? ? ?)",
+    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             TABLE_NAME,WORLD_ID,WORLD_NAME, WORLD_STATUS,WORLD_START_TIME,WORLD_END_TIME, ENTRY_PORTAL_ROOM_NAME, EXIT_PORTAL_ROOM_NAME, ESTIMATED_DIFFICULTY, PORTAL_SIZE, PREFERRED_DURATION_MINUTES);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,WORLD_ID);
-    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=? %s=? %s=? %s=? %s=? %s=? %s=? %s=? %s=?  WHERE %s=?",
+    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?  WHERE %s=?",
             TABLE_NAME, WORLD_NAME, WORLD_STATUS,WORLD_START_TIME,WORLD_END_TIME, ENTRY_PORTAL_ROOM_NAME, EXIT_PORTAL_ROOM_NAME, ESTIMATED_DIFFICULTY, PORTAL_SIZE, PREFERRED_DURATION_MINUTES, WORLD_ID);
 
     private int worldID;
@@ -44,19 +45,38 @@ public class World implements DatabaseManager.DatabaseEntry {
     private int portalSize;
     private int durationMinutes;
 
-    private World(int worldID, String name, String status, long startTime, long endTime, String entryRoomName, String exitRoomName, int portalSize, int durationMinutes){
-        this.worldID = worldID;
-        this.name = name;
-        this.status = status;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.entryRoomName = entryRoomName;
-        this.exitRoomName = exitRoomName;
-        this.portalSize = portalSize;
-        this.durationMinutes = durationMinutes;
+    public static final int MINIMUM_SIM_TIME_MINUTES = 30;
 
-        if(name == null || name.isEmpty() || status == null || status.isEmpty())
-            throw new IllegalArgumentException("Bad world name or status");
+    /**Value of getStatus() when the world is newly created and has not yet started*/
+    public static final String STATUS_NEW = "new";
+    /**Value of getStatus() when the world is created and actively being solved by players*/
+    public static final String STATUS_IN_PROGRESS = "inProgress";
+    /**Value of getStatus() when the world timed out without getting solved and was destroyed. World file has been deleted*/
+    public static final String STATUS_FAILED = "failed";
+    /**Value of getStatus() when the world has been completed but there are still players active in the sim*/
+    public static final String FINISHING = "finishing";
+    /**Value of getStatus() when the world was completed and all players have left. World file has been deleted*/
+    public static final String STATUS_COMPLETE = "complete";
+
+    private static boolean nullOrEmpty(String s){
+        return s == null || s.isEmpty();
+    }
+
+    private World(int worldID, ResultSet templateMetaTableEntry) throws Exception{
+        this.worldID = worldID;
+        this.name = templateMetaTableEntry.getString(WorldMetaTable.WORLD_NAME);
+        this.status = STATUS_NEW;
+        this.startTime = 0;
+        this.endTime = 0;
+        this.entryRoomName = templateMetaTableEntry.getString(WorldMetaTable.ENTRY_PORTAL_ROOM_NAME);
+        this.exitRoomName = templateMetaTableEntry.getString(WorldMetaTable.EXIT_PORTAL_ROOM_NAME);
+        this.portalSize = templateMetaTableEntry.getInt(WorldMetaTable.PORTAL_SIZE);
+        this.durationMinutes =  templateMetaTableEntry.getInt(WorldMetaTable.PREFERRED_DURATION_MINUTES);
+        if(durationMinutes < MINIMUM_SIM_TIME_MINUTES)
+            durationMinutes = MINIMUM_SIM_TIME_MINUTES;
+
+        if(nullOrEmpty(name) || nullOrEmpty(entryRoomName) || nullOrEmpty(exitRoomName))
+            throw new IllegalArgumentException("Bad template config");
 
         if(!saveToDatabase(""))
             throw new IllegalStateException("Unable to create world");
@@ -79,17 +99,47 @@ public class World implements DatabaseManager.DatabaseEntry {
     }
 
     public static World createWorldFromTemplate(String templateName){
-        File templateFile = new File("data/template/" + templateName + ".db");
+        File templateFile = new File(DatabaseManager.TEMPLATE_DIRECTORY + templateName + ".db");
         if(!templateFile.exists())
             return null;
-        int newWorldID = String.valueOf(System.currentTimeMillis()).hashCode();
+        int newWorldID = Math.abs(String.valueOf(System.currentTimeMillis()).hashCode());
         while(getWorldByWorldID(newWorldID) != null){
-            newWorldID = String.valueOf(newWorldID).hashCode();
+            newWorldID = Math.abs(String.valueOf(newWorldID).hashCode());
         }
-        FileUtils.copyFile(templateFile.getPath(), newWorldID + ".db");
+        try {
+            FileUtils.copyFile(templateFile, new File(DatabaseManager.DATA_DIRECTORY + newWorldID + ".db"));
+        }catch (IOException e){
+            e.printStackTrace();
+            return null;
+        }
 
-        //TODO get the data from the world, construct a world object from it, return the world object
-        return null;
+        Connection c = DatabaseManager.getDatabaseConnection(newWorldID + ".db");
+        PreparedStatement getSQL;
+        Statement deleteSQL;
+        World newWorld;
+        if(c == null)
+            return null;
+        else{
+            try {
+                getSQL = c.prepareStatement(GET_FROM_TEMPLATE);
+                ResultSet metaSet = getSQL.executeQuery();
+                if(metaSet.next()) {
+                    newWorld = new World(newWorldID, metaSet);
+                }else
+                    newWorld = null;
+                getSQL.close();
+
+
+            if(newWorld != null){
+                deleteSQL = c.createStatement();
+                deleteSQL.executeUpdate(DROP_META_TABLE_SQL);
+            }
+            }catch (Exception e){
+                newWorld = null;
+            }
+        }
+
+        return newWorld;
     }
 
     /**
