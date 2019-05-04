@@ -18,8 +18,9 @@ public class AccountTable implements DatabaseManager.DatabaseTable {
     public static final String EMAIL = "email";
     public static final String ACCOUNT_TYPE = "accountType";
 
+    public static final String ACCOUNT_DB_NAME = "meta.db";
+
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
-    private final List<String> CONSTRAINTS = new ArrayList<>();
 
     public AccountTable(){
         TABLE_DEFINITION.put(USER_NAME,"VARCHAR(16) PRIMARY KEY NOT NULL");
@@ -39,6 +40,6 @@ public class AccountTable implements DatabaseManager.DatabaseTable {
 
     @Override
     public List<String> getConstraints() {
-        return null;
+        return Collections.emptyList();
     }
 }

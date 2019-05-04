@@ -237,6 +237,65 @@ public class World implements DatabaseManager.DatabaseEntry {
         return toReturn;
     }
 
+    public int getWorldID() {
+        return worldID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public String getEntryRoomName() {
+        return entryRoomName;
+    }
+
+    public String getExitRoomName() {
+        return exitRoomName;
+    }
+
+    public int getEstimatedDifficulty() {
+        return estimatedDifficulty;
+    }
+
+    public int getPortalSize() {
+        return portalSize;
+    }
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public String getDatabaseName(){
+        return worldID + ".db";
+    }
+
+    public void resetStatus(){
+        this.status = STATUS_NEW;
+        this.startTime = 0;
+        this.endTime = 0;
+        updateInDatabase("");
+    }
+
+    public void startWorld(){
+        if(!this.status.equals(STATUS_NEW))
+            throw new IllegalStateException("World was already started");
+        this.status = STATUS_IN_PROGRESS;
+        this.startTime = System.currentTimeMillis();
+        this.endTime = startTime + (durationMinutes * 60 * 1000);
+    }
+
     /**
      * saves the world to the meta database.
      * @param ignored not used in the current implementation

@@ -4,6 +4,7 @@ import client.AccountTable;
 import database.DatabaseManager;
 import world.entity.EntityTable;
 import world.item.*;
+import world.meta.World;
 import world.room.Room;
 import world.room.RoomTable;
 import world.story.StoryArcTable;
@@ -12,9 +13,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class WorldTester {
-    private static final String DB_NAME = "testSim.db";
-
     public static void main(String[] args){
+        World w = World.createWorldFromTemplate("testTemplate");
+        if(w == null){
+            System.out.println("Failed to initialize world for testing");
+            return;
+        }
+
         List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
         tables.add(new AccountTable());
         tables.add(new ItemStatTable());
@@ -27,18 +32,18 @@ public class WorldTester {
         tables.add(new ContainerInstanceTable());
 
         DatabaseManager.createDirectories();
-        DatabaseManager.createNewWorldDatabase(DB_NAME);
-        DatabaseManager.createWorldTables(DB_NAME, tables);
+        DatabaseManager.createNewWorldDatabase(w.getDatabaseName());
+        DatabaseManager.createWorldTables(w.getDatabaseName(), tables);
 
-        Room r = Room.getRoomByRoomName("The Origin", DB_NAME);
-        Container c = Container.getContainerByContainerID(1,DB_NAME);
+        Room r = Room.getRoomByRoomName("The Origin", w.getDatabaseName());
+        Container c = Container.getContainerByContainerID(1,w.getDatabaseName());
         if(r != null && c != null) {
 
-            displayRoomContents(r);
+            displayRoomContents(r,w);
             displayContainerContents(c);
 
             System.out.println("Attempting to move items in room into container");
-            List<Item> inRoom = Item.getItemsInRoom(r.getRoomName(),DB_NAME);
+            List<Item> inRoom = Item.getItemsInRoom(r.getRoomName(),w.getDatabaseName());
 
             for(Item i: inRoom){
                 if(c.tryStoreItem(i)){
@@ -48,18 +53,18 @@ public class WorldTester {
                 }
             }
 
-            displayRoomContents(r);
+            displayRoomContents(r,w);
             displayContainerContents(c);
 
             System.out.println("Attempting to unlock the container with the key");
-            Item i = Item.getItemByID(3,DB_NAME);
+            Item i = Item.getItemByID(3,w.getDatabaseName());
             if(c.setLockedWithItem(i,false))
                 System.out.println("Unlocked!");
             else
                 System.out.println("Failed to unlock");
 
             System.out.println("Attempting to move items in room into container");
-            inRoom = Item.getItemsInRoom(r.getRoomName(),DB_NAME);
+            inRoom = Item.getItemsInRoom(r.getRoomName(),w.getDatabaseName());
 
             for(Item j: inRoom){
                 if(c.tryStoreItem(i)){
@@ -69,11 +74,11 @@ public class WorldTester {
                 }
             }
 
-            displayRoomContents(r);
+            displayRoomContents(r,w);
             displayContainerContents(c);
 
             System.out.println("Attempting to lock the container with the key");
-            i = Item.getItemByID(3,DB_NAME);
+            i = Item.getItemByID(3,w.getDatabaseName());
             if(c.setLockedWithItem(i,true))
                 System.out.println("Locked!");
             else
@@ -81,9 +86,9 @@ public class WorldTester {
         }
     }
 
-    private static void displayRoomContents(Room r){
+    private static void displayRoomContents(Room r, World w){
         System.out.println("In Room");
-        List<Item> inRoom = Item.getItemsInRoom(r.getRoomName(), DB_NAME);
+        List<Item> inRoom = Item.getItemsInRoom(r.getRoomName(), w.getDatabaseName());
         for(Item i : inRoom){
             System.out.println(i.getDisplayableName());
         }
