@@ -1,6 +1,7 @@
 package world.entity;
 
 import database.DatabaseManager;
+import world.meta.World;
 import world.room.Room;
 
 import java.sql.Connection;
@@ -30,6 +31,8 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     private String controllerType;
     private String roomName;
 
+    private String databaseName;
+
     private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,ENTITY_ID);
     private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             TABLE_NAME,ENTITY_ID,DISPLAY_NAME, HP,MAX_HP,MP,MAX_MP,STAMINA,MAX_STAMINA,STR,DEX,INT,WIS,CONTROLLER_TYPE,ROOM_NAME);
@@ -37,7 +40,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
             TABLE_NAME, DISPLAY_NAME, HP,MAX_HP,MP,MAX_MP,STAMINA,MAX_STAMINA,STR,DEX,INT,WIS,CONTROLLER_TYPE,ROOM_NAME,ENTITY_ID);
 
-    private Entity(ResultSet readEntry) throws SQLException {
+    private Entity(ResultSet readEntry, String databaseName) throws SQLException {
         entityID = readEntry.getString(ENTITY_ID);
         displayName = readEntry.getString(DISPLAY_NAME);
 
@@ -54,6 +57,8 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
         controllerType = readEntry.getString(CONTROLLER_TYPE);
         roomName = readEntry.getString(ROOM_NAME);
+
+        this.databaseName = databaseName;
     }
 
     public static Entity getEntityByEntityID(String entityID, String databaseName){
@@ -68,7 +73,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
                 getSQL.setString(1,entityID);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next())
-                    toReturn = new Entity(accountSet);
+                    toReturn = new Entity(accountSet,databaseName);
                 else
                     toReturn = null;
                 getSQL.close();
@@ -105,5 +110,31 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     @Override
     public boolean existsInDatabase(String databaseName) {
         return getEntityByEntityID(entityID,databaseName) != null;
+    }
+
+    public static final int CODE_TRANSFER_COMPLETE = 0;
+    public static final int CODE_ALREADY_EXISTS_AT_DESTINATION = -1;
+    public static final int CODE_TRANSFER_FAILED = -2;
+
+
+    public int transferToWorld(World newWorld){
+        if(newWorld == null)
+            throw new IllegalArgumentException("cannot transfer to a null world");
+
+        if(existsInDatabase(databaseName) && !removeFromDatabase(databaseName)) {
+            updateInDatabase(databaseName);
+            return CODE_TRANSFER_FAILED;
+        }
+
+        if(existsInDatabase(newWorld.getDatabaseName()))
+            return CODE_ALREADY_EXISTS_AT_DESTINATION;
+        if(!saveToDatabase(newWorld.getDatabaseName()))
+            return CODE_TRANSFER_FAILED;
+        this.databaseName = newWorld.getDatabaseName();
+
+    }
+
+    public String getID(){
+        return entityID;
     }
 }

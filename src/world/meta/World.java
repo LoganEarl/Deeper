@@ -2,6 +2,7 @@ package world.meta;
 
 import database.DatabaseManager;
 import utils.FileUtils;
+import world.entity.Entity;
 
 import javax.xml.crypto.Data;
 import java.io.File;
@@ -26,6 +27,7 @@ public class World implements DatabaseManager.DatabaseEntry {
     private static final String DROP_META_TABLE_SQL = String.format(Locale.US, "DROP TABLE %s", WorldMetaTable.TABLE_NAME);
     private static final String GET_FROM_TEMPLATE = String.format(Locale.US, "SELECT * FROM %s", WorldMetaTable.TABLE_NAME);
     private static final String GET_ENTITY_SQL = String.format(Locale.US, "SELECT * FROM %s INNER JOIN %s WHERE %s=?", EntityWorldTable.TABLE_NAME, TABLE_NAME, EntityWorldTable.ENTITY_ID);
+    private static final String SET_ENTITY_WORLD = String.format(Locale.US, "REPLACE INTO %s(%s, %s) VALUES (?, ?)",EntityWorldTable.TABLE_NAME, EntityWorldTable.ENTITY_ID, EntityWorldTable.WORLD_ID);
     private static final String GET_ALL_SQL = String.format(Locale.US, "SELECT * FROM %s", TABLE_NAME);
     private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME, WORLD_ID);
     private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -98,6 +100,11 @@ public class World implements DatabaseManager.DatabaseEntry {
             throw new IllegalArgumentException("Illegal world: " + worldID + ", unable to parse");
     }
 
+    /**
+     * creates a new world instance using the template of the given name. The given template must exists already
+     * @param templateName the name of the world template file without the file extension. Example, "testWorld"
+     * @return the newly created world or null if it failed
+     */
     public static World createWorldFromTemplate(String templateName){
         File templateFile = new File(DatabaseManager.TEMPLATE_DIRECTORY + templateName + ".db");
         if(!templateFile.exists())
@@ -179,6 +186,10 @@ public class World implements DatabaseManager.DatabaseEntry {
             }
         }
         return toReturn;
+    }
+    
+    public static boolean setWorldOfEntity(Entity e, World w){
+        return DatabaseManager.executeStatement(SET_ENTITY_WORLD,META_DATABASE_NAME,e.getID(), w.getWorldID()) > 0;
     }
 
     /**
