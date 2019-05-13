@@ -2,6 +2,7 @@ package world.test;
 
 import client.AccountTable;
 import database.DatabaseManager;
+import world.entity.Entity;
 import world.entity.EntityTable;
 import world.item.ContainerInstanceTable;
 import world.item.ContainerStatTable;
@@ -42,6 +43,29 @@ public class TemplateTester {
         DatabaseManager.createNewWorldDatabase(World.META_DATABASE_NAME);
         DatabaseManager.createWorldTables(World.META_DATABASE_NAME,tables);
 
-        World test = World.createWorldFromTemplate(TEMPLATE_NAME);
+        World test1 = World.createWorldFromTemplate(TEMPLATE_NAME);
+        World test2 = World.createWorldFromTemplate(TEMPLATE_NAME);
+
+        if(test1 == null || test2 == null){
+            System.out.println("Unable to create new world sims");
+            return;
+        }
+
+        System.out.println("Attempting to save entity to database");
+        Entity newEntity = new Entity.EntityBuilder()
+                .setID("TestEnt")
+                .setControllerType(EntityTable.CONTROLLER_TYPE_PLAYER)
+                .setDisplayName("CartOfSwine")
+                .setRoomName("The Origin")
+                .setDatabaseName(test1.getDatabaseName())
+                .build();
+        newEntity.saveToDatabase(newEntity.getDatabaseName());
+        World.setWorldOfEntity(newEntity,test1);
+
+        Entity testEntityRetrieval = Entity.getEntityByEntityID(newEntity.getID(),newEntity.getDatabaseName());
+        if(testEntityRetrieval == null){
+            System.out.println("Unable to get new entity from test 1");
+        }
+
     }
 }

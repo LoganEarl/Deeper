@@ -40,6 +40,10 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
             TABLE_NAME, DISPLAY_NAME, HP,MAX_HP,MP,MAX_MP,STAMINA,MAX_STAMINA,STR,DEX,INT,WIS,CONTROLLER_TYPE,ROOM_NAME,ENTITY_ID);
 
+    private Entity() {
+        //for use by the builder
+    }
+
     private Entity(ResultSet readEntry, String databaseName) throws SQLException {
         entityID = readEntry.getString(ENTITY_ID);
         displayName = readEntry.getString(DISPLAY_NAME);
@@ -130,11 +134,146 @@ public class Entity implements DatabaseManager.DatabaseEntry {
             return CODE_ALREADY_EXISTS_AT_DESTINATION;
         if(!saveToDatabase(newWorld.getDatabaseName()))
             return CODE_TRANSFER_FAILED;
-        this.databaseName = newWorld.getDatabaseName();
 
+        if(!World.setWorldOfEntity(this,newWorld))
+            return CODE_TRANSFER_FAILED;
+        this.databaseName = newWorld.getDatabaseName();
+        this.roomName = newWorld.getEntryRoomName();
+        updateInDatabase(databaseName);
+        return CODE_TRANSFER_COMPLETE;
     }
 
     public String getID(){
         return entityID;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getControllerType() {
+        return controllerType;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public static class EntityBuilder{
+        private String entityID = "";
+        private String displayName = "";
+        private int hp = 10;
+        private int maxHP = 10;
+        private int mp = 10;
+        private int maxMP = 10;
+        private int stamina = 10;
+        private int maxStamina = 10;
+
+        private int strength = 10;
+        private int dexterity = 10;
+        private int intelligence = 10;
+        private int wisdom = 10;
+
+        private String controllerType = CONTROLLER_TYPE_STATIC;
+        private String roomName = "";
+
+        private String databaseName = "";
+
+        public Entity build(){
+            Entity e = new Entity();
+            e.hp = hp;
+            e.maxHP = maxHP;
+            e.mp = mp;
+            e.maxMP = maxMP;
+            e.stamina = stamina;
+            e.maxStamina = maxStamina;
+            e.entityID = entityID;
+            e.displayName = displayName;
+            e.strength = strength;
+            e.dexterity = dexterity;
+            e.intelligence = intelligence;
+            e.wisdom = wisdom;
+            e.controllerType = controllerType;
+            e.roomName = roomName;
+            e.databaseName = databaseName;
+            return e;
+        }
+
+        public EntityBuilder setHPVals(int hp, int maxHP){
+            this.hp = hp;
+            this.maxHP = maxHP;
+            return this;
+        }
+
+        public EntityBuilder setMPVals(int mp, int maxMP){
+            this.mp = mp;
+            this.maxMP = maxMP;
+            return this;
+        }
+
+        public EntityBuilder setStaminaVals(int stamina, int maxStamina){
+            this.stamina = stamina;
+            this.maxStamina = maxStamina;
+            return this;
+        }
+
+        public EntityBuilder setStrength(int strength){
+            this.strength = strength;
+            return this;
+        }
+
+        public EntityBuilder setDexterity(int dexterity){
+            this.dexterity = dexterity;
+            return this;
+        }
+
+        public EntityBuilder setIntelligence(int intelligence){
+            this.intelligence = intelligence;
+            return this;
+        }
+
+        public EntityBuilder setWisdom(int wisdom){
+            this.wisdom = wisdom;
+            return this;
+        }
+
+        public EntityBuilder setID(String id){
+            this.entityID = id;
+            return this;
+        }
+
+        public EntityBuilder setDisplayName(String displayName){
+            this.displayName = displayName;
+            return this;
+        }
+
+        public EntityBuilder setDatabaseName(String databaseName){
+            this.databaseName = databaseName;
+            return this;
+        }
+
+        public EntityBuilder setRoomName(String roomName){
+            this.roomName = roomName;
+            return this;
+        }
+
+        /**
+         * sets the controller
+         * @param controllerType one of the EntityTable.CONTROLLER_TYPE_* constants
+         * @throws IllegalArgumentException if passed in controller type is not one of the EntityTable.CONTROLLER_TYPE_* constants
+         * @return this builder
+         */
+        public EntityBuilder setControllerType(String controllerType){
+            if(controllerType != null && controllerType.equals(CONTROLLER_TYPE_PLAYER) || controllerType.equals(CONTROLLER_TYPE_STATIC))
+                this.controllerType = controllerType;
+            else
+                throw new IllegalArgumentException("Cannot assign a controller type that is not one of the EntityTable.CONTROLLER_TYPE_* constants");
+            return this;
+        }
+
     }
 }
