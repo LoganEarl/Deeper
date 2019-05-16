@@ -73,11 +73,13 @@ public class SimulationManager {
                 break;
             case CLIENT_ELEVATE_USER_MESSAGE:
                 message = new ClientElevateUserMessage(sourceClient);
+                break;
             default:
-                message = new ClientDebugMessage(sourceClient);
+                message = null;
                 break;
         }
-        message.constructFromString(rawMessageBody);
+        if(message != null)
+            message.constructFromString(rawMessageBody);
 
         return message;
     };
