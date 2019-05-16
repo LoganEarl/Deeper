@@ -2,7 +2,6 @@ package world.entity;
 
 import database.DatabaseManager;
 import world.meta.World;
-import world.room.Room;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,6 +39,13 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
             TABLE_NAME, DISPLAY_NAME, HP,MAX_HP,MP,MAX_MP,STAMINA,MAX_STAMINA,STR,DEX,INT,WIS,CONTROLLER_TYPE,ROOM_NAME,ENTITY_ID);
 
+    /**Code returned when an entity has been successfully transferred to a new world by the transferToWorld() method*/
+    public static final int CODE_TRANSFER_COMPLETE = 0;
+    /**Code returned when an entity could not be transferred to the new world because there already exists an entity by that id in the target world*/
+    public static final int CODE_ALREADY_EXISTS_AT_DESTINATION = -1;
+    /**Code returned when an entity could not be transferred to the new world because of an unspecified database/file io error*/
+    public static final int CODE_TRANSFER_FAILED = -2;
+
     private Entity() {
         //for use by the builder
     }
@@ -63,6 +69,38 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         roomName = readEntry.getString(ROOM_NAME);
 
         this.databaseName = databaseName;
+    }
+
+
+
+    /**
+     * will transfer this entity to the given world, updating the meta file and everything.
+     * If it fails, it will return the appropriate code and keep the entity in it's current world.
+     * There cannot be more than one entity with the same Entity_ID in one world, attempting to move
+     * an entity whos ID is also in the new world will fail the attempt
+     * @param newWorld the new world this entity will exist in
+     * @return ont of the CODE_* constants defined above.
+     */
+    public int transferToWorld(World newWorld){
+        if(newWorld == null)
+            throw new IllegalArgumentException("cannot transfer to a null world");
+
+        if(existsInDatabase(databaseName) && !removeFromDatabase(databaseName)) {
+            updateInDatabase(databaseName);
+            return CODE_TRANSFER_FAILED;
+        }
+
+        if(existsInDatabase(newWorld.getDatabaseName()))
+            return CODE_ALREADY_EXISTS_AT_DESTINATION;
+        if(!saveToDatabase(newWorld.getDatabaseName()))
+            return CODE_TRANSFER_FAILED;
+
+        if(!World.setWorldOfEntity(this,newWorld))
+            return CODE_TRANSFER_FAILED;
+        this.databaseName = newWorld.getDatabaseName();
+        this.roomName = newWorld.getEntryRoomName();
+        updateInDatabase(databaseName);
+        return CODE_TRANSFER_COMPLETE;
     }
 
     public static Entity getEntityByEntityID(String entityID, String databaseName){
@@ -114,33 +152,6 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     @Override
     public boolean existsInDatabase(String databaseName) {
         return getEntityByEntityID(entityID,databaseName) != null;
-    }
-
-    public static final int CODE_TRANSFER_COMPLETE = 0;
-    public static final int CODE_ALREADY_EXISTS_AT_DESTINATION = -1;
-    public static final int CODE_TRANSFER_FAILED = -2;
-
-
-    public int transferToWorld(World newWorld){
-        if(newWorld == null)
-            throw new IllegalArgumentException("cannot transfer to a null world");
-
-        if(existsInDatabase(databaseName) && !removeFromDatabase(databaseName)) {
-            updateInDatabase(databaseName);
-            return CODE_TRANSFER_FAILED;
-        }
-
-        if(existsInDatabase(newWorld.getDatabaseName()))
-            return CODE_ALREADY_EXISTS_AT_DESTINATION;
-        if(!saveToDatabase(newWorld.getDatabaseName()))
-            return CODE_TRANSFER_FAILED;
-
-        if(!World.setWorldOfEntity(this,newWorld))
-            return CODE_TRANSFER_FAILED;
-        this.databaseName = newWorld.getDatabaseName();
-        this.roomName = newWorld.getEntryRoomName();
-        updateInDatabase(databaseName);
-        return CODE_TRANSFER_COMPLETE;
     }
 
     public String getID(){

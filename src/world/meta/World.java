@@ -4,7 +4,6 @@ import database.DatabaseManager;
 import utils.FileUtils;
 import world.entity.Entity;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
@@ -23,6 +22,14 @@ import static world.meta.WorldTable.*;
  */
 public class World implements DatabaseManager.DatabaseEntry {
     public static final String META_DATABASE_NAME = "meta.db";
+
+    public static final int HUB_WORLD_ID = 0;
+    public static final String HUB_TEMPLATE_NAME = "hubTemplate";
+    public static final int LIMBO_WORLD_ID = 1;
+    public static final String LIMBO_TEMPLATE_NAME = "limboTemplate";
+
+    private static World hubWorld;
+    private static World limbo;
 
     private static final String DROP_META_TABLE_SQL = String.format(Locale.US, "DROP TABLE %s", WorldMetaTable.TABLE_NAME);
     private static final String GET_FROM_TEMPLATE = String.format(Locale.US, "SELECT * FROM %s", WorldMetaTable.TABLE_NAME);
@@ -100,6 +107,13 @@ public class World implements DatabaseManager.DatabaseEntry {
             throw new IllegalArgumentException("Illegal world: " + worldID + ", unable to parse");
     }
 
+    public static void initDefaultWorlds(){
+        createWorldWithID(HUB_WORLD_ID, HUB_TEMPLATE_NAME);
+        hubWorld = getWorldByWorldID(HUB_WORLD_ID);
+        createWorldWithID(LIMBO_WORLD_ID, LIMBO_TEMPLATE_NAME);
+        limbo = getWorldByWorldID(LIMBO_WORLD_ID);
+    }
+
     /**
      * creates a new world instance using the template of the given name. The given template must exists already
      * @param templateName the name of the world template file without the file extension. Example, "testWorld"
@@ -113,6 +127,16 @@ public class World implements DatabaseManager.DatabaseEntry {
         while(getWorldByWorldID(newWorldID) != null){
             newWorldID = Math.abs(String.valueOf(newWorldID).hashCode());
         }
+        return createWorldWithID(newWorldID,templateName);
+    }
+
+    private static World createWorldWithID(int newWorldID, String templateName){
+        if(getWorldByWorldID(newWorldID) != null)
+            return null;
+
+        File templateFile = new File(DatabaseManager.TEMPLATE_DIRECTORY + templateName + ".db");
+        if(!templateFile.exists())
+            return null;
         try {
             FileUtils.copyFile(templateFile, new File(DatabaseManager.DATA_DIRECTORY + newWorldID + ".db"));
         }catch (IOException e){
@@ -137,10 +161,10 @@ public class World implements DatabaseManager.DatabaseEntry {
                 getSQL.close();
 
 
-            if(newWorld != null){
-                deleteSQL = c.createStatement();
-                deleteSQL.executeUpdate(DROP_META_TABLE_SQL);
-            }
+                if(newWorld != null){
+                    deleteSQL = c.createStatement();
+                    deleteSQL.executeUpdate(DROP_META_TABLE_SQL);
+                }
             }catch (Exception e){
                 newWorld = null;
             }
@@ -352,5 +376,13 @@ public class World implements DatabaseManager.DatabaseEntry {
     @Override
     public boolean existsInDatabase(String ignored) {
         return getWorldByWorldID(worldID) != null;
+    }
+
+    public static World getHubWorld(){
+        return hubWorld;
+    }
+
+    public static World getLimboWorld(){
+        return limbo;
     }
 }

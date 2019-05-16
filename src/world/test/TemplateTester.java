@@ -43,8 +43,9 @@ public class TemplateTester {
         DatabaseManager.createNewWorldDatabase(World.META_DATABASE_NAME);
         DatabaseManager.createWorldTables(World.META_DATABASE_NAME,tables);
 
-        World test1 = World.createWorldFromTemplate(TEMPLATE_NAME);
-        World test2 = World.createWorldFromTemplate(TEMPLATE_NAME);
+        World.initDefaultWorlds();
+        World test1 = World.getLimboWorld();
+        World test2 = World.getHubWorld();
 
         if(test1 == null || test2 == null){
             System.out.println("Unable to create new world sims");
@@ -53,10 +54,9 @@ public class TemplateTester {
 
         System.out.println("Attempting to save entity to database");
         Entity newEntity = new Entity.EntityBuilder()
-                .setID("TestEnt")
+                .setID("TestEnt:" + System.currentTimeMillis())
                 .setControllerType(EntityTable.CONTROLLER_TYPE_PLAYER)
                 .setDisplayName("CartOfSwine")
-                .setRoomName("The Origin")
                 .setDatabaseName(test1.getDatabaseName())
                 .build();
         newEntity.saveToDatabase(newEntity.getDatabaseName());
