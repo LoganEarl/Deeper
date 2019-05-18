@@ -1,6 +1,6 @@
 package client.commands;
 
-import network.MessageType;
+import network.ServerMessageType;
 import network.SimulationManager;
 import network.WebServer;
 
@@ -30,6 +30,6 @@ public class PromptCommand implements SimulationManager.Command, WebServer.Serve
 
     @Override
     public byte[] getBytes() {
-        return (MessageType.SERVER_PROMPT_MESSAGE + "\n" + toSend + WebServer.MESSAGE_DIVIDER).getBytes();
+        return (ServerMessageType.SERVER_PROMPT_MESSAGE + "\n" + toSend + WebServer.MESSAGE_DIVIDER).getBytes();
     }
 }

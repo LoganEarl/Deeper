@@ -1,6 +1,6 @@
 package client.messages;
 
-import network.MessageType;
+import network.ServerMessageType;
 import network.WebServer;
 
 public class ClientGreeting implements WebServer.ClientMessage{
@@ -15,8 +15,8 @@ public class ClientGreeting implements WebServer.ClientMessage{
     }
 
     @Override
-    public MessageType getMessageType() {
-        return MessageType.CLIENT_GREETING;
+    public ServerMessageType getMessageType() {
+        return ServerMessageType.CLIENT_GREETING;
     }
 
     @Override

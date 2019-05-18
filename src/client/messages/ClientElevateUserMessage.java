@@ -1,7 +1,7 @@
 package client.messages;
 
 import client.Account;
-import network.MessageType;
+import network.ServerMessageType;
 import network.WebServer;
 
 /**
@@ -9,7 +9,7 @@ import network.WebServer;
  * level greater than that being dispensed, and greater than the current level of the target.<br>
  *     Message format as follows<br><br>
  *
- *      [MessageType.CLIENT_ELEVATE_USER_MESSAGE]\n<br>
+ *      [ServerMessageType.CLIENT_ELEVATE_USER_MESSAGE]\n<br>
  *      targetName\n<br>
  *      newPermissionLevel[WebServer.MESSAGE_DIVIDER]<br><br>
  *
@@ -29,8 +29,8 @@ public class ClientElevateUserMessage implements WebServer.ClientMessage{
     }
 
     @Override
-    public MessageType getMessageType() {
-        return MessageType.CLIENT_ELEVATE_USER_MESSAGE;
+    public ServerMessageType getMessageType() {
+        return ServerMessageType.CLIENT_ELEVATE_USER_MESSAGE;
     }
 
     @Override

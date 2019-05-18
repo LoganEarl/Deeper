@@ -1,6 +1,6 @@
 package client.messages;
 
-import network.MessageType;
+import network.ServerMessageType;
 import network.WebServer;
 
 public class ClientDebugMessage implements WebServer.ClientMessage {
@@ -17,8 +17,8 @@ public class ClientDebugMessage implements WebServer.ClientMessage {
     }
 
     @Override
-    public MessageType getMessageType() {
-        return MessageType.CLIENT_DEBUG_MESSAGE;
+    public ServerMessageType getMessageType() {
+        return ServerMessageType.CLIENT_DEBUG_MESSAGE;
     }
 
     @Override

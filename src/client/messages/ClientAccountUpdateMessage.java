@@ -1,13 +1,13 @@
 package client.messages;
 
-import network.MessageType;
+import network.ServerMessageType;
 import network.WebServer;
 
 /**
  * Instantiated form of a client's attempt to update account information. Still needs to be verified but contains all the info to do so.<br>
  *     Message format is as follows<br><br>
  *
- *     [MessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE]\n<br>
+ *     [ServerMessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE]\n<br>
  *     oldUserName\n<br>
  *     newUserName\n<br>
  *     oldHashedPassword\n<br>
@@ -19,7 +19,7 @@ import network.WebServer;
  *
  *     You can also use the following format for making new accounts<br><br>
  *
- *     [MessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE]\n<br>
+ *     [ServerMessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE]\n<br>
  *     newUserName\n<br>
  *     newHashedPassword\n<br>
  *     newEmailAddress[WebServer.MESSAGE_DIVIDER]<br><br>
@@ -39,8 +39,8 @@ public class ClientAccountUpdateMessage implements WebServer.ClientMessage {
     }
 
     @Override
-    public MessageType getMessageType() {
-        return MessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE;
+    public ServerMessageType getMessageType() {
+        return ServerMessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE;
     }
 
     @Override

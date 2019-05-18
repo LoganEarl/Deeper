@@ -141,6 +141,10 @@ public class WebServer {
         byte[] getBytes();
     }
 
+    public interface MessageType{
+        String getParsableFormat();
+    }
+
     /**
      * Interface for a message that was sent by the client to the server. The message is converted into this format by a
      * {@link ClientMessageParser} provided to the server during its construction. The client message will have a type associated with it
@@ -151,7 +155,7 @@ public class WebServer {
          * gets what kind of message it is.
          * @return the type message that was received
          */
-        MessageType getMessageType();
+        WebServer.MessageType getMessageType();
 
         /**
          * gets the internet address of the client that sent the message

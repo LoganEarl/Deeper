@@ -1,13 +1,13 @@
 package client.messages;
 
-import network.MessageType;
+import network.ServerMessageType;
 import network.WebServer;
 
 /**
  * Instantiated form of a client's attempt to login. Still needs to be verified but contains all the info to do so.<br>
  *     Message format is as follows<br><br>
  *
- *     [MessageType.CLIENT_LOGIN_MESSAGE]\n<br>
+ *     [ServerMessageType.CLIENT_LOGIN_MESSAGE]\n<br>
  *     userName\n<br>
  *     hashedPassword[WebServer.MESSAGE_DIVIDER]
  * @author Logan Earl
@@ -28,8 +28,8 @@ public class ClientLoginMessage implements WebServer.ClientMessage {
     }
 
     @Override
-    public MessageType getMessageType() {
-        return MessageType.CLIENT_LOGIN_MESSAGE;
+    public WebServer.MessageType getMessageType() {
+        return ServerMessageType.CLIENT_LOGIN_MESSAGE;
     }
 
     @Override

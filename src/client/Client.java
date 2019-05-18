@@ -5,7 +5,7 @@ import client.messages.ClientAccountUpdateMessage;
 import client.messages.ClientElevateUserMessage;
 import client.messages.ClientLoginMessage;
 import client.messages.ClientLogoutMessage;
-import network.MessageType;
+import network.ServerMessageType;
 import network.SimulationManager;
 import network.WebServer;
 
@@ -36,20 +36,24 @@ public class Client {
         this.status = newStatus;
     }
 
+    public ClientStatus getStatus(){
+        return status;
+    }
+
     public boolean registerMessage(WebServer.ClientMessage message){
         boolean handledMessage = false;
-        if(message.getMessageType() == MessageType.CLIENT_LOGIN_MESSAGE){
+        if(message.getMessageType() == ServerMessageType.CLIENT_LOGIN_MESSAGE){
             tryLogIn((ClientLoginMessage) message);
             handledMessage = true;
-        }else if(message.getMessageType() == MessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE &&
+        }else if(message.getMessageType() == ServerMessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE &&
                 (status == ClientStatus.UNAUTHENTICATED || status == ClientStatus.ACTIVE)){
             tryUpdateInfo((ClientAccountUpdateMessage) message);
             handledMessage = true;
-        }else if(message.getMessageType() == MessageType.CLIENT_ELEVATE_USER_MESSAGE &&
+        }else if(message.getMessageType() == ServerMessageType.CLIENT_ELEVATE_USER_MESSAGE &&
                 (status == ClientStatus.ACTIVE && associatedAccount != null)){
             tryElevateUser((ClientElevateUserMessage)message);
             handledMessage = true;
-        }else if(message.getMessageType() == MessageType.CLIENT_LOGOUT_MESSAGE){
+        }else if(message.getMessageType() == ServerMessageType.CLIENT_LOGOUT_MESSAGE){
             tryLogOut((ClientLogoutMessage)message);
             handledMessage = true;
         }

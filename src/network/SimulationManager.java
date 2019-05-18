@@ -7,6 +7,7 @@ import client.messages.*;
 import database.DatabaseManager;
 import world.entity.EntityTable;
 import world.item.*;
+import world.playerInterface.WorldMessageParser;
 import world.room.RoomTable;
 import world.story.StoryArcTable;
 
@@ -53,7 +54,7 @@ public class SimulationManager {
             rawMessageBody = toParse.substring(headerLastIndex + 1);
         }
 
-        MessageType messageType = MessageType.parseFromString(rawMessageType);
+        ServerMessageType messageType = ServerMessageType.parseFromString(rawMessageType);
         WebServer.ClientMessage message;
         switch (messageType) {
             case CLIENT_GREETING:
@@ -85,7 +86,7 @@ public class SimulationManager {
     };
 
     public SimulationManager(int port) {
-        server = new WebServer(port, clientListener, clientParser);
+        server = new WebServer(port, clientListener, new WorldMessageParser(clientParser));
 
     }
 
@@ -142,6 +143,10 @@ public class SimulationManager {
 
     public Map<String,Client> getClients(){
         return clients;
+    }
+
+    public Client getClientWithAddress(String address){
+        return clients.get(address);
     }
 
     /**

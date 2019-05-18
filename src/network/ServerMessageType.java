@@ -5,7 +5,7 @@ package network;
  * the default value of UNKNOWN_MESSAGE_FORMAT will be used
  * @author Logan Earl
  */
-public enum MessageType {
+public enum ServerMessageType implements WebServer.MessageType {
     /**Message sent from server to ask the client for information. ServerPromptMessage*/
     SERVER_PROMPT_MESSAGE("ServerPromptMessage"),
 
@@ -29,7 +29,7 @@ public enum MessageType {
 
     private String messageType;
 
-    MessageType(String parsableFormat) {
+    ServerMessageType(String parsableFormat) {
         this.messageType = parsableFormat;
     }
 
@@ -42,8 +42,8 @@ public enum MessageType {
      * @param toParse the message type from the message header
      * @return the type of the message or UNKNOWN_MESSAGE_FORMAT if it could not be determined
      */
-    public static MessageType parseFromString(String toParse) {
-        for (MessageType m : MessageType.values())
+    public static ServerMessageType parseFromString(String toParse) {
+        for (ServerMessageType m : ServerMessageType.values())
             if (m.messageType.equals(toParse.toLowerCase()))
                 return m;
         return UNKNOWN_MESSAGE_FORMAT;
