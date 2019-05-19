@@ -6,7 +6,7 @@ import network.SimulationManager;
 import network.WebServer;
 import world.entity.Entity;
 import world.meta.World;
-import world.playerInterface.commands.NotifyCommand;
+import world.playerInterface.commands.LookCommand;
 import world.playerInterface.messages.ClientLookMessage;
 
 import java.util.HashMap;
@@ -59,7 +59,7 @@ public class PlayerManagementService {
             case CLIENT_LOOK_MESSAGE:
                 Entity controlledEntity = getEntityOfAccount(message.getClient());
                 if(controlledEntity != null)
-                    simulationManager.scheduleCommand(new NotifyCommand((ClientLookMessage) message,controlledEntity,this));
+                    simulationManager.scheduleCommand(new LookCommand((ClientLookMessage) message,controlledEntity,this));
 
                 break;
         }

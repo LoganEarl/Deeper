@@ -20,6 +20,8 @@ public class Room implements DatabaseManager.DatabaseEntry {
     private String roomName;
     private String roomDescription;
 
+    private String databaseName;
+
     private String upRoomID;
     private String downRoomID;
     private String northRoomID;
@@ -36,7 +38,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
     private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
             TABLE_NAME, ROOM_DESCRIPTION, ROOM_VISIBILITY, ROOM_UP_NAME, ROOM_DOWN_NAME, ROOM_NORTH_NAME, ROOM_SOUTH_NAME, ROOM_EAST_NAME, ROOM_WEST_NAME, ROOM_NAME);
 
-    private Room(ResultSet readEntry) throws SQLException{
+    private Room(ResultSet readEntry, String databaseName) throws SQLException{
         roomName = readEntry.getString(ROOM_NAME);
         roomDescription = readEntry.getString(ROOM_DESCRIPTION);
 
@@ -48,6 +50,8 @@ public class Room implements DatabaseManager.DatabaseEntry {
         westRoomID = readEntry.getString(ROOM_WEST_NAME);
 
         visibilityCode = readEntry.getInt(ROOM_VISIBILITY);
+
+        this.databaseName = databaseName;
     }
 
     /**
@@ -68,7 +72,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
                 getSQL.setString(1,roomName);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next())
-                    toReturn = new Room(accountSet);
+                    toReturn = new Room(accountSet,databaseName);
                 else
                     toReturn = null;
                 getSQL.close();
@@ -155,5 +159,9 @@ public class Room implements DatabaseManager.DatabaseEntry {
      */
     public int getVisibilityCode() {
         return visibilityCode;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
     }
 }

@@ -4,6 +4,7 @@ import client.AccountTable;
 import database.DatabaseManager;
 import world.entity.Entity;
 import world.entity.EntityTable;
+import world.entity.Race;
 import world.item.ContainerInstanceTable;
 import world.item.ContainerStatTable;
 import world.item.ItemInstanceTable;

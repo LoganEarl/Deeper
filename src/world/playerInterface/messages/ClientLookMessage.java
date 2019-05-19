@@ -61,7 +61,7 @@ public class ClientLookMessage implements WebServer.ClientMessage {
     }
 
     /**
-     * get the target of the client's scrutiny
+     * get the target of the client's scrutiny. If blank, assume it to be the room name of the entity that is doing the looking
      * @return a string that is a Room name, an Item name, an Entity Display name, or a container name
      */
     public String getTarget(){

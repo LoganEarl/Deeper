@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Locale;
+import java.util.*;
 
 import static world.entity.EntityTable.*;
 
@@ -38,6 +38,8 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,ENTITY_ID);
     private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
             TABLE_NAME, DISPLAY_NAME, HP,MAX_HP,MP,MAX_MP,STAMINA,MAX_STAMINA,STR,DEX,INT,WIS,CONTROLLER_TYPE,ROOM_NAME,ENTITY_ID);
+    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=?)",
+            TABLE_NAME, ROOM_NAME);
 
     /**Code returned when an entity has been successfully transferred to a new world by the transferToWorld() method*/
     public static final int CODE_TRANSFER_COMPLETE = 0;
@@ -125,6 +127,43 @@ public class Entity implements DatabaseManager.DatabaseEntry {
             }
         }
         return toReturn;
+    }
+
+    /**
+     * gets all the entities in the given room
+     * @param roomName the room name to check for items
+     * @param databaseName the database containing the items
+     * @return a list of all items in the room
+     */
+    public static List<Entity> getEntitiesInRoom(String roomName, String databaseName, String... excludedEntityIDs){
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+        PreparedStatement getSQL;
+        List<Entity> foundItems = new LinkedList<>();
+        if(c == null)
+            return Collections.emptyList();
+        else{
+            try {
+                List<String> excluded;
+                if(excludedEntityIDs == null || excludedEntityIDs.length == 0)
+                    excluded = Collections.emptyList();
+                else
+                    excluded = Arrays.asList(excludedEntityIDs);
+
+                getSQL = c.prepareStatement(GET_ROOM_SQL);
+                getSQL.setString(1,roomName);
+                ResultSet accountSet = getSQL.executeQuery();
+                while(accountSet.next()) {
+                    Entity e = new Entity(accountSet,databaseName);
+                    if(!excluded.contains(e.getID()))
+                        foundItems.add(e);
+                }
+                getSQL.close();
+                c.close();
+            }catch (Exception e){
+                foundItems = Collections.emptyList();
+            }
+        }
+        return foundItems;
     }
 
     @Override

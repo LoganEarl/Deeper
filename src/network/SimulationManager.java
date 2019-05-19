@@ -25,7 +25,7 @@ import java.util.*;
 public class SimulationManager {
     private Map<String, Client> clients = new HashMap<>();
     private WebServer server;
-    private static final String DB_NAME = "testSim.db";
+    private static final String DB_NAME = "account.db";
     //TODO needs a reference to the core database so it can access account info
 
     private Queue<Command> commandQueue = new LinkedList<>();
@@ -93,14 +93,6 @@ public class SimulationManager {
     public void init() {
         List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
         tables.add(new AccountTable());
-        tables.add(new ItemStatTable());
-        tables.add(new ContainerStatTable());
-        tables.add(new RoomTable());
-        tables.add(new EntityTable());
-        tables.add(new StoryArcTable());
-
-        tables.add(new ItemInstanceTable());
-        tables.add(new ContainerInstanceTable());
 
         DatabaseManager.createDirectories();
         DatabaseManager.createNewWorldDatabase(DB_NAME);
