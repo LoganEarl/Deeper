@@ -1,7 +1,6 @@
 package world.entity;
 
 import database.DatabaseManager;
-import world.item.ContainerStatTable;
 import world.room.RoomTable;
 
 import java.util.*;
@@ -30,6 +29,8 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
     public static final String STAMINA = "stamina";
     /**The maximum amount of stamina points the entity can have*/
     public static final String MAX_STAMINA = "maxStamina";
+    /**The race of the entity. Foreign key to the race table*/
+    public static final String RACE_ID = RaceTable.RACE_ID;
 
     /**The strength attribute of the entity. 10 is average*/
     public static final String STR = "strength";
@@ -67,11 +68,14 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(DEX,"INT");
         TABLE_DEFINITION.put(INT,"INT");
         TABLE_DEFINITION.put(WIS,"INT");
+        TABLE_DEFINITION.put(RACE_ID, "VARCHAR(16)");
         TABLE_DEFINITION.put(CONTROLLER_TYPE,"VARCHAR(16)");
         TABLE_DEFINITION.put(ROOM_NAME, "VARCHAR(32)");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                RACE_ID, RaceTable.TABLE_NAME, RaceTable.RACE_ID));
     }
 
 

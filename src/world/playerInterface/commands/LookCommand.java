@@ -54,7 +54,7 @@ public class LookCommand implements SimulationManager.Command, WebServer.ServerM
         if(nearEntities.size() == 0)
             creaturesString = "There are no other entities here";
         else if(nearEntities.size() == 1)
-            creaturesString = "";
+            creaturesString = nearEntities.get(0).getDisplayName();
         return String.format(Locale.US,
                 "%s\n\n%s\n\n" +
                         "%s\n%s");

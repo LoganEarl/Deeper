@@ -13,7 +13,7 @@ public class RaceTable implements DatabaseManager.DatabaseTable {
     public static final String TABLE_NAME = "race";
 
     /**The unique identifier of the race as written in the database. EG "human"*/
-    public static final String IDENTIFIER = "nameID";
+    public static final String RACE_ID = "raceID";
     /**The displayed value of the race. Works like the DisplayName of an entity*/
     public static final String DISPLAY_NAME = "displayName";
     /**The description for the race*/
@@ -31,7 +31,7 @@ public class RaceTable implements DatabaseManager.DatabaseTable {
     public static final Map<String,String> COLUMN_DEFINITIONS = new LinkedHashMap<>();
 
     public RaceTable(){
-        COLUMN_DEFINITIONS.put(IDENTIFIER, "VARCHAR(16) PRIMARY KEY NOT NULL");
+        COLUMN_DEFINITIONS.put(RACE_ID, "VARCHAR(16) PRIMARY KEY NOT NULL");
         COLUMN_DEFINITIONS.put(DISPLAY_NAME, "VARCHAR(32)");
         COLUMN_DEFINITIONS.put(DESCRIPTION, "TEXT");
         COLUMN_DEFINITIONS.put(BASE_INT, "INT");

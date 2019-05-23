@@ -1,11 +1,17 @@
 package world.entity;
 
+import database.DatabaseManager;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * instantiated from of a race. Note, all playable races are stored as constants of this class. When a new world is instantiated, these playable races need to be replaced into the new file to ensure that players migrating to the world do not fail their foreign key restraints.
+ * @author Logan Earl
+ */
 public class Race {
     //TODO i copied the desc from dnd so make sure to change that later
     public static final Race HUMAN = new Race(
@@ -18,20 +24,20 @@ public class Race {
             25
     );
 
-    private static final String INSERT_SQL = String.format(Locale.US, "REPLACE INTO %s(%s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)", RaceTable.TABLE_NAME, RaceTable.IDENTIFIER, RaceTable.DISPLAY_NAME, RaceTable.DESCRIPTION, RaceTable.BASE_INT, RaceTable.BASE_WIS, RaceTable.BASE_STR, RaceTable.BASE_DEX);
+    private static final String INSERT_SQL = String.format(Locale.US, "REPLACE INTO %s(%s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?)", RaceTable.TABLE_NAME, RaceTable.RACE_ID, RaceTable.DISPLAY_NAME, RaceTable.DESCRIPTION, RaceTable.BASE_INT, RaceTable.BASE_WIS, RaceTable.BASE_STR, RaceTable.BASE_DEX);
 
 
     private String displayName;
-    private String databaseName;
+    private String identifier;
     private String description;
     private int baseStr;
     private int baseDex;
     private int baseInt;
     private int baseWis;
 
-    Race(String displayName, String databaseName, String description, int baseStr, int baseDex, int baseInt, int baseWis){
+    Race(String displayName, String identifier, String description, int baseStr, int baseDex, int baseInt, int baseWis){
         this.displayName = displayName;
-        this.databaseName = databaseName;
+        this.identifier = identifier;
         this.description = description;
         this.baseDex = baseDex;
         this.baseInt = baseInt;
@@ -54,13 +60,17 @@ public class Race {
 
     public static Race getFromDatabaseRace(String databaseName){
         for(Race r: defaultRaces())
-            if(r.getDatabaseName().equals(databaseName))
+            if(r.getRaceID().equals(databaseName))
                 return r;
         return null;
     }
 
     public static void writePlayableRacesToDatabaseFile(String databaseName){
-
+        for(Race r: defaultRaces()){
+            DatabaseManager.executeStatement(INSERT_SQL,databaseName,
+                    r.getRaceID(), r.getDisplayName(), r.getDescription(),
+                    r.getBaseInt(), r.getBaseWis(), r.getBaseStr(), r.getBaseDex());
+        }
     }
 
     public String getDisplayName() {
@@ -71,8 +81,8 @@ public class Race {
      * gets the name of the race as it would be stored in the database.
      * @return the string value of the race as it would be stored in the database.
      */
-    public String getDatabaseName() {
-        return databaseName;
+    public String getRaceID() {
+        return identifier;
     }
 
     public String getDescription() {

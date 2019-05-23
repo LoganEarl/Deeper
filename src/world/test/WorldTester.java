@@ -3,6 +3,7 @@ package world.test;
 import client.AccountTable;
 import database.DatabaseManager;
 import world.entity.EntityTable;
+import world.entity.RaceTable;
 import world.item.*;
 import world.meta.World;
 import world.room.Room;
@@ -25,6 +26,7 @@ public class WorldTester {
         tables.add(new ItemStatTable());
         tables.add(new ContainerStatTable());
         tables.add(new RoomTable());
+        tables.add(new RaceTable());
         tables.add(new EntityTable());
         tables.add(new StoryArcTable());
 

@@ -3,12 +3,22 @@ package world.meta;
 import database.DatabaseManager;
 import utils.FileUtils;
 import world.entity.Entity;
+import world.entity.EntityTable;
+import world.entity.Race;
+import world.entity.RaceTable;
+import world.item.ContainerInstanceTable;
+import world.item.ContainerStatTable;
+import world.item.ItemInstanceTable;
+import world.item.ItemStatTable;
+import world.room.RoomTable;
+import world.story.StoryArcTable;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 import static world.meta.WorldTable.*;
@@ -108,10 +118,31 @@ public class World implements DatabaseManager.DatabaseEntry {
     }
 
     public static void initDefaultWorlds(){
+        List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
+        tables.add(new ItemStatTable());
+        tables.add(new ContainerStatTable());
+        tables.add(new RoomTable());
+        tables.add(new RaceTable());
+        tables.add(new EntityTable());
+        tables.add(new StoryArcTable());
+
+        tables.add(new ItemInstanceTable());
+        tables.add(new ContainerInstanceTable());
+        tables.add(new WorldMetaTable());
+
+        DatabaseManager.createNewTemplate(HUB_TEMPLATE_NAME + ".db");
+        DatabaseManager.createTemplateTables(HUB_TEMPLATE_NAME + ".db",tables);
+
+        DatabaseManager.createNewTemplate(LIMBO_TEMPLATE_NAME + ".db");
+        DatabaseManager.createTemplateTables(LIMBO_TEMPLATE_NAME + ".db",tables);
+
         createWorldWithID(HUB_WORLD_ID, HUB_TEMPLATE_NAME);
-        hubWorld = getWorldByWorldID(HUB_WORLD_ID);
         createWorldWithID(LIMBO_WORLD_ID, LIMBO_TEMPLATE_NAME);
+
+        hubWorld = getWorldByWorldID(HUB_WORLD_ID);
+        Race.writePlayableRacesToDatabaseFile(hubWorld.getDatabaseName());
         limbo = getWorldByWorldID(LIMBO_WORLD_ID);
+        Race.writePlayableRacesToDatabaseFile(limbo.getDatabaseName());
     }
 
     /**
@@ -131,7 +162,7 @@ public class World implements DatabaseManager.DatabaseEntry {
     }
 
     private static World createWorldWithID(int newWorldID, String templateName){
-        if(getWorldByWorldID(newWorldID) != null)
+        if(getWorldByWorldID(newWorldID) != null && new File(DatabaseManager.DATA_DIRECTORY + newWorldID + ".db").exists())
             return null;
 
         File templateFile = new File(DatabaseManager.TEMPLATE_DIRECTORY + templateName + ".db");

@@ -5,6 +5,7 @@ import database.DatabaseManager;
 import world.entity.Entity;
 import world.entity.EntityTable;
 import world.entity.Race;
+import world.entity.RaceTable;
 import world.item.ContainerInstanceTable;
 import world.item.ContainerStatTable;
 import world.item.ItemInstanceTable;
@@ -22,11 +23,11 @@ public class TemplateTester {
     private static final String TEMPLATE_NAME = "testTemplate";
 
     public static void main(String[] args){
-        List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
-        tables.add(new AccountTable());
+        /*List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
         tables.add(new ItemStatTable());
         tables.add(new ContainerStatTable());
         tables.add(new RoomTable());
+        tables.add(new RaceTable());
         tables.add(new EntityTable());
         tables.add(new StoryArcTable());
 
@@ -43,7 +44,7 @@ public class TemplateTester {
 
         DatabaseManager.createNewWorldDatabase(World.META_DATABASE_NAME);
         DatabaseManager.createWorldTables(World.META_DATABASE_NAME,tables);
-
+*/
         World.initDefaultWorlds();
         World test1 = World.getLimboWorld();
         World test2 = World.getHubWorld();
