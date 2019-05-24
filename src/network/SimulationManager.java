@@ -1,5 +1,6 @@
 package network;
 
+import client.Account;
 import client.AccountTable;
 import client.Client;
 import client.commands.PromptCommand;
@@ -7,6 +8,7 @@ import client.messages.*;
 import database.DatabaseManager;
 import world.entity.EntityTable;
 import world.item.*;
+import world.playerInterface.PlayerManagementService;
 import world.playerInterface.WorldMessageParser;
 import world.room.RoomTable;
 import world.story.StoryArcTable;
@@ -25,6 +27,8 @@ import java.util.*;
 public class SimulationManager {
     private Map<String, Client> clients = new HashMap<>();
     private WebServer server;
+    private PlayerManagementService service;
+
     private static final String DB_NAME = "account.db";
     //TODO needs a reference to the core database so it can access account info
 
@@ -34,8 +38,9 @@ public class SimulationManager {
         if(!message.wasCorrectlyParsed())
             scheduleCommand(new PromptCommand("Unable to parse command", server, client));
         else {
-            if (!clients.containsKey(client))
+            if (!clients.containsKey(client)) {
                 clients.put(client, new Client(SimulationManager.this, client));
+            }
             if(!clients.get(client).registerMessage(message))
                 scheduleCommand(new PromptCommand("Unable to process that command at this time",server,client));
         }
@@ -87,6 +92,7 @@ public class SimulationManager {
 
     public SimulationManager(int port) {
         server = new WebServer(port, clientListener, new WorldMessageParser(clientParser));
+        service = new PlayerManagementService(this);
 
     }
 
@@ -139,6 +145,10 @@ public class SimulationManager {
 
     public Client getClientWithAddress(String address){
         return clients.get(address);
+    }
+
+    public void notifyOfLoginComplete(Account a, Client c){
+        service.registerEntityControlSource(c.getAddress(),a.getUserName());
     }
 
     /**

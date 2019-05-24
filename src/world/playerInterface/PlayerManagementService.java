@@ -9,11 +9,17 @@ import world.meta.World;
 import world.playerInterface.commands.LookCommand;
 import world.playerInterface.messages.ClientLookMessage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PlayerManagementService {
-    private Map<String,Entity> controlledEntities = new HashMap<>();
+
+    //associates internet addresses to entity objects basically
+    private Map<String,Entity> accountToEntity = new HashMap<>();
+    private Map<Entity,String> entityToAccount = new HashMap<>();
+
 
     private SimulationManager simulationManager;
 
@@ -27,7 +33,8 @@ public class PlayerManagementService {
         if(w != null){
             Entity e;
             if((e = Entity.getEntityByEntityID(entityID, w.getDatabaseName())) != null) {
-                controlledEntities.put(controllerID, e);
+                accountToEntity.put(controllerID, e);
+                entityToAccount.put(e,controllerID);
                 return true;
             }
         }
@@ -35,12 +42,28 @@ public class PlayerManagementService {
     }
 
     public void removeControlSource(String controllerID){
-        controlledEntities.remove(controllerID);
+        if(accountToEntity.containsKey(controllerID)) {
+            entityToAccount.remove(accountToEntity.get(controllerID));
+            accountToEntity.remove(controllerID);
+        }
+    }
+
+    public void removeControlSource(Entity entity){
+        if(entityToAccount.containsKey(entity)){
+            accountToEntity.remove(entityToAccount.get(entity));
+            entityToAccount.remove(entity);
+        }
     }
 
     public Entity getEntityOfAccount(String account){
-        if(controlledEntities.containsKey(account))
-            return controlledEntities.get(account);
+        if(accountToEntity.containsKey(account))
+            return accountToEntity.get(account);
+        return null;
+    }
+
+    public String getAccountOfEntity(Entity e){
+        if(entityToAccount.containsKey(e))
+            return entityToAccount.get(e);
         return null;
     }
 
@@ -63,5 +86,18 @@ public class PlayerManagementService {
 
                 break;
         }
+    }
+
+    public WebServer getAttachedWebServer(){
+        return simulationManager.getServer();
+    }
+
+    public void sendMessageToEntities(String message, Entity... entities){
+        List<String> addresses = new ArrayList<>();
+        for(Entity e : entities){
+            String clientID = getAccountOfEntity(e);
+            addresses.add(clientID);
+        }
+        simulationManager.scheduleCommand(new PromptCommand(message,simulationManager.getServer(),addresses.toArray(new String[0])));
     }
 }

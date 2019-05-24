@@ -45,6 +45,8 @@ public class TemplateTester {
         DatabaseManager.createNewWorldDatabase(World.META_DATABASE_NAME);
         DatabaseManager.createWorldTables(World.META_DATABASE_NAME,tables);
 */
+        DatabaseManager.createDirectories();
+
         World.initDefaultWorlds();
         World test1 = World.getLimboWorld();
         World test2 = World.getHubWorld();

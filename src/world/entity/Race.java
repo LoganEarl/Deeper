@@ -58,9 +58,9 @@ public class Race {
         return defaultRaces;
     }
 
-    public static Race getFromDatabaseRace(String databaseName){
+    public static Race getFromID(String raceName){
         for(Race r: defaultRaces())
-            if(r.getRaceID().equals(databaseName))
+            if(r.getRaceID().equals(raceName))
                 return r;
         return null;
     }

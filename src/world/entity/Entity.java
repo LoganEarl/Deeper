@@ -6,7 +6,6 @@ import world.meta.World;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 import static world.entity.EntityTable.*;
@@ -53,7 +52,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         //for use by the builder
     }
 
-    private Entity(ResultSet readEntry, String databaseName) throws SQLException {
+    private Entity(ResultSet readEntry, String databaseName) throws Exception {
         entityID = readEntry.getString(ENTITY_ID);
         displayName = readEntry.getString(DISPLAY_NAME);
 
@@ -67,6 +66,10 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         dexterity = readEntry.getInt(DEX);
         intelligence = readEntry.getInt(INT);
         wisdom = readEntry.getInt(WIS);
+
+        raceID = readEntry.getString(RACE_ID);
+        if(Race.getFromID(raceID) == null)
+            throw new IllegalArgumentException("Race of the entity is not recognized");
 
         controllerType = readEntry.getString(CONTROLLER_TYPE);
         roomName = readEntry.getString(ROOM_NAME);
@@ -123,7 +126,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
                     toReturn = null;
                 getSQL.close();
                 c.close();
-            }catch (SQLException e){
+            }catch (Exception e){
                 toReturn = null;
             }
         }
@@ -200,10 +203,18 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
     /**
      * get a displayable name for this entity.
-     * @return The display name if there is one. Otherwise will return the race + : + entity ID
+     * @return The display name if there is one. Otherwise will return the race + : + entity ID (if the race is illegal as well it will just return the entityID)
      */
     public String getDisplayName() {
-        return displayName != null && displayName.isEmpty()? displayName: Race.getFromDatabaseRace(this.);
+        if(displayName != null && !displayName.isEmpty()) {
+            return displayName;
+        }else{
+            Race myRace = Race.getFromID(this.raceID);
+            if(myRace == null)
+                return this.entityID;
+            else
+                return myRace.getDisplayName() + ":" + this.entityID;
+        }
     }
 
     public String getControllerType() {
@@ -216,6 +227,18 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
     public String getDatabaseName() {
         return databaseName;
+    }
+
+    /**
+     * Shortcut to Race.getFromID(myEntity.getRaceID())
+     * @return the instantiated form of this entity's race. Can be null
+     */
+    public Race getRace(){
+        return Race.getFromID(this.raceID);
+    }
+
+    public String getRaceID(){
+        return this.raceID;
     }
 
     public static class EntityBuilder{
@@ -235,6 +258,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
         private String controllerType = CONTROLLER_TYPE_STATIC;
         private String roomName = "";
+        private String raceID = Race.HUMAN.getRaceID();
 
         private String databaseName = "";
 
@@ -254,6 +278,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
             e.wisdom = wisdom;
             e.controllerType = controllerType;
             e.roomName = roomName;
+            e.raceID = raceID;
             e.databaseName = databaseName;
             return e;
         }
@@ -313,6 +338,25 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
         public EntityBuilder setRoomName(String roomName){
             this.roomName = roomName;
+            return this;
+        }
+
+        public EntityBuilder setRace(Race r){
+            this.raceID = r.getRaceID();
+            return this;
+        }
+
+        /**
+         * sets the race of the building entity and also sets it's stats to the defaults specified in the race
+         * @param r the race to pull data from
+         * @return this builder
+         */
+        public EntityBuilder setStatsToRaceDefaults(Race r){
+            this.raceID = r.getRaceID();
+            this.strength =r.getBaseStr();
+            this.dexterity = r.getBaseDex();
+            this.intelligence = r.getBaseInt();
+            this.wisdom = r.getBaseWis();
             return this;
         }
 

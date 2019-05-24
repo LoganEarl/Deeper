@@ -5,10 +5,7 @@ import database.DatabaseManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import static world.item.ContainerInstanceTable.*;
 
@@ -28,6 +25,10 @@ public class Container implements DatabaseManager.DatabaseEntry {
             TABLE_NAME, CONTAINER_NAME, ENTITY_ID, ROOM_NAME, CONTAINER_STATE, LOCK_NUMBER, CONTAINER_ID);
     private static final String GET_ID_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?",
             TABLE_NAME, CONTAINER_ID);
+    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=? AND %s IS NULL",
+            TABLE_NAME, ROOM_NAME, ENTITY_ID);
+    private static final String GET_NAME_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=? AND %s=? AND %s IS NULL",
+            TABLE_NAME, ROOM_NAME, CONTAINER_NAME, ENTITY_ID);
 
     private int containerID;
     private String containerName;
@@ -88,6 +89,67 @@ public class Container implements DatabaseManager.DatabaseEntry {
         return toReturn;
     }
 
+    /**
+     * used to get the first container in the given room with the given name
+     * @param containerName the name of the container
+     * @param roomName the name of the room the container is in
+     * @param databaseName the name of the database containing the container
+     * @return a Container instance or null if not found
+     */
+    public static Container getContainerByNameRoom(String containerName, String roomName, String databaseName){
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+        PreparedStatement getSQL = null;
+        Container toReturn;
+        if(c == null)
+            return null;
+        else{
+            try {
+                getSQL = c.prepareStatement(GET_NAME_ROOM_SQL);
+                getSQL.setString(1,roomName);
+                getSQL.setString(2,containerName);
+                ResultSet accountSet = getSQL.executeQuery();
+                if(accountSet.next()) {
+                    toReturn = new Container(accountSet,databaseName);
+                }else
+                    toReturn = null;
+                getSQL.close();
+                c.close();
+            }catch (Exception e){
+                toReturn = null;
+            }
+        }
+        return toReturn;
+    }
+
+    /**
+     * gets all the containers in the given room
+     * @param roomName the name of the room to check for containers
+     * @param databaseName the name of the database containing the containers
+     * @return a list of all containers in the room
+     */
+    public static List<Container> getContainersInRoom(String roomName, String databaseName){
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+        PreparedStatement getSQL;
+        List<Container> foundContainers = new LinkedList<>();
+        if(c == null)
+            return Collections.emptyList();
+        else{
+            try {
+                getSQL = c.prepareStatement(GET_ROOM_SQL);
+                getSQL.setString(1,roomName);
+                ResultSet accountSet = getSQL.executeQuery();
+                while(accountSet.next()) {
+                    foundContainers.add(new Container(accountSet,databaseName));
+                }
+                getSQL.close();
+                c.close();
+            }catch (Exception e){
+                foundContainers = Collections.emptyList();
+            }
+        }
+        return foundContainers;
+    }
+
     @Override
     public boolean saveToDatabase(String databaseName) {
         Container container = getContainerByContainerID(containerID,databaseName);
@@ -141,6 +203,10 @@ public class Container implements DatabaseManager.DatabaseEntry {
 
     public int getLockNumber() {
         return lockNumber;
+    }
+
+    public boolean getIsLocked(){
+        return this.containerState.equals(STATE_LOCKED);
     }
 
     public String getDatabaseName() {
