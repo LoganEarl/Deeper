@@ -247,7 +247,13 @@ public class World implements DatabaseManager.DatabaseEntry {
         }
         return toReturn;
     }
-    
+
+    /**
+     * use to registerThe Deep Dark an entity to the given world. Will not change the world the given entity thinks it is in. Not to be confused with Entity.transferToWorld() which is preferable in almost every instance
+     * @param e the entity to transfer
+     * @param w the world to register the entity to
+     * @return true if successful
+     */
     public static boolean setWorldOfEntity(Entity e, World w){
         return DatabaseManager.executeStatement(SET_ENTITY_WORLD,META_DATABASE_NAME,e.getID(), w.getWorldID()) > 0;
     }

@@ -13,7 +13,7 @@ import world.room.Room;
 import java.util.List;
 import java.util.Locale;
 
-public class LookCommand implements SimulationManager.Command, WebServer.ServerMessage  {
+public class LookCommand implements SimulationManager.Command {
     private Entity fromEntity;
     private ClientLookMessage sourceMessage;
 
@@ -133,10 +133,5 @@ public class LookCommand implements SimulationManager.Command, WebServer.ServerM
     @Override
     public boolean isComplete() {
         return complete;
-    }
-
-    @Override
-    public byte[] getBytes() {
-        return new byte[0];
     }
 }

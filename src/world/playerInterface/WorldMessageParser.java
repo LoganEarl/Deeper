@@ -1,6 +1,7 @@
 package world.playerInterface;
 
 import network.WebServer;
+import world.playerInterface.messages.ClientCreateCharacterMessage;
 import world.playerInterface.messages.ClientLookMessage;
 
 public class WorldMessageParser implements WebServer.ClientMessageParser {
@@ -44,6 +45,9 @@ public class WorldMessageParser implements WebServer.ClientMessageParser {
             case CLIENT_INVENTORY_MESSAGE:
                 break;
             case UNKNOWN_MESSAGE_FORMAT:
+                break;
+            case CLIENT_CREATE_CHAR_MESSAGE:
+                message = new ClientCreateCharacterMessage(sourceClient);
                 break;
         }
 

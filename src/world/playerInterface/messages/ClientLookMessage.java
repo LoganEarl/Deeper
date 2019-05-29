@@ -4,7 +4,7 @@ import network.WebServer;
 import world.playerInterface.WorldMessageType;
 
 /**
- * Command used to get room contents, to examine items, and to look into containers
+ * Message from a client expressing a desire to get a room's description, examine items, and to look into containers
  * @author Logan Earl
  */
 public class ClientLookMessage implements WebServer.ClientMessage {

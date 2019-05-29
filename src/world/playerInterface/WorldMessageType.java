@@ -8,6 +8,7 @@ public enum WorldMessageType implements WebServer.MessageType {
     CLIENT_ATTACK_MESSAGE("attack"),
     CLIENT_HOLD_MESSAGE("grab"),
     CLIENT_LOOK_MESSAGE("look"),
+    CLIENT_CREATE_CHAR_MESSAGE("create"),
     /**The default type of messages that turned out to be un-parsable. UnknownMessageFormat*/
     UNKNOWN_MESSAGE_FORMAT("UnknownMessageFormat");
 

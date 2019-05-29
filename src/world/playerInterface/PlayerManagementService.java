@@ -20,6 +20,7 @@ public class PlayerManagementService {
     private Map<String,Entity> accountToEntity = new HashMap<>();
     private Map<Entity,String> entityToAccount = new HashMap<>();
 
+    private Map<Entity, List<MessageContext>> messageContexts = new HashMap<>();
 
     private SimulationManager simulationManager;
 
@@ -72,6 +73,12 @@ public class PlayerManagementService {
             return false;
         }
 
+        //special case where they want to make a new character. Can be done without logging in
+        if(message.getMessageType() == WorldMessageType.CLIENT_CREATE_CHAR_MESSAGE){
+
+            return true;
+        }
+
         Client associatedClient = simulationManager.getClientWithAddress(message.getClient());
         if(associatedClient.getStatus() != Client.ClientStatus.ACTIVE){
             simulationManager.scheduleCommand(new PromptCommand("You are unable to act in the world as you are not logged in", simulationManager.getServer(), message.getClient()));
@@ -93,6 +100,11 @@ public class PlayerManagementService {
         return simulationManager.getServer();
     }
 
+    /**
+     * sends the given string message to all the given entities in the form of a {@link PromptCommand}
+     * @param message the message string to send
+     * @param entities the entities to receive the message
+     */
     public void sendMessageToEntities(String message, Entity... entities){
         List<String> addresses = new ArrayList<>();
         for(Entity e : entities){
@@ -100,5 +112,49 @@ public class PlayerManagementService {
             addresses.add(clientID);
         }
         simulationManager.scheduleCommand(new PromptCommand(message,simulationManager.getServer(),addresses.toArray(new String[0])));
+    }
+
+    /**
+     * associate the given context to the entity so that incoming messages from the entity
+     * are passed to the given context before going to the default one.
+     * @param entity the entity to get the new context
+     * @param context the context
+     */
+    public void addEntityMessageContext(Entity entity, MessageContext context){
+        if(!messageContexts.containsKey(entity))
+            messageContexts.put(entity,new ArrayList<>(4));
+        messageContexts.get(entity).add(context);
+    }
+
+    /**
+     * removes the given context from the entity
+     * @param entity the entity with the context to remove
+     * @param toRemove the context to remove
+     */
+    public void removeMessageContextOfEntity(Entity entity, MessageContext toRemove){
+        if(messageContexts.containsKey(entity)){
+             messageContexts.get(entity).remove(toRemove);
+        }
+    }
+
+    /**
+     * a custom context in which commands can be executed. Messages that arrive from the
+     * associated entity will first be routed to the context. The context can then choose
+     * to consume the message or ignore it. If it is ignored, the message will go to the
+     * default context for all world messages.
+     */
+    public interface MessageContext {
+        /**
+         * @return the time in milliseconds until the context should self-invalidate to prevent memory leaks
+         */
+        long getTimeToExpire();
+
+        /**
+         * called when a message is received from the associated entity
+         * @param fromEntity the entity that sent the message
+         * @param message the message that was sent
+         * @return true to consume the message, false if the message should continue on to other contexts
+         */
+        boolean registerMessage(Entity fromEntity, boolean isLoggedIn, WebServer.ClientMessage message);
     }
 }
