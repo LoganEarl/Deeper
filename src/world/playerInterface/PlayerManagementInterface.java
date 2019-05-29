@@ -10,13 +10,14 @@ import world.playerInterface.commands.CreateCharCommand;
 import world.playerInterface.commands.LookCommand;
 import world.playerInterface.messages.ClientCreateCharacterMessage;
 import world.playerInterface.messages.ClientLookMessage;
+import world.playerInterface.messages.ContextMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PlayerManagementService {
+public class PlayerManagementInterface {
 
     //associates internet addresses to entity objects basically
     private Map<String,Entity> accountToEntity = new HashMap<>();
@@ -26,7 +27,7 @@ public class PlayerManagementService {
 
     private SimulationManager simulationManager;
 
-    public PlayerManagementService(SimulationManager simulationManager){
+    public PlayerManagementInterface(SimulationManager simulationManager){
         this.simulationManager = simulationManager;
     }
 
@@ -178,6 +179,6 @@ public class PlayerManagementService {
          * @param message the message that was sent
          * @return true to consume the message, false if the message should continue on to other contexts
          */
-        boolean registerMessage(Entity fromEntity, boolean isLoggedIn, WebServer.ClientMessage message);
+        boolean registerMessage(Entity fromEntity, boolean isLoggedIn, ContextMessage message);
     }
 }

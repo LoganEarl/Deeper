@@ -104,4 +104,17 @@ public class Race {
     public int getBaseWis() {
         return baseWis;
     }
+
+    public static String getPlayableRaceDescriptions(){
+        StringBuilder description = new StringBuilder();
+        for(Race r: Race.defaultRaces())
+            description.append(r.toString()).append("\n\n");
+        return description.toString();
+    }
+
+    @Override
+    public String toString(){
+        return String.format(Locale.US,"%s: %s\nBase Stats: [STR %d] [DEX %d] [INT %d] [WIS %d]",
+                displayName, description, baseStr, baseDex, baseInt, baseWis);
+    }
 }

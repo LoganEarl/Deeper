@@ -7,7 +7,7 @@ import client.commands.PromptCommand;
 import client.messages.*;
 import database.DatabaseManager;
 import world.meta.World;
-import world.playerInterface.PlayerManagementService;
+import world.playerInterface.PlayerManagementInterface;
 import world.playerInterface.WorldMessageParser;
 
 import java.util.*;
@@ -24,7 +24,7 @@ import java.util.*;
 public class SimulationManager {
     private Map<String, Client> clients = new HashMap<>();
     private WebServer server;
-    private PlayerManagementService service;
+    private PlayerManagementInterface service;
 
     private static final String DB_NAME = "account.db";
     //TODO needs a reference to the core database so it can access account info
@@ -89,7 +89,7 @@ public class SimulationManager {
 
     public SimulationManager(int port) {
         server = new WebServer(port, clientListener, new WorldMessageParser(clientParser));
-        service = new PlayerManagementService(this);
+        service = new PlayerManagementInterface(this);
 
     }
 
@@ -155,8 +155,14 @@ public class SimulationManager {
      * Interface for a command that a client wants executed, such as a login attempt
      */
     public interface Command {
+        /**Called by the server thread when executing the command.*/
         void execute();
 
+        /**
+         * Called by the server thread after executing the command. Determines if the command was consumed by the last execute call.
+         * If so, it will not be called again and removed from the command queue. If not, it will continue to be executed
+         * @return true to consume the command
+         */
         boolean isComplete();
     }
 }

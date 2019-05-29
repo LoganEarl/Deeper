@@ -1,12 +1,11 @@
 package world.playerInterface.commands;
 
 import network.SimulationManager;
-import network.WebServer;
 import world.entity.Entity;
 import world.entity.Race;
 import world.item.Container;
 import world.item.Item;
-import world.playerInterface.PlayerManagementService;
+import world.playerInterface.PlayerManagementInterface;
 import world.playerInterface.messages.ClientLookMessage;
 import world.room.Room;
 
@@ -19,9 +18,9 @@ public class LookCommand implements SimulationManager.Command {
 
     private boolean complete = false;
     private String messageToSend = "";
-    private PlayerManagementService service;
+    private PlayerManagementInterface service;
 
-    public LookCommand(ClientLookMessage sourceMessage, Entity observer, PlayerManagementService service){
+    public LookCommand(ClientLookMessage sourceMessage, Entity observer, PlayerManagementInterface service){
         fromEntity = observer;
         this.sourceMessage = sourceMessage;
         this.service = service;
