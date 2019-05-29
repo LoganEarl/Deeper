@@ -1,7 +1,6 @@
 package world.story;
 
 import database.DatabaseManager;
-import world.entity.EntityTable;
 
 import java.util.*;
 

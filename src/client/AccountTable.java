@@ -2,7 +2,10 @@ package client;
 
 import database.DatabaseManager;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Holds information relating to the creation of a SQL table that holds each account that has been created.

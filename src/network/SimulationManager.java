@@ -6,12 +6,9 @@ import client.Client;
 import client.commands.PromptCommand;
 import client.messages.*;
 import database.DatabaseManager;
-import world.entity.EntityTable;
-import world.item.*;
+import world.meta.World;
 import world.playerInterface.PlayerManagementService;
 import world.playerInterface.WorldMessageParser;
-import world.room.RoomTable;
-import world.story.StoryArcTable;
 
 import java.util.*;
 
@@ -41,7 +38,7 @@ public class SimulationManager {
             if (!clients.containsKey(client)) {
                 clients.put(client, new Client(SimulationManager.this, client));
             }
-            if(!clients.get(client).registerMessage(message))
+            if(!clients.get(client).registerMessage(message) && !service.registerMessage(message))
                 scheduleCommand(new PromptCommand("Unable to process that command at this time",server,client));
         }
     };
@@ -103,6 +100,9 @@ public class SimulationManager {
         DatabaseManager.createDirectories();
         DatabaseManager.createNewWorldDatabase(DB_NAME);
         DatabaseManager.createWorldTables(DB_NAME, tables);
+
+        DatabaseManager.createDirectories();
+        World.initWorldSystem();
 
         server.startServer();
     }

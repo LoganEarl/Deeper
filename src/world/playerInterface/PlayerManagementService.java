@@ -67,15 +67,15 @@ public class PlayerManagementService {
         return null;
     }
 
-    public void registerMessage(WebServer.ClientMessage message){
+    public boolean registerMessage(WebServer.ClientMessage message){
         if(!(message.getMessageType() instanceof WorldMessageType)){
-            return;
+            return false;
         }
 
         Client associatedClient = simulationManager.getClientWithAddress(message.getClient());
         if(associatedClient.getStatus() != Client.ClientStatus.ACTIVE){
             simulationManager.scheduleCommand(new PromptCommand("You are unable to act in the world as you are not logged in", simulationManager.getServer(), message.getClient()));
-            return;
+            return true;
         }
 
         switch ((WorldMessageType)message.getMessageType()){
@@ -86,6 +86,7 @@ public class PlayerManagementService {
 
                 break;
         }
+        return true;
     }
 
     public WebServer getAttachedWebServer(){

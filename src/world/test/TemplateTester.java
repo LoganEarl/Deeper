@@ -1,23 +1,9 @@
 package world.test;
 
-import client.AccountTable;
 import database.DatabaseManager;
 import world.entity.Entity;
 import world.entity.EntityTable;
-import world.entity.Race;
-import world.entity.RaceTable;
-import world.item.ContainerInstanceTable;
-import world.item.ContainerStatTable;
-import world.item.ItemInstanceTable;
-import world.item.ItemStatTable;
 import world.meta.World;
-import world.meta.WorldMetaTable;
-import world.meta.WorldTable;
-import world.room.RoomTable;
-import world.story.StoryArcTable;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class TemplateTester {
     private static final String TEMPLATE_NAME = "testTemplate";
@@ -47,7 +33,7 @@ public class TemplateTester {
 */
         DatabaseManager.createDirectories();
 
-        World.initDefaultWorlds();
+        World.initWorldSystem();
         World test1 = World.getLimboWorld();
         World test2 = World.getHubWorld();
 
@@ -58,7 +44,7 @@ public class TemplateTester {
 
         System.out.println("Attempting to save entity to database");
         Entity newEntity = new Entity.EntityBuilder()
-                .setID("TestEnt:" + System.currentTimeMillis())
+                .setID("Cart")
                 .setControllerType(EntityTable.CONTROLLER_TYPE_PLAYER)
                 .setDisplayName("CartOfSwine")
                 .setDatabaseName(test1.getDatabaseName())

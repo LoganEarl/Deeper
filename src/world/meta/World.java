@@ -117,7 +117,7 @@ public class World implements DatabaseManager.DatabaseEntry {
             throw new IllegalArgumentException("Illegal world: " + worldID + ", unable to parse");
     }
 
-    public static void initDefaultWorlds(){
+    public static void initWorldSystem(){
         List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
         tables.add(new ItemStatTable());
         tables.add(new ContainerStatTable());
@@ -135,6 +135,11 @@ public class World implements DatabaseManager.DatabaseEntry {
 
         DatabaseManager.createNewTemplate(LIMBO_TEMPLATE_NAME + ".db");
         DatabaseManager.createTemplateTables(LIMBO_TEMPLATE_NAME + ".db",tables);
+
+        tables.clear();
+        tables.add(new WorldTable());
+        tables.add(new EntityWorldTable());
+        DatabaseManager.createWorldTables(META_DATABASE_NAME,tables);
 
         createWorldWithID(HUB_WORLD_ID, HUB_TEMPLATE_NAME);
         createWorldWithID(LIMBO_WORLD_ID, LIMBO_TEMPLATE_NAME);
@@ -287,7 +292,7 @@ public class World implements DatabaseManager.DatabaseEntry {
             return null;
         else{
             try {
-                getSQL = c.prepareStatement(GET_SQL);
+                getSQL = c.prepareStatement(GET_ENTITY_SQL);
                 getSQL.setString(1,entityID);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next())
