@@ -6,7 +6,9 @@ import network.SimulationManager;
 import network.WebServer;
 import world.entity.Entity;
 import world.meta.World;
+import world.playerInterface.commands.CreateCharCommand;
 import world.playerInterface.commands.LookCommand;
+import world.playerInterface.messages.ClientCreateCharacterMessage;
 import world.playerInterface.messages.ClientLookMessage;
 
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ public class PlayerManagementService {
     private Map<String,Entity> accountToEntity = new HashMap<>();
     private Map<Entity,String> entityToAccount = new HashMap<>();
 
-    private Map<Entity, List<MessageContext>> messageContexts = new HashMap<>();
+    private Map<String, List<MessageContext>> messageContexts = new HashMap<>();
 
     private SimulationManager simulationManager;
 
@@ -75,7 +77,8 @@ public class PlayerManagementService {
 
         //special case where they want to make a new character. Can be done without logging in
         if(message.getMessageType() == WorldMessageType.CLIENT_CREATE_CHAR_MESSAGE){
-
+            Client associatedClient = simulationManager.getClientWithAddress(message.getClient());
+            simulationManager.scheduleCommand(new CreateCharCommand(associatedClient.getUserName(), (ClientCreateCharacterMessage)message, this));
             return true;
         }
 
@@ -105,13 +108,17 @@ public class PlayerManagementService {
      * @param message the message string to send
      * @param entities the entities to receive the message
      */
-    public void sendMessageToEntities(String message, Entity... entities){
+    public void sendMessage(String message, Entity... entities){
         List<String> addresses = new ArrayList<>();
         for(Entity e : entities){
             String clientID = getAccountOfEntity(e);
             addresses.add(clientID);
         }
         simulationManager.scheduleCommand(new PromptCommand(message,simulationManager.getServer(),addresses.toArray(new String[0])));
+    }
+
+    public void sendMessage(String message, String... clients){
+        simulationManager.scheduleCommand(new PromptCommand(message,simulationManager.getServer(),clients));
     }
 
     /**
@@ -121,9 +128,23 @@ public class PlayerManagementService {
      * @param context the context
      */
     public void addEntityMessageContext(Entity entity, MessageContext context){
-        if(!messageContexts.containsKey(entity))
-            messageContexts.put(entity,new ArrayList<>(4));
-        messageContexts.get(entity).add(context);
+        String address = getAccountOfEntity(entity);
+
+        if(address != null){
+            addClientMessageContext(address,context);
+        }
+    }
+
+    public void addClientMessageContext(String client, MessageContext context){
+        if(!messageContexts.containsKey(client))
+            messageContexts.put(client, new ArrayList<>(2));
+        messageContexts.get(client).add(context);
+    }
+
+    public void removeMessageContextOfClient(String client, MessageContext toRemove){
+        if(messageContexts.containsKey(client)){
+            messageContexts.get(client).remove(toRemove);
+        }
     }
 
     /**
@@ -132,8 +153,10 @@ public class PlayerManagementService {
      * @param toRemove the context to remove
      */
     public void removeMessageContextOfEntity(Entity entity, MessageContext toRemove){
-        if(messageContexts.containsKey(entity)){
-             messageContexts.get(entity).remove(toRemove);
+        String address = getAccountOfEntity(entity);
+
+        if(address != null){
+            removeMessageContextOfClient(address,toRemove);
         }
     }
 

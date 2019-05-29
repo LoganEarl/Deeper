@@ -1,5 +1,7 @@
 package world.playerInterface;
 
+import client.Client;
+import network.SimulationManager;
 import network.WebServer;
 import world.playerInterface.messages.ClientCreateCharacterMessage;
 import world.playerInterface.messages.ClientLookMessage;

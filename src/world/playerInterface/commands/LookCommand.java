@@ -40,7 +40,7 @@ public class LookCommand implements SimulationManager.Command {
             response = describeRoom();
         else
             response = "Not yet implemented";
-        service.sendMessageToEntities(response, fromEntity);
+        service.sendMessage(response, fromEntity);
 
         complete = true;
     }

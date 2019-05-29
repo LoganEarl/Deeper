@@ -209,6 +209,12 @@ public class Client {
         return this.address;
     }
 
+    public String getUserName(){
+        if(this.associatedAccount != null)
+            return associatedAccount.getUserName();
+        return null;
+    }
+
     /**Enumeration of possible client states*/
     public enum ClientStatus{
         /**client has either logged out or was kicked at some point. Has no open connections associated with client account*/
