@@ -7,6 +7,9 @@ import world.playerInterface.PlayerManagementInterface;
 import world.playerInterface.messages.ClientCreateCharacterMessage;
 import world.playerInterface.messages.ContextMessage;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 public class CreateCharCommand implements SimulationManager.Command, PlayerManagementInterface.MessageContext {
     private long lastUpdateTime = System.currentTimeMillis();
     private static final long EXPIRATION_TIME = 600000; //10 minutes
@@ -26,6 +29,12 @@ public class CreateCharCommand implements SimulationManager.Command, PlayerManag
     private static final int STAGE_COMPLETE = 5;
     private static final int STAGE_NO_USERNAME = -1;
     private boolean refreshFlag = false;
+
+    private Race selectedRace;
+
+    private int[] allocations = {0,0,0,0};
+    private String[] allocationNames = {"str","dex","int","wis"};
+    private int pointsAvailable = 40;
 
     public CreateCharCommand(String userName, ClientCreateCharacterMessage message, PlayerManagementInterface service){
         this.service = service;
@@ -68,19 +77,53 @@ public class CreateCharCommand implements SimulationManager.Command, PlayerManag
                 }
             }
             if(stage == STAGE_RACE) {
-                Race selectedRace;
                 if(newMessageArgs == null){
                     service.sendMessage("Please choose a race from the following...\n\n" +
                             Race.getPlayableRaceDescriptions(), message.getClient());
                 }else if(newMessageArgs.length == 1 && (selectedRace = Race.getFromID(newMessageArgs[0])) != null){
-                    builder.setStatsToRaceDefaults(selectedRace);
                     stage = STAGE_STATS;
                     newMessageArgs = null;
                 }
             }
             if(stage == STAGE_STATS){
-                
+                int attributeIndex;
+
+                if(newMessageArgs == null){
+                    service.sendMessage("You have " + pointsAvailable +
+                            " stat points available to allocate. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis]", message.getClient());
+                }else if(newMessageArgs.length == 4 &&
+                        (newMessageArgs[0].equals("add") || newMessageArgs[0].equals("subtract")) &&
+                        isInteger(newMessageArgs[1]) &&
+                        (newMessageArgs[2].equals("from") || newMessageArgs[2].equals("to")) &&
+                        (attributeIndex = Arrays.asList(allocationNames).indexOf(newMessageArgs[3])) != -1){
+                    int points = Integer.parseInt(newMessageArgs[1]);
+                    if(newMessageArgs[0].equals("subtract")) points *= -1;
+                    if(pointsAvailable >= points && allocations[attributeIndex] + points >= 0){
+                        allocations[attributeIndex] += points;
+                        service.sendMessage("You have " + pointsAvailable + " points remaining. Your stats are as follows\n" + getCurrentStats(),message.getClient());
+                    }else if(pointsAvailable < points)
+                        service.sendMessage("You do not have enough points for this allocation", message.getClient());
+                    else
+                        service.sendMessage("You cannot allocate less points to an attribute than your race's base stats",message.getClient());
+                }
             }
+        }
+    }
+
+    private String getCurrentStats(){
+        return String.format(Locale.US, "[STR %d] [DEX %d] [INT %d] [WIS %d]",
+                selectedRace.getBaseStr() + allocations[0],
+                selectedRace.getBaseDex() + allocations[1],
+                selectedRace.getBaseInt() + allocations[2],
+                selectedRace.getBaseWis() + allocations[3]);
+    }
+
+    private static boolean isInteger(String s) {
+        try {
+            Integer.parseInt(s);
+            return true;
+        } catch(Exception e) {
+            return false;
         }
     }
 

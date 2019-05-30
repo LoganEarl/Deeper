@@ -27,7 +27,7 @@ public class ClientCreateCharacterMessage implements WebServer.ClientMessage {
 
     @Override
     public void constructFromString(String rawMessageBody) {
-        String[] args = rawMessageBody.toLowerCase().split(" ");
+        String[] args = rawMessageBody.toLowerCase().split("\n");
         if(args.length == 2 && args[0].equals("new") && args[1].equals("character")){
             parsedCorrectly = true;
         }

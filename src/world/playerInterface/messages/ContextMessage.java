@@ -26,7 +26,7 @@ public class ContextMessage implements WebServer.ClientMessage  {
 
     @Override
     public void constructFromString(String rawMessageBody) {
-        String[] rawArgs = rawMessageBody.split(" ");
+        String[] rawArgs = rawMessageBody.split("\n");
         if(rawArgs.length >= 1 && !rawArgs[0].isEmpty()) {
             fullArgs = new String[rawArgs.length + 1];
             fullArgs[0] = messageHeader;

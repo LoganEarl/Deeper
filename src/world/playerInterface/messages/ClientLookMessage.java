@@ -30,7 +30,7 @@ public class ClientLookMessage implements WebServer.ClientMessage {
 
     @Override
     public void constructFromString(String rawMessageBody) {
-        String[] args = rawMessageBody.toLowerCase().split(" ");
+        String[] args = rawMessageBody.toLowerCase().split("\n");
         if(args.length == 0) {
             isLookingInto = false;
             examineTarget = "";

@@ -1,0 +1,25 @@
+[Context Specific Commands]
+    [character creation context]
+        [race names]
+            human
+        add
+        subtract
+
+[Other commands]
+    [world commands]
+        create
+        inventory
+        stats
+        attack
+        grab
+        look
+        UnknownMessageFormat
+
+    [server commands]
+        connect
+        login
+        debug
+        update
+        elevate
+        logout
+        UnknownMessageFormat
