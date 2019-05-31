@@ -71,6 +71,10 @@ public class PlayerManagementInterface {
         return null;
     }
 
+    public void registerCommand(SimulationManager.Command command){
+        simulationManager.scheduleCommand(command);
+    }
+
     public boolean registerMessage(WebServer.ClientMessage message){
         if(!(message.getMessageType() instanceof WorldMessageType)){
             return false;

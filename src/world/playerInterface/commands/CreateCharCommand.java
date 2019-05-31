@@ -3,6 +3,7 @@ package world.playerInterface.commands;
 import network.SimulationManager;
 import world.entity.Entity;
 import world.entity.Race;
+import world.meta.World;
 import world.playerInterface.PlayerManagementInterface;
 import world.playerInterface.messages.ClientCreateCharacterMessage;
 import world.playerInterface.messages.ContextMessage;
@@ -30,6 +31,7 @@ public class CreateCharCommand implements SimulationManager.Command, PlayerManag
     private static final int STAGE_NO_USERNAME = -1;
     private boolean refreshFlag = false;
 
+    private String selectedName;
     private Race selectedRace;
 
     private int[] allocations = {0,0,0,0};
@@ -54,58 +56,101 @@ public class CreateCharCommand implements SimulationManager.Command, PlayerManag
     public void execute() {
         if(refreshFlag) {
             refreshFlag = false;
-            if (stage == STAGE_NO_USERNAME) {
-                service.sendMessage("You must be logged in to create a character", message.getClient());
-                service.removeMessageContextOfClient(message.getClient(), this);
-                stage = STAGE_COMPLETE;
-            }
-            if(stage == STAGE_START){
-                newMessageArgs = null;
-                stage = STAGE_DISPLAY_NAME;
-            }
-            if(stage == STAGE_DISPLAY_NAME) {
-                if(newMessageArgs == null) {
-                    service.sendMessage("Please enter the name you wish to go by", message.getClient());
-                } else if(newMessageArgs.length == 1 &&
-                        newMessageArgs[0].length() > 3 &&
-                        newMessageArgs[0].chars().allMatch(Character::isAlphabetic)){
-                    builder.setDisplayName(newMessageArgs[0]);
-                    service.sendMessage("Very well, you will be known as " + newMessageArgs[0] + " from now on.", message.getClient());
-                    newMessageArgs = null;
-                }else{
-                    service.sendMessage("That name will not do. Please choose a name with 4 or more letters, made up of only letters", message.getClient());
-                }
-            }
-            if(stage == STAGE_RACE) {
-                if(newMessageArgs == null){
-                    service.sendMessage("Please choose a race from the following...\n\n" +
-                            Race.getPlayableRaceDescriptions(), message.getClient());
-                }else if(newMessageArgs.length == 1 && (selectedRace = Race.getFromID(newMessageArgs[0])) != null){
-                    stage = STAGE_STATS;
-                    newMessageArgs = null;
-                }
-            }
-            if(stage == STAGE_STATS){
-                int attributeIndex;
+            checkForUsername();
+            checkForStart();
+            checkForDisplayName();
+            checkForRace();
+            checkForStats();
+            checkForVerification();
+        }
+    }
 
-                if(newMessageArgs == null){
-                    service.sendMessage("You have " + pointsAvailable +
-                            " stat points available to allocate. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis]", message.getClient());
-                }else if(newMessageArgs.length == 4 &&
-                        (newMessageArgs[0].equals("add") || newMessageArgs[0].equals("subtract")) &&
-                        isInteger(newMessageArgs[1]) &&
-                        (newMessageArgs[2].equals("from") || newMessageArgs[2].equals("to")) &&
-                        (attributeIndex = Arrays.asList(allocationNames).indexOf(newMessageArgs[3])) != -1){
-                    int points = Integer.parseInt(newMessageArgs[1]);
-                    if(newMessageArgs[0].equals("subtract")) points *= -1;
-                    if(pointsAvailable >= points && allocations[attributeIndex] + points >= 0){
-                        allocations[attributeIndex] += points;
-                        service.sendMessage("You have " + pointsAvailable + " points remaining. Your stats are as follows\n" + getCurrentStats(),message.getClient());
-                    }else if(pointsAvailable < points)
-                        service.sendMessage("You do not have enough points for this allocation", message.getClient());
-                    else
-                        service.sendMessage("You cannot allocate less points to an attribute than your race's base stats",message.getClient());
-                }
+    private void checkForUsername(){
+        if (stage == STAGE_NO_USERNAME) {
+            service.sendMessage("You must be logged in to create a character", message.getClient());
+            service.removeMessageContextOfClient(message.getClient(), this);
+            stage = STAGE_COMPLETE;
+        }
+    }
+
+    private void checkForStart(){
+        if(stage == STAGE_START){
+            newMessageArgs = null;
+            stage = STAGE_DISPLAY_NAME;
+        }
+    }
+
+    private void checkForDisplayName(){
+        if(stage == STAGE_DISPLAY_NAME) {
+            if(newMessageArgs == null) {
+                service.sendMessage("Please enter the name you wish to go by", message.getClient());
+            } else if(newMessageArgs.length == 1 &&
+                    newMessageArgs[0].length() > 3 &&
+                    newMessageArgs[0].chars().allMatch(Character::isAlphabetic)){
+                builder.setDisplayName(newMessageArgs[0]);
+                selectedName = newMessageArgs[0];
+                service.sendMessage("Very well, you will be known as " + newMessageArgs[0] + " from now on.", message.getClient());
+                newMessageArgs = null;
+            }else{
+                service.sendMessage("That name will not do. Please choose a name with 4 or more letters, made up of only letters", message.getClient());
+            }
+        }
+    }
+
+    private void checkForRace(){
+        if(stage == STAGE_RACE) {
+            if(newMessageArgs == null){
+                service.sendMessage("Please choose a race from the following...\n\n" +
+                        Race.getPlayableRaceDescriptions(), message.getClient());
+            }else if(newMessageArgs.length == 1 && (selectedRace = Race.getFromID(newMessageArgs[0])) != null){
+                stage = STAGE_STATS;
+                newMessageArgs = null;
+            }else{
+                service.sendMessage("I did not understand that, Please choose a race from the following...\n\n" + Race.getPlayableRaceDescriptions(), message.getClient());
+            }
+        }
+    }
+
+    private void checkForStats(){
+        if(stage == STAGE_STATS){
+            int attributeIndex;
+
+            if(newMessageArgs == null){
+                service.sendMessage("You have " + pointsAvailable +
+                        " stat points available to allocate. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis]. Use [done] when complete.", message.getClient());
+            }else if(newMessageArgs.length == 4 &&
+                    (newMessageArgs[0].equals("add") || newMessageArgs[0].equals("subtract")) &&
+                    isInteger(newMessageArgs[1]) &&
+                    (newMessageArgs[2].equals("from") || newMessageArgs[2].equals("to")) &&
+                    (attributeIndex = Arrays.asList(allocationNames).indexOf(newMessageArgs[3])) != -1){
+                int points = Integer.parseInt(newMessageArgs[1]);
+                if(newMessageArgs[0].equals("subtract")) points *= -1;
+                if(pointsAvailable >= points && allocations[attributeIndex] + points >= 0){
+                    allocations[attributeIndex] += points;
+                    service.sendMessage("You have " + pointsAvailable + " points remaining. Your stats are as follows\n" + getCurrentStats(),message.getClient());
+                }else if(pointsAvailable < points)
+                    service.sendMessage("You do not have enough points for this allocation", message.getClient());
+                else
+                    service.sendMessage("You cannot allocate less points to an attribute than your race's base stats",message.getClient());
+            }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("done")){
+                builder.setStrength(allocations[0] + selectedRace.getBaseStr());
+                stage = STAGE_VERIFY;
+                newMessageArgs = null;
+            }else{
+                service.sendMessage("I do not understand. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis]. Use [done] when complete.",message.getClient());
+            }
+        }
+    }
+
+    private void checkForVerification(){
+        if(stage == STAGE_VERIFY){
+            if(newMessageArgs == null){
+                service.sendMessage(String.format(Locale.US, "Name: %s\nRace: %s\nStats: %s\n\nIs this correct? [yes/no]",selectedName,selectedRace.getDisplayName(),getCurrentStats()),message.getClient());
+            }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("yes")){
+                service.sendMessage("Very well, your character creation is now complete. Welcome " + selectedName + " to the Simulacrum!", message.getClient());
+                Entity newPlayer = builder.build();
+                newPlayer.transferToWorld(World.getHubWorld());
+                service.registerCommand(new LookCommand(null,newPlayer,service));
             }
         }
     }

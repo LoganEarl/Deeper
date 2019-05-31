@@ -28,14 +28,14 @@ public class LookCommand implements SimulationManager.Command {
 
     @Override
     public void execute() {
-        if(sourceMessage == null || fromEntity == null){
+        if(fromEntity == null){
             complete = true;
-            System.out.println("Failed to execute a look command for a null entity or null message");
+            System.out.println("Failed to execute a look command for a null entity");
         }
 
         String response;
 
-        if(sourceMessage.getTarget() == null || sourceMessage.getTarget().isEmpty())
+        if(sourceMessage == null || sourceMessage.getTarget() == null || sourceMessage.getTarget().isEmpty())
             response = describeRoom();
         else
             response = "Not yet implemented";
