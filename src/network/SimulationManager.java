@@ -43,52 +43,8 @@ public class SimulationManager {
         }
     };
 
-    private final WebServer.ClientMessageParser clientParser = (toParse, sourceClient) -> {
-        String rawMessageType;
-        String rawMessageBody;
-
-        int headerLastIndex = toParse.indexOf('\n');
-        if (headerLastIndex == -1 || headerLastIndex == toParse.length() - 1) {
-            rawMessageType = toParse;
-            rawMessageBody = "";
-        }else{
-            rawMessageType = toParse.substring(0, headerLastIndex);
-            rawMessageBody = toParse.substring(headerLastIndex + 1);
-        }
-
-        ServerMessageType messageType = ServerMessageType.parseFromString(rawMessageType);
-        WebServer.ClientMessage message;
-        switch (messageType) {
-            case CLIENT_GREETING:
-                message = new ClientGreeting(sourceClient);
-                break;
-            case CLIENT_DEBUG_MESSAGE:
-                message = new ClientDebugMessage(sourceClient);
-                break;
-            case CLIENT_ACCOUNT_UPDATE_MESSAGE:
-                message = new ClientAccountUpdateMessage(sourceClient);
-                break;
-            case CLIENT_LOGIN_MESSAGE:
-                message = new ClientLoginMessage(sourceClient);
-                break;
-            case CLIENT_LOGOUT_MESSAGE:
-                message = new ClientLogoutMessage(sourceClient);
-                break;
-            case CLIENT_ELEVATE_USER_MESSAGE:
-                message = new ClientElevateUserMessage(sourceClient);
-                break;
-            default:
-                message = null;
-                break;
-        }
-        if(message != null)
-            message.constructFromString(rawMessageBody);
-
-        return message;
-    };
-
     public SimulationManager(int port) {
-        server = new WebServer(port, clientListener, new WorldMessageParser(clientParser));
+        server = new WebServer(port, clientListener);
         service = new PlayerManagementInterface(this);
 
     }

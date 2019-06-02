@@ -1,5 +1,6 @@
 package world.playerInterface.messages;
 
+import network.ClientMessage;
 import network.WebServer;
 import world.playerInterface.WorldMessageType;
 
@@ -7,7 +8,7 @@ import world.playerInterface.WorldMessageType;
  * Message from a client representing its intention to create a new character
  * @author Logan Earl
  */
-public class ClientCreateCharacterMessage implements WebServer.ClientMessage {
+public class ClientCreateCharacterMessage implements ClientMessage {
     private String sourceClient;
     private boolean parsedCorrectly = false;
 

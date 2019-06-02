@@ -17,7 +17,6 @@ public class WebServer {
     private boolean serverRunning = false;
 
     private OnMessageReceivedListener clientListener;
-    private ClientMessageParser clientParser;
 
     /**Used to denote the end of a message*/
     public static final String MESSAGE_DIVIDER = "<!EOM!>";
@@ -28,11 +27,9 @@ public class WebServer {
      * Creates the server thread, but does not start it yet. To do that, use the startServer() method
      * @param port the port to start the server on
      * @param clientListener listener used to receive messages from connected clients
-     * @param parser parser used to instantiate and populate newly received client messages
      */
-    public WebServer(final int port, OnMessageReceivedListener clientListener, ClientMessageParser parser) {
+    public WebServer(final int port, OnMessageReceivedListener clientListener) {
         this.clientListener = clientListener;
-        this.clientParser = parser;
 
         serverThread = new Thread(() -> {
             try {
@@ -114,7 +111,7 @@ public class WebServer {
                         if(clientListener != null)
                             for(String message: messages)
                                 if(message != null && !message.isEmpty())
-                                    clientListener.onClientMessage(identifier,clientParser.parseFromString(message, identifier));
+                                    clientListener.onClientMessage(identifier,message);
                     }
                 }catch (Exception e){
                     e.printStackTrace();
@@ -141,59 +138,15 @@ public class WebServer {
         byte[] getBytes();
     }
 
-    public interface MessageType{
-        String getParsableFormat();
-    }
-
-    /**
-     * Interface for a message that was sent by the client to the server. The message is converted into this format by a
-     * {@link ClientMessageParser} provided to the server during its construction. The client message will have a type associated with it
-     * as well as information on which client sent the message.
-     */
-    public interface ClientMessage {
-        /**
-         * gets what kind of message it is.
-         * @return the type message that was received
-         */
-        WebServer.MessageType getMessageType();
-
-        /**
-         * gets the internet address of the client that sent the message
-         * @return the String value of the client that sent the message
-         */
-        String getClient();
-
-        /**
-         * client messages must have an empty constructor and will have to be constructed using this method.
-         * @param rawMessageBody the header-less content of a client message received by the server. Should contain all the necessary info to construct the message in
-         *                       a format specified in the concrete implementation
-         */
-        void constructFromString(String rawMessageBody);
-
-        /**
-         * used to determine if the message was constructed correctly
-         * @return true if a previous call to constructFromString succeeded. false otherwise
-         */
-        boolean wasCorrectlyParsed();
-    }
-
-    /**
-     * Parser provided to the WebServer during construction responsible for converting the raw string value of a received message into
-     * the appropriate ClientMessage object
-     */
-    public interface ClientMessageParser{
-        ClientMessage parseFromString(String toParse, String sourceClient);
-    }
-
     /**
      * Listener used to alert the program at large of a newly received message from a client.
      */
     public interface OnMessageReceivedListener{
         /**
-         * method called when a new message is received and has been parsed
+         * method called when a new message is received
          * @param client the client's internet address
-         * @param message the message the client sent
+         * @param rawMessage the message the client sent
          */
-        void onClientMessage(String client, ClientMessage message);
+        void onClientMessage(String client, String rawMessage);
     }
 }
