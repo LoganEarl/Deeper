@@ -1,13 +1,12 @@
 package world.playerInterface.commands;
 
 import client.Client;
+import client.ClientRegistry;
 import network.CommandExecutor;
-import network.SimulationManager;
 import network.messaging.MessagePipeline;
 import world.entity.Entity;
 import world.entity.Race;
 import world.meta.World;
-import world.playerInterface.PlayerManagementInterface;
 import world.playerInterface.messages.ClientCreateCharacterMessage;
 
 import java.util.Arrays;
@@ -19,9 +18,12 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
 
     private int stage = STAGE_START;
 
+    private ClientRegistry registry;
+    private Client sourceClient;
+    private MessagePipeline pipeline;
+    private CommandExecutor executor;
+
     private Entity.EntityBuilder builder = new Entity.EntityBuilder();
-    private ClientCreateCharacterMessage message;
-    private PlayerManagementInterface service;
     private String[] newMessageArgs = null;
 
     private static final int STAGE_START = 0;
@@ -33,6 +35,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     private static final int STAGE_NO_USERNAME = -1;
     private boolean refreshFlag = false;
 
+    private String userName;
     private String selectedName;
     private Race selectedRace;
 
@@ -40,16 +43,21 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     private String[] allocationNames = {"str","dex","int","wis"};
     private int pointsAvailable = 40;
 
-    public CreateCharCommand(String userName, ClientCreateCharacterMessage message, PlayerManagementInterface service){
-        this.service = service;
-        this.message = message;
+    public CreateCharCommand(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
+        this.registry = registry;
+        this.sourceClient = sourceClient;
+        this.pipeline = pipeline;
+        this.executor = executor;
+
+        if(sourceClient.getStatus() == Client.ClientStatus.ACTIVE)
+            userName = sourceClient.getUserName();
 
         if(userName == null) {
             stage = STAGE_NO_USERNAME;
             refreshFlag = true;
         }
         else {
-            service.addClientMessageContext(message.getClient(),this);
+            this.pipeline.addMessageContext(sourceClient,this);
             builder.setID(userName);
         }
     }
@@ -69,8 +77,8 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
 
     private void checkForUsername(){
         if (stage == STAGE_NO_USERNAME) {
-            service.sendMessage("You must be logged in to create a character", message.getClient());
-            service.removeMessageContextOfClient(message.getClient(), this);
+            registry.sendMessage("You must be logged in to create a character", sourceClient);
+            pipeline.removeMessageContext(sourceClient, this);
             stage = STAGE_COMPLETE;
         }
     }
@@ -85,16 +93,16 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     private void checkForDisplayName(){
         if(stage == STAGE_DISPLAY_NAME) {
             if(newMessageArgs == null) {
-                service.sendMessage("Please enter the name you wish to go by", message.getClient());
+                registry.sendMessage("Please enter the name you wish to go by", sourceClient);
             } else if(newMessageArgs.length == 1 &&
                     newMessageArgs[0].length() > 3 &&
                     newMessageArgs[0].chars().allMatch(Character::isAlphabetic)){
                 builder.setDisplayName(newMessageArgs[0]);
                 selectedName = newMessageArgs[0];
-                service.sendMessage("Very well, you will be known as " + newMessageArgs[0] + " from now on.", message.getClient());
+                registry.sendMessage("Very well, you will be known as " + newMessageArgs[0] + " from now on.", sourceClient);
                 newMessageArgs = null;
             }else{
-                service.sendMessage("That name will not do. Please choose a name with 4 or more letters, made up of only letters", message.getClient());
+                registry.sendMessage("That name will not do. Please choose a name with 4 or more letters, made up of only letters", sourceClient);
             }
         }
     }
@@ -102,13 +110,13 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     private void checkForRace(){
         if(stage == STAGE_RACE) {
             if(newMessageArgs == null){
-                service.sendMessage("Please choose a race from the following...\n\n" +
-                        Race.getPlayableRaceDescriptions(), message.getClient());
+                registry.sendMessage("Please choose a race from the following...\n\n" +
+                        Race.getPlayableRaceDescriptions(),sourceClient);
             }else if(newMessageArgs.length == 1 && (selectedRace = Race.getFromID(newMessageArgs[0])) != null){
                 stage = STAGE_STATS;
                 newMessageArgs = null;
             }else{
-                service.sendMessage("I did not understand that, Please choose a race from the following...\n\n" + Race.getPlayableRaceDescriptions(), message.getClient());
+                registry.sendMessage("I did not understand that, Please choose a race from the following...\n\n" + Race.getPlayableRaceDescriptions(), sourceClient);
             }
         }
     }
@@ -118,8 +126,8 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
             int attributeIndex;
 
             if(newMessageArgs == null){
-                service.sendMessage("You have " + pointsAvailable +
-                        " stat points available to allocate. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis]. Use [done] when complete.", message.getClient());
+                registry.sendMessage("You have " + pointsAvailable +
+                        " stat points available to allocate. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis]. Use [done] when complete.", sourceClient);
             }else if(newMessageArgs.length == 4 &&
                     (newMessageArgs[0].equals("add") || newMessageArgs[0].equals("subtract")) &&
                     isInteger(newMessageArgs[1]) &&
@@ -129,17 +137,17 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 if(newMessageArgs[0].equals("subtract")) points *= -1;
                 if(pointsAvailable >= points && allocations[attributeIndex] + points >= 0){
                     allocations[attributeIndex] += points;
-                    service.sendMessage("You have " + pointsAvailable + " points remaining. Your stats are as follows\n" + getCurrentStats(),message.getClient());
+                    registry.sendMessage("You have " + pointsAvailable + " points remaining. Your stats are as follows\n" + getCurrentStats(),sourceClient);
                 }else if(pointsAvailable < points)
-                    service.sendMessage("You do not have enough points for this allocation", message.getClient());
+                    registry.sendMessage("You do not have enough points for this allocation", sourceClient);
                 else
-                    service.sendMessage("You cannot allocate less points to an attribute than your race's base stats",message.getClient());
+                    registry.sendMessage("You cannot allocate less points to an attribute than your race's base stats",sourceClient);
             }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("done")){
                 builder.setStrength(allocations[0] + selectedRace.getBaseStr());
                 stage = STAGE_VERIFY;
                 newMessageArgs = null;
             }else{
-                service.sendMessage("I do not understand. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis]. Use [done] when complete.",message.getClient());
+                registry.sendMessage("I do not understand. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis]. Use [done] when complete.",sourceClient);
             }
         }
     }
@@ -147,12 +155,12 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     private void checkForVerification(){
         if(stage == STAGE_VERIFY){
             if(newMessageArgs == null){
-                service.sendMessage(String.format(Locale.US, "Name: %s\nRace: %s\nStats: %s\n\nIs this correct? [yes/no]",selectedName,selectedRace.getDisplayName(),getCurrentStats()),message.getClient());
+                registry.sendMessage(String.format(Locale.US, "Name: %s\nRace: %s\nStats: %s\n\nIs this correct? [yes/no]",selectedName,selectedRace.getDisplayName(),getCurrentStats()),sourceClient);
             }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("yes")){
-                service.sendMessage("Very well, your character creation is now complete. Welcome " + selectedName + " to the Simulacrum!", message.getClient());
+                registry.sendMessage("Very well, your character creation is now complete. Welcome " + selectedName + " to the Simulacrum!", sourceClient);
                 Entity newPlayer = builder.build();
                 newPlayer.transferToWorld(World.getHubWorld());
-                service.registerCommand(new LookCommand(null,newPlayer,service));
+                executor.scheduleCommand(new LookCommand("",false, sourceClient,registry));
             }
         }
     }

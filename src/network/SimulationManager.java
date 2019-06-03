@@ -2,10 +2,12 @@ package network;
 
 import client.AccountTable;
 import client.ClientRegistry;
+import client.messages.*;
 import database.DatabaseManager;
 import network.messaging.MessagePipeline;
 import world.meta.World;
-import world.playerInterface.PlayerManagementInterface;
+import world.playerInterface.messages.ClientCreateCharacterMessage;
+import world.playerInterface.messages.ClientLookMessage;
 
 import java.util.*;
 
@@ -20,7 +22,6 @@ import java.util.*;
 
 public class SimulationManager {
     private WebServer server;
-    private PlayerManagementInterface service;
     private MessagePipeline messagePipeline;
     private CommandExecutor commandExecutor;
     private ClientRegistry clientRegistry;
@@ -29,11 +30,13 @@ public class SimulationManager {
     //TODO needs a reference to the core database so it can access account info
 
     public SimulationManager(int port, CommandExecutor executor) {
-        clientRegistry = new ClientRegistry()
-        messagePipeline = new MessagePipeline();
         this.commandExecutor = executor;
-        server = new WebServer(port, messagePipeline);
-        service = new PlayerManagementInterface(this);
+
+        server = new WebServer(port);
+        clientRegistry = new ClientRegistry(executor, server,DB_NAME);
+        messagePipeline = new MessagePipeline(clientRegistry,executor);
+
+        server.setMessageRecievedListener(messagePipeline);
     }
 
     public void init() {
@@ -46,6 +49,16 @@ public class SimulationManager {
 
         DatabaseManager.createDirectories();
         World.initWorldSystem();
+
+        messagePipeline.loadMessage(ClientLoginMessage.class);
+        messagePipeline.loadMessage(ClientAccountUpdateMessage.class);
+        messagePipeline.loadMessage(ClientDebugMessage.class);
+        messagePipeline.loadMessage(ClientElevateUserMessage.class);
+        messagePipeline.loadMessage(ClientLogoutMessage.class);
+
+        messagePipeline.loadMessage(ClientCreateCharacterMessage.class);
+        messagePipeline.loadMessage(ClientLookMessage.class);
+
 
         server.startServer();
     }

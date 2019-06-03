@@ -1,8 +1,10 @@
 package client.messages;
 
 import client.Client;
+import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
+import network.messaging.MessagePipeline;
 
 /**
  * Instantiated form of a client's attempt to login. Still needs to be verified but contains all the info to do so.<br>
@@ -20,8 +22,10 @@ public class ClientLoginMessage extends ClientMessage {
     /**the hashed form of the password entered by the client trying to log in*/
     private String hashedPassword;
 
-    public ClientLoginMessage(Client client, CommandExecutor executor){
-        super("login",client,executor);
+    public static final String HEADER = "login";
+
+    public ClientLoginMessage(Client client, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
+        super(HEADER,client,executor, registry, pipeline);
     }
 
     @Override

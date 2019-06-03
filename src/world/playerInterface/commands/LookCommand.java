@@ -1,29 +1,33 @@
 package world.playerInterface.commands;
 
-import network.SimulationManager;
+import client.Client;
+import client.ClientRegistry;
+import network.CommandExecutor;
+import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.Race;
 import world.item.Container;
 import world.item.Item;
-import world.playerInterface.PlayerManagementInterface;
-import world.playerInterface.messages.ClientLookMessage;
 import world.room.Room;
 
 import java.util.List;
 import java.util.Locale;
 
-public class LookCommand implements SimulationManager.Command {
+public class LookCommand implements CommandExecutor.Command {
     private Entity fromEntity;
-    private ClientLookMessage sourceMessage;
+    private Client fromClient;
+    private ClientRegistry registry;
+    private String target;
+    private boolean lookInto;
 
     private boolean complete = false;
-    private String messageToSend = "";
-    private PlayerManagementInterface service;
 
-    public LookCommand(ClientLookMessage sourceMessage, Entity observer, PlayerManagementInterface service){
-        fromEntity = observer;
-        this.sourceMessage = sourceMessage;
-        this.service = service;
+    public LookCommand(String target, boolean lookInto, Client fromClient, ClientRegistry registry){
+        this.fromEntity = WorldUtils.getEntityOfClient(fromClient);
+        this.fromClient = fromClient;
+        this.target = target;
+        this.registry = registry;
+        this.lookInto = lookInto;
     }
 
     @Override
@@ -35,11 +39,11 @@ public class LookCommand implements SimulationManager.Command {
 
         String response;
 
-        if(sourceMessage == null || sourceMessage.getTarget() == null || sourceMessage.getTarget().isEmpty())
+        if(target == null || target.isEmpty())
             response = describeRoom();
         else
             response = "Not yet implemented";
-        service.sendMessage(response, fromEntity);
+        registry.sendMessage(response, fromClient);
 
         complete = true;
     }

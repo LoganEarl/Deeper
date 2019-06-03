@@ -1,8 +1,10 @@
 package client.messages;
 
 import client.Client;
+import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
+import network.messaging.MessagePipeline;
 
 /**
  * Instantiated form of a clients logout attempt. Can also be used to log out other players<br>
@@ -19,8 +21,10 @@ import network.messaging.ClientMessage;
 public class ClientLogoutMessage extends ClientMessage {
     private String targetUserName = "";
 
-    public ClientLogoutMessage(Client sourceClient, CommandExecutor executor){
-        super("logout",sourceClient,executor);
+    public static final String HEADER = "logout";
+
+    public ClientLogoutMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
+        super(HEADER,sourceClient,executor, registry, pipeline);
     }
 
     @Override

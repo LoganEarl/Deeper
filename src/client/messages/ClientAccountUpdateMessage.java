@@ -1,8 +1,10 @@
 package client.messages;
 
 import client.Client;
+import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
+import network.messaging.MessagePipeline;
 
 /**
  * Instantiated form of a client's attempt to update account information. Still needs to be verified but contains all the info to do so.<br>
@@ -35,8 +37,8 @@ public class ClientAccountUpdateMessage extends ClientMessage {
 
     public static final String HEADER = "update";
 
-    public ClientAccountUpdateMessage(Client client, CommandExecutor executor){
-        super(HEADER,client,executor);
+    public ClientAccountUpdateMessage(Client client, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
+        super(HEADER,client,executor, registry, pipeline);
     }
 
     @Override

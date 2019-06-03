@@ -26,11 +26,8 @@ public class WebServer {
     /**
      * Creates the server thread, but does not start it yet. To do that, use the startServer() method
      * @param port the port to start the server on
-     * @param clientListener listener used to receive messages from connected clients
      */
-    public WebServer(final int port, OnMessageReceivedListener clientListener) {
-        this.clientListener = clientListener;
-
+    public WebServer(final int port) {
         serverThread = new Thread(() -> {
             try {
                 serverRunning = true;
@@ -47,6 +44,10 @@ public class WebServer {
                         Arrays.toString(e.getStackTrace()));
             }
         });
+    }
+
+    public void setMessageRecievedListener(OnMessageReceivedListener clientListener){
+        this.clientListener = clientListener;
     }
 
     /**

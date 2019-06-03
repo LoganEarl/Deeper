@@ -132,6 +132,10 @@ public class Client {
         return null;
     }
 
+    public ClientRegistry getRegistry(){
+        return clientRegistry;
+    }
+
     public Account getAssociatedAccount() {
         return associatedAccount;
     }

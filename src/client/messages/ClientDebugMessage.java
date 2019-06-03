@@ -1,14 +1,18 @@
 package client.messages;
 
 import client.Client;
+import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
+import network.messaging.MessagePipeline;
 
 public class ClientDebugMessage extends ClientMessage {
     private String message;
 
-    public ClientDebugMessage(Client sourceClient, CommandExecutor executor){
-        super("debug",sourceClient,executor);
+    public static final String HEADER = "debug";
+
+    public ClientDebugMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
+        super(HEADER,sourceClient,executor, registry, pipeline);
     }
 
     public String getMessage() {

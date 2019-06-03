@@ -8,83 +8,99 @@ import network.WebServer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MessagePipeline implements WebServer.OnMessageReceivedListener {
     private Map<String, Constructor<? extends ClientMessage>> loadedMessageBuilders = new HashMap<>();
-    private Map<Client,MessageContext> specificContexts = new HashMap<>();
+    private Map<Client, List<MessageContext>> specificContexts = new HashMap<>();
     private ClientRegistry registry;
     private CommandExecutor executor;
 
-    public MessagePipeline(ClientRegistry registry, CommandExecutor executor){
+    public MessagePipeline(ClientRegistry registry, CommandExecutor executor) {
         this.registry = registry;
         this.executor = executor;
     }
 
     @Override
     public void onClientMessage(String clientAddress, String rawMessage) {
-        if(registry.getClient(clientAddress) == null)
+        if (registry.getClient(clientAddress) == null)
             registry.addClient(clientAddress);
         Client client = registry.getClient(clientAddress);
 
-        if(specificContexts.containsKey(client)){
-            MessageContext context = specificContexts.get(client);
-            if(context.registerMessage(client, rawMessage.split("\n")))
-                return;
+        if (specificContexts.containsKey(client)) {
+            List<MessageContext> contexts = specificContexts.get(client);
+            if(contexts != null) {
+                for (MessageContext context : contexts)
+                    if (context.registerMessage(client, rawMessage.split("\n")))
+                        return;
+            }
         }
 
         String header = getHeader(rawMessage);
 
-        if(!header.isEmpty() && loadedMessageBuilders.containsKey(header)){
+        if (!header.isEmpty() && loadedMessageBuilders.containsKey(header)) {
             try {
-                ClientMessage message = loadedMessageBuilders.get(header).newInstance(client, executor);
+                ClientMessage message = loadedMessageBuilders.get(header).newInstance(client, executor, registry, this);
 
-                if(message.constructFromString(getMessageBody(rawMessage)))
+                if (message.constructFromString(getMessageBody(rawMessage)))
                     message.resolve();
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("Attempt to invoke a clientMessage constructor failed");
                 e.printStackTrace();
             }
 
-        }else
+        } else
             registry.sendMessage("Im sorry, but I did not recognize that. Please try again or use [help] if you have any questions", client);
     }
 
-    public void loadMessage(Class<? extends ClientMessage> messageClass){
+    public void loadMessage(Class<? extends ClientMessage> messageClass) {
         try {
             Field headerField = messageClass.getField("HEADER");
-            if(Modifier.isStatic(headerField.getModifiers()) && Modifier.isFinal(headerField.getModifiers())){
-                String header = (String)headerField.get(null);
-                if(loadedMessageBuilders.containsKey(header))
+            if (Modifier.isStatic(headerField.getModifiers()) && Modifier.isFinal(headerField.getModifiers())) {
+                String header = (String) headerField.get(null);
+                if (loadedMessageBuilders.containsKey(header))
                     System.out.println("Unable to load class " + messageClass.getName() + " as it's header " + header + " is already bound to a different message");
                 Constructor<? extends ClientMessage> messageConstructor = ClientMessage.getConstructor(messageClass);
-                if(messageConstructor != null)
+                if (messageConstructor != null)
                     loadedMessageBuilders.put(header, messageConstructor);
                 else
                     System.out.println("Unable to load message" + messageClass.getName() + " because it has no appropriate constructor");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Unable to load message" + messageClass.getName() + " because it has no static final header field or a related exception");
             e.printStackTrace();
         }
     }
 
-    private String getHeader(String rawMessage){
-        if(rawMessage == null || rawMessage.isEmpty())
+    private String getHeader(String rawMessage) {
+        if (rawMessage == null || rawMessage.isEmpty())
             return "";
         String[] args = rawMessage.split("\n");
-        if(args.length > 1)
+        if (args.length > 1)
             return args[0];
         else
             return "";
     }
 
-    private String getMessageBody(String rawMessage){
+    private String getMessageBody(String rawMessage) {
         int firstIndex = rawMessage.indexOf("\n");
-        if(firstIndex > -1 && firstIndex < rawMessage.length())
-            return rawMessage.substring(firstIndex+1);
+        if (firstIndex > -1 && firstIndex < rawMessage.length())
+            return rawMessage.substring(firstIndex + 1);
         return "";
+    }
+
+    public void addMessageContext(Client client, MessageContext messageContext) {
+        specificContexts.computeIfAbsent(client, k -> new ArrayList<>(2));
+        if(!specificContexts.get(client).contains(messageContext)) specificContexts.get(client).add(messageContext);
+    }
+
+    public void removeMessageContext(Client client, MessageContext messageContext){
+        if(specificContexts.containsKey(client) && specificContexts.get(client) != null){
+            specificContexts.get(client).remove(messageContext);
+        }
     }
 
     /**
@@ -101,8 +117,9 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
 
         /**
          * called when a message is received from the associated entity
+         *
          * @param sourceClient the client that sent the message
-         * @param messageArgs the message that was sent
+         * @param messageArgs  the message that was sent
          * @return true to consume the message, false if the message should continue on to other contexts
          */
         boolean registerMessage(Client sourceClient, String[] messageArgs);
