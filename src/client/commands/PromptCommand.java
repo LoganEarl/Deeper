@@ -1,20 +1,20 @@
 package client.commands;
 
-import network.ServerMessageType;
-import network.SimulationManager;
+import network.CommandExecutor;
 import network.WebServer;
 
-public class PromptCommand implements SimulationManager.Command, WebServer.ServerMessage {
+public class PromptCommand implements CommandExecutor.Command, WebServer.ServerMessage {
     private boolean complete = false;
     private String toSend;
     private String[] clients;
     private WebServer server;
 
+    public static final String HEADER = "SERVER_PROMPT_MESSAGE";
 
-    public PromptCommand(String message, WebServer server, String... clients){
+    public PromptCommand(String message, WebServer server, String... addresses){
         toSend = message;
         this.server = server;
-        this.clients = clients;
+        this.clients = addresses;
     }
 
     @Override
@@ -24,12 +24,17 @@ public class PromptCommand implements SimulationManager.Command, WebServer.Serve
     }
 
     @Override
+    public String getHeader() {
+        return HEADER;
+    }
+
+    @Override
     public boolean isComplete() {
         return complete;
     }
 
     @Override
     public byte[] getBytes() {
-        return (ServerMessageType.SERVER_PROMPT_MESSAGE + "\n" + toSend + WebServer.MESSAGE_DIVIDER).getBytes();
+        return (toSend + WebServer.MESSAGE_DIVIDER).getBytes();
     }
 }

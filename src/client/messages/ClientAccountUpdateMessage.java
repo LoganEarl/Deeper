@@ -1,7 +1,8 @@
 package client.messages;
 
-import network.ServerMessageType;
-import network.WebServer;
+import client.Client;
+import network.CommandExecutor;
+import network.messaging.ClientMessage;
 
 /**
  * Instantiated form of a client's attempt to update account information. Still needs to be verified but contains all the info to do so.<br>
@@ -25,51 +26,21 @@ import network.WebServer;
  *     newEmailAddress[WebServer.MESSAGE_DIVIDER]<br><br>
  * @author Logan Earl
  */
-public class ClientAccountUpdateMessage implements WebServer.ClientMessage {
-    private String client;
+public class ClientAccountUpdateMessage extends ClientMessage {
     private String oldUserName;
     private String newUserName;
     private String oldHashedPassword;
     private String newHashedPassword;
     private String newEmailAddress;
-    private boolean wasParsedCorrectly = false;
 
-    public ClientAccountUpdateMessage(String client){
-        this.client = client;
+    public static final String HEADER = "update";
+
+    public ClientAccountUpdateMessage(Client client, CommandExecutor executor){
+        super(HEADER,client,executor);
     }
 
     @Override
-    public ServerMessageType getMessageType() {
-        return ServerMessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE;
-    }
-
-    @Override
-    public String getClient() {
-        return client;
-    }
-
-    public String getOldUserName() {
-        return oldUserName;
-    }
-
-    public String getNewUserName() {
-        return newUserName;
-    }
-
-    public String getOldHashedPassword() {
-        return oldHashedPassword;
-    }
-
-    public String getNewHashedPassword() {
-        return newHashedPassword;
-    }
-
-    public String getNewEmailAddress() {
-        return newEmailAddress;
-    }
-
-    @Override
-    public void constructFromString(String rawMessageBody) {
+    public boolean constructFromString(String rawMessageBody) {
         String[] contents = rawMessageBody.split("\n");
         if(contents.length == 5){
             this.oldUserName = contents[0];
@@ -77,7 +48,7 @@ public class ClientAccountUpdateMessage implements WebServer.ClientMessage {
             this.oldHashedPassword = contents[2];
             this.newHashedPassword = contents[3];
             this.newEmailAddress = contents[4];
-            wasParsedCorrectly = true;
+            return true;
         }
         if(contents.length == 3){
             this.oldUserName = "";
@@ -85,12 +56,13 @@ public class ClientAccountUpdateMessage implements WebServer.ClientMessage {
             this.oldHashedPassword = "";
             this.newHashedPassword = contents[1];
             this.newEmailAddress = contents[2];
-            wasParsedCorrectly = true;
+            return true;
         }
+        return false;
     }
 
     @Override
-    public boolean wasCorrectlyParsed() {
-        return wasParsedCorrectly;
+    public void doActions() {
+        getClient().tryUpdateInfo(getClient(),oldUserName,newUserName,oldHashedPassword,newHashedPassword,newEmailAddress);
     }
 }

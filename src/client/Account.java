@@ -13,6 +13,8 @@ import java.util.Locale;
  * is independent of a client, as an account can be accessed from different clients
  */
 public class Account implements DatabaseManager.DatabaseEntry {
+    private static final String DB_NAME = "account.db";
+
     private String userName;
     private String newUserName;
     private String hashedPassword;

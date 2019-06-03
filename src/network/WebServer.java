@@ -99,7 +99,10 @@ public class WebServer {
             while(alive){
                 try {
                     if (!messageQueue.isEmpty()) {
-                        out.write(messageQueue.remove().getBytes());
+                        ServerMessage message = messageQueue.remove();
+                        out.write(message.getHeader().getBytes());
+                        out.write("\n".getBytes());
+                        out.write(message.getBytes());
                         out.flush();
                     }
                     if(in.available() > 0){
@@ -136,6 +139,7 @@ public class WebServer {
      */
     public interface ServerMessage {
         byte[] getBytes();
+        String getHeader();
     }
 
     /**

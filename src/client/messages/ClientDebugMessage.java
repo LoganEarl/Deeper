@@ -1,15 +1,14 @@
 package client.messages;
 
-import network.ServerMessageType;
-import network.WebServer;
+import client.Client;
+import network.CommandExecutor;
+import network.messaging.ClientMessage;
 
-public class ClientDebugMessage implements WebServer.ClientMessage {
-    private String client;
+public class ClientDebugMessage extends ClientMessage {
     private String message;
-    boolean parsed = false;
 
-    public ClientDebugMessage(String sourceClient){
-        this.client = sourceClient;
+    public ClientDebugMessage(Client sourceClient, CommandExecutor executor){
+        super("debug",sourceClient,executor);
     }
 
     public String getMessage() {
@@ -17,23 +16,13 @@ public class ClientDebugMessage implements WebServer.ClientMessage {
     }
 
     @Override
-    public ServerMessageType getMessageType() {
-        return ServerMessageType.CLIENT_DEBUG_MESSAGE;
-    }
-
-    @Override
-    public String getClient() {
-        return client;
-    }
-
-    @Override
-    public void constructFromString(String rawMessageBody) {
+    public boolean constructFromString(String rawMessageBody) {
         this.message = rawMessageBody;
-        parsed = true;
+        return true;
     }
 
     @Override
-    public boolean wasCorrectlyParsed() {
-        return parsed;
+    public void doActions() {
+        System.out.println(message);
     }
 }

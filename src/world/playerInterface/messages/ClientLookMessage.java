@@ -1,7 +1,6 @@
 package world.playerInterface.messages;
 
 import network.WebServer;
-import world.playerInterface.WorldMessageType;
 
 /**
  * Message from a client expressing a desire to get a room's description, examine items, and to look into containers

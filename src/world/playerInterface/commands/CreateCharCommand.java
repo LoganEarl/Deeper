@@ -1,17 +1,19 @@
 package world.playerInterface.commands;
 
+import client.Client;
+import network.CommandExecutor;
 import network.SimulationManager;
+import network.messaging.MessagePipeline;
 import world.entity.Entity;
 import world.entity.Race;
 import world.meta.World;
 import world.playerInterface.PlayerManagementInterface;
 import world.playerInterface.messages.ClientCreateCharacterMessage;
-import world.playerInterface.messages.ContextMessage;
 
 import java.util.Arrays;
 import java.util.Locale;
 
-public class CreateCharCommand implements SimulationManager.Command, PlayerManagementInterface.MessageContext {
+public class CreateCharCommand implements CommandExecutor.Command, MessagePipeline.MessageContext {
     private long lastUpdateTime = System.currentTimeMillis();
     private static final long EXPIRATION_TIME = 600000; //10 minutes
 
@@ -184,11 +186,11 @@ public class CreateCharCommand implements SimulationManager.Command, PlayerManag
 
     //TODO client input comes in here
     @Override
-    public boolean registerMessage(Entity fromEntity, boolean isLoggedIn, ContextMessage message) {
-        if(isLoggedIn) {
+    public boolean registerMessage(Client sourceClient, String[] messageArgs) {
+        if(sourceClient.getAssociatedAccount() != null && sourceClient.getStatus() == Client.ClientStatus.ACTIVE) {
             lastUpdateTime = System.currentTimeMillis();
 
-            newMessageArgs = message.getArgs();
+            newMessageArgs = messageArgs;
             refreshFlag = true;
             return true;
         }

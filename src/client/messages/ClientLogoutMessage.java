@@ -1,7 +1,8 @@
 package client.messages;
 
-import network.ServerMessageType;
-import network.WebServer;
+import client.Client;
+import network.CommandExecutor;
+import network.messaging.ClientMessage;
 
 /**
  * Instantiated form of a clients logout attempt. Can also be used to log out other players<br>
@@ -15,43 +16,27 @@ import network.WebServer;
  *     targetUserName[WebServer.MESSAGE_DIVIDER]<br><br>
  * @author Logan Earl
  */
-public class ClientLogoutMessage implements WebServer.ClientMessage{
-    private String client;
-    private boolean wasParsedCorrectly = false;
-
+public class ClientLogoutMessage extends ClientMessage {
     private String targetUserName = "";
 
-    public ClientLogoutMessage(String sourceClient){
-        this.client = sourceClient;
+    public ClientLogoutMessage(Client sourceClient, CommandExecutor executor){
+        super("logout",sourceClient,executor);
     }
 
     @Override
-    public ServerMessageType getMessageType() {
-        return ServerMessageType.CLIENT_LOGOUT_MESSAGE;
-    }
-
-    @Override
-    public String getClient() {
-        return client;
-    }
-
-    public String getTargetUserName() {
-        return targetUserName;
-    }
-
-    @Override
-    public void constructFromString(String rawMessageBody) {
+    public boolean constructFromString(String rawMessageBody) {
         String[] contents = rawMessageBody.split("\n");
         if(contents.length == 0)
-            wasParsedCorrectly = true;
+            return true;
         if(contents.length == 1){
             targetUserName = contents[0];
-            wasParsedCorrectly = true;
+            return true;
         }
+        return false;
     }
 
     @Override
-    public boolean wasCorrectlyParsed() {
-        return wasParsedCorrectly;
+    public void doActions() {
+        getClient().tryLogOut(getClient(),targetUserName);
     }
 }

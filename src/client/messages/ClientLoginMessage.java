@@ -1,7 +1,8 @@
 package client.messages;
 
-import network.ServerMessageType;
-import network.WebServer;
+import client.Client;
+import network.CommandExecutor;
+import network.messaging.ClientMessage;
 
 /**
  * Instantiated form of a client's attempt to login. Still needs to be verified but contains all the info to do so.<br>
@@ -13,50 +14,29 @@ import network.WebServer;
  * @author Logan Earl
  */
 
-public class ClientLoginMessage implements WebServer.ClientMessage {
-    /**the internet address of the client trying to log in*/
-    private String client;
+public class ClientLoginMessage extends ClientMessage {
     /**the userName entered by the client trying to log in*/
     private String userName;
     /**the hashed form of the password entered by the client trying to log in*/
     private String hashedPassword;
 
-    private boolean wasParsedCorrectly = false;
-
-    public ClientLoginMessage(String client){
-        this.client = client;
+    public ClientLoginMessage(Client client, CommandExecutor executor){
+        super("login",client,executor);
     }
 
     @Override
-    public WebServer.MessageType getMessageType() {
-        return ServerMessageType.CLIENT_LOGIN_MESSAGE;
-    }
-
-    @Override
-    public String getClient() {
-        return client;
-    }
-
-    public String getUserName(){
-        return userName;
-    }
-
-    public String getHashedPassword(){
-        return hashedPassword;
-    }
-
-    @Override
-    public void constructFromString(String rawMessageBody) {
+    public boolean constructFromString(String rawMessageBody) {
         String[] contents = rawMessageBody.split("\n");
         if(contents.length == 2){
             userName = contents[0];
             hashedPassword = contents[1];
-            wasParsedCorrectly = true;
+            return true;
         }
+        return false;
     }
 
     @Override
-    public boolean wasCorrectlyParsed() {
-        return wasParsedCorrectly;
+    public void doActions() {
+        getClient().tryLogIn(getClient(), userName, hashedPassword);
     }
 }

@@ -10,7 +10,6 @@ import world.playerInterface.commands.CreateCharCommand;
 import world.playerInterface.commands.LookCommand;
 import world.playerInterface.messages.ClientCreateCharacterMessage;
 import world.playerInterface.messages.ClientLookMessage;
-import world.playerInterface.messages.ContextMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,9 +21,6 @@ public class PlayerManagementInterface {
     //associates internet addresses to entity objects basically
     private Map<String,Entity> accountToEntity = new HashMap<>();
     private Map<Entity,String> entityToAccount = new HashMap<>();
-
-    private Map<String, List<MessageContext>> messageContexts = new HashMap<>();
-
     private SimulationManager simulationManager;
 
     public PlayerManagementInterface(SimulationManager simulationManager){
@@ -163,26 +159,5 @@ public class PlayerManagementInterface {
         if(address != null){
             removeMessageContextOfClient(address,toRemove);
         }
-    }
-
-    /**
-     * a custom context in which commands can be executed. Messages that arrive from the
-     * associated entity will first be routed to the context. The context can then choose
-     * to consume the message or ignore it. If it is ignored, the message will go to the
-     * default context for all world messages.
-     */
-    public interface MessageContext {
-        /**
-         * @return the time in milliseconds until the context should self-invalidate to prevent memory leaks
-         */
-        long getTimeToExpire();
-
-        /**
-         * called when a message is received from the associated entity
-         * @param fromEntity the entity that sent the message
-         * @param message the message that was sent
-         * @return true to consume the message, false if the message should continue on to other contexts
-         */
-        boolean registerMessage(Entity fromEntity, boolean isLoggedIn, ContextMessage message);
     }
 }
