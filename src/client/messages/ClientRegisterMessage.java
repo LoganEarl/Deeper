@@ -19,7 +19,7 @@ public class ClientRegisterMessage extends ClientMessage {
 
     @Override
     public boolean constructFromString(String rawMessage) {
-        String[] args = rawMessage.split(" ");
+        String[] args = rawMessage.split("\n");
         if(args.length == 2){
             userName = args[0];
             hPass = args[1];

@@ -35,7 +35,7 @@ public class SayCommand extends EntityCommand {
     }
 
     @Override
-    public boolean isComplete() {
+    public boolean entityCommandIsComplete() {
         return complete;
     }
 }

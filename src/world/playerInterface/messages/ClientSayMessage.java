@@ -19,7 +19,7 @@ public class ClientSayMessage extends ClientMessage {
     @Override
     public boolean constructFromString(String rawMessage) {
         if(rawMessage != null){
-            message = rawMessage;
+            message = rawMessage.replace("\n"," ");
         }
         return true;
     }
