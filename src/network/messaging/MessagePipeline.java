@@ -79,7 +79,7 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
         if (rawMessage == null || rawMessage.isEmpty())
             return "";
         String[] args = rawMessage.split("\n");
-        if (args.length > 1)
+        if (args.length >= 1)
             return args[0];
         else
             return "";

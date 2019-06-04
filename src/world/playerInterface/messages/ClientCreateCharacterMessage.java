@@ -32,7 +32,6 @@ public class ClientCreateCharacterMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        //this is already guaranteed to be in the world thread so we can just execute it now to save a server tick
-        new CreateCharCommand(getClient(),getExecutor(),getClientRegistry(),getMessagePipeline()).execute();
+        getExecutor().scheduleCommand(new CreateCharCommand(getClient(),getExecutor(),getClientRegistry(),getMessagePipeline()));
     }
 }

@@ -132,8 +132,8 @@ public class Client {
         return null;
     }
 
-    public ClientRegistry getRegistry(){
-        return clientRegistry;
+    public void sendMessage(String message){
+        clientRegistry.sendMessage(message,this);
     }
 
     public Account getAssociatedAccount() {

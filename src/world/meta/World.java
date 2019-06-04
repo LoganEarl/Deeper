@@ -52,6 +52,8 @@ public class World implements DatabaseManager.DatabaseEntry {
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,WORLD_ID);
     private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?  WHERE %s=?",
             TABLE_NAME, WORLD_NAME, WORLD_STATUS,WORLD_START_TIME,WORLD_END_TIME, ENTRY_PORTAL_ROOM_NAME, EXIT_PORTAL_ROOM_NAME, ESTIMATED_DIFFICULTY, PORTAL_SIZE, PREFERRED_DURATION_MINUTES, WORLD_ID);
+    private static final String DELETE_ENTITY_SQL = String.format(Locale.US, "DELETE FROM %s WHERE %s=?",
+            EntityWorldTable.TABLE_NAME, EntityWorldTable.ENTITY_ID);
 
     private int worldID;
     private String name;
@@ -256,6 +258,16 @@ public class World implements DatabaseManager.DatabaseEntry {
      */
     public static boolean setWorldOfEntity(Entity e, World w){
         return DatabaseManager.executeStatement(SET_ENTITY_WORLD,META_DATABASE_NAME,e.getID(), w.getWorldID()) > 0;
+    }
+
+    public static boolean deleteEntity(Entity e){
+        World w = getWorldOfEntityID(e.getID());
+        if(w != null) {
+            DatabaseManager.executeStatement(DELETE_ENTITY_SQL, META_DATABASE_NAME, e.getID());
+            e.removeFromDatabase(w.getDatabaseName());
+            return true;
+        }
+        return false;
     }
 
     /**

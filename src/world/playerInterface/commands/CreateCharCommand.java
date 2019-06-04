@@ -4,10 +4,11 @@ import client.Client;
 import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.MessagePipeline;
+import world.WorldUtils;
 import world.entity.Entity;
+import world.entity.EntityTable;
 import world.entity.Race;
 import world.meta.World;
-import world.playerInterface.messages.ClientCreateCharacterMessage;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -33,7 +34,8 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     private static final int STAGE_VERIFY = 4;
     private static final int STAGE_COMPLETE = 5;
     private static final int STAGE_NO_USERNAME = -1;
-    private boolean refreshFlag = false;
+    private static final int STAGE_EXISTING_CHARACTER = -2;
+    private boolean refreshFlag = true;
 
     private String userName;
     private String selectedName;
@@ -54,11 +56,15 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
 
         if(userName == null) {
             stage = STAGE_NO_USERNAME;
-            refreshFlag = true;
-        }
-        else {
+        }else{
+            if(WorldUtils.getEntityOfClient(sourceClient) != null) {
+                stage = STAGE_EXISTING_CHARACTER;
+            }
             this.pipeline.addMessageContext(sourceClient,this);
             builder.setID(userName);
+            builder.setDatabaseName(World.getHubWorld().getDatabaseName());
+            builder.setRoomName(World.getHubWorld().getEntryRoomName());
+            builder.setControllerType(EntityTable.CONTROLLER_TYPE_PLAYER);
         }
     }
 
@@ -67,6 +73,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
         if(refreshFlag) {
             refreshFlag = false;
             checkForUsername();
+            checkForExistingCharacter();
             checkForStart();
             checkForDisplayName();
             checkForRace();
@@ -80,6 +87,35 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
             registry.sendMessage("You must be logged in to create a character", sourceClient);
             pipeline.removeMessageContext(sourceClient, this);
             stage = STAGE_COMPLETE;
+        }
+    }
+
+    private void checkForExistingCharacter(){
+        if(stage == STAGE_EXISTING_CHARACTER){
+            if(newMessageArgs == null){
+                registry.sendMessage("You already have a character associated to that account. Do you want to delete that character and start fresh? [yes/no]", sourceClient);
+            }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("yes")){
+                Entity preexisting = WorldUtils.getEntityOfClient(sourceClient);
+                if(preexisting != null) {
+                    if (World.deleteEntity(preexisting)) {
+                        registry.sendMessage("Your old character has been deleted", sourceClient);
+                        newMessageArgs = null;
+                        stage = STAGE_START;
+                    }else{
+                        registry.sendMessage("Whoops. There is something preventing me from deleting your old character. Please contact an admin for help.", sourceClient);
+                        newMessageArgs = null;
+                        stage = STAGE_COMPLETE;
+                    }
+                }
+            }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("no")){
+                registry.sendMessage("Okay, your account has been preserved. Carry on I guess.", sourceClient);
+                pipeline.removeMessageContext(sourceClient,this);
+                newMessageArgs = null;
+                stage = STAGE_COMPLETE;
+            }else{
+                registry.sendMessage("Im sorry I cannot understand that. \nDo you want to delete that character and start fresh? [yes/no]",sourceClient);
+                newMessageArgs = null;
+            }
         }
     }
 
@@ -100,6 +136,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 builder.setDisplayName(newMessageArgs[0]);
                 selectedName = newMessageArgs[0];
                 registry.sendMessage("Very well, you will be known as " + newMessageArgs[0] + " from now on.", sourceClient);
+                stage = STAGE_RACE;
                 newMessageArgs = null;
             }else{
                 registry.sendMessage("That name will not do. Please choose a name with 4 or more letters, made up of only letters", sourceClient);
@@ -137,6 +174,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 if(newMessageArgs[0].equals("subtract")) points *= -1;
                 if(pointsAvailable >= points && allocations[attributeIndex] + points >= 0){
                     allocations[attributeIndex] += points;
+                    pointsAvailable -= points;
                     registry.sendMessage("You have " + pointsAvailable + " points remaining. Your stats are as follows\n" + getCurrentStats(),sourceClient);
                 }else if(pointsAvailable < points)
                     registry.sendMessage("You do not have enough points for this allocation", sourceClient);
@@ -158,6 +196,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 registry.sendMessage(String.format(Locale.US, "Name: %s\nRace: %s\nStats: %s\n\nIs this correct? [yes/no]",selectedName,selectedRace.getDisplayName(),getCurrentStats()),sourceClient);
             }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("yes")){
                 registry.sendMessage("Very well, your character creation is now complete. Welcome " + selectedName + " to the Simulacrum!", sourceClient);
+                pipeline.removeMessageContext(sourceClient,this);
                 Entity newPlayer = builder.build();
                 newPlayer.transferToWorld(World.getHubWorld());
                 executor.scheduleCommand(new LookCommand("",false, sourceClient,registry));

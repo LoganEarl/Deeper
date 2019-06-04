@@ -13,7 +13,7 @@ import world.room.Room;
 import java.util.List;
 import java.util.Locale;
 
-public class LookCommand implements CommandExecutor.Command {
+public class LookCommand extends EntityCommand {
     private Entity fromEntity;
     private Client fromClient;
     private ClientRegistry registry;
@@ -23,6 +23,7 @@ public class LookCommand implements CommandExecutor.Command {
     private boolean complete = false;
 
     public LookCommand(String target, boolean lookInto, Client fromClient, ClientRegistry registry){
+        super(fromClient);
         this.fromEntity = WorldUtils.getEntityOfClient(fromClient);
         this.fromClient = fromClient;
         this.target = target;
@@ -31,7 +32,7 @@ public class LookCommand implements CommandExecutor.Command {
     }
 
     @Override
-    public void execute() {
+    public void executeEntityCommand() {
         if(fromEntity == null){
             complete = true;
             System.out.println("Failed to execute a look command for a null entity");

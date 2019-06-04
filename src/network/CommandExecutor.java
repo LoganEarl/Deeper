@@ -15,7 +15,8 @@ public class CommandExecutor {
 
         for (Command c : toExecute) {
             c.execute();
-            if (!c.isComplete()) continuingCommands.add(c);
+            if (!c.isComplete())
+                continuingCommands.add(c);
         }
         commandQueue.addAll(continuingCommands);
     }
