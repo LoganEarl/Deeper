@@ -9,6 +9,7 @@ public class TestClient {
     public static void main(String[] args) throws Exception {
         //TODO redo this to use new message formatting
         Socket socket = new Socket("localhost", 5555);
+        //Socket socket = new Socket(InetAddress.getByName("67.110.213.185"), 25560);
         final BufferedInputStream in = new BufferedInputStream(socket.getInputStream());
         new Thread(() -> {
             boolean quit = false;

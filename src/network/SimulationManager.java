@@ -9,6 +9,7 @@ import world.meta.World;
 import world.playerInterface.messages.ClientCreateCharacterMessage;
 import world.playerInterface.messages.ClientLookMessage;
 import world.playerInterface.messages.ClientMoveMessage;
+import world.playerInterface.messages.ClientSayMessage;
 
 import java.util.*;
 
@@ -60,10 +61,12 @@ public class SimulationManager {
         messagePipeline.loadMessage(ClientDebugMessage.class);
         messagePipeline.loadMessage(ClientElevateUserMessage.class);
         messagePipeline.loadMessage(ClientLogoutMessage.class);
+        messagePipeline.loadMessage(ClientRegisterMessage.class);
 
         messagePipeline.loadMessage(ClientCreateCharacterMessage.class);
         messagePipeline.loadMessage(ClientLookMessage.class);
         messagePipeline.loadMessage(ClientMoveMessage.class);
+        messagePipeline.loadMessage(ClientSayMessage.class);
 
 
         server.startServer();
