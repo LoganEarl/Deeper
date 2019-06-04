@@ -1,8 +1,6 @@
 package world.playerInterface.commands;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.Race;
@@ -13,21 +11,29 @@ import world.room.Room;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * command used to get item and room descriptions. Can also be used to look into unlocked containers.
+ * @author Logan Earl
+ */
 public class LookCommand extends EntityCommand {
     private Entity fromEntity;
     private Client fromClient;
-    private ClientRegistry registry;
     private String target;
     private boolean lookInto;
 
     private boolean complete = false;
 
-    public LookCommand(String target, boolean lookInto, Client fromClient, ClientRegistry registry){
+    /**
+     * Sole constructor
+     * @param target the item/entity/container that is being inspected.
+     * @param lookInto true to look inside the selected thing. Does not apply to rooms
+     * @param fromClient the client doing the looking.
+     */
+    public LookCommand(String target, boolean lookInto, Client fromClient){
         super(fromClient);
         this.fromEntity = WorldUtils.getEntityOfClient(fromClient);
         this.fromClient = fromClient;
         this.target = target;
-        this.registry = registry;
         this.lookInto = lookInto;
     }
 
@@ -44,7 +50,7 @@ public class LookCommand extends EntityCommand {
             response = describeRoom();
         else
             response = "Not yet implemented";
-        registry.sendMessage(response, fromClient);
+        fromClient.sendMessage(response);
 
         complete = true;
     }

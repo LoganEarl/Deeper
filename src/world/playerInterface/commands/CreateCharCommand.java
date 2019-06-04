@@ -13,6 +13,13 @@ import world.meta.World;
 import java.util.Arrays;
 import java.util.Locale;
 
+/**
+ * will go through the process of creating a new character. If the player already has a character, it will given them the option
+ * of deleting the old one. Can be used on a client that is not logged in, although it just tells them to log in and then quits.
+ * Serves as a consuming {@link network.messaging.MessagePipeline.MessageContext} until the character creation sequence is done.
+ * So the player will not be able to do anything else while creating a character. The command will timeout after 10 minutes has passed
+ * @author Logan Earl
+ */
 public class CreateCharCommand implements CommandExecutor.Command, MessagePipeline.MessageContext {
     private long lastUpdateTime = System.currentTimeMillis();
     private static final long EXPIRATION_TIME = 600000; //10 minutes
@@ -45,6 +52,15 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     private String[] allocationNames = {"str","dex","int","wis"};
     private int pointsAvailable = 40;
 
+    /**
+     * cole constructor
+     * @param sourceClient the client attempting to make a new character
+     * @param executor the executor the server is running on for server thread access
+     * @param registry the registry the client is connected under
+     * @param pipeline the messaging pipeline the client's commands are parsed through. Used to establish a custom
+     *                 MessageContext
+     * @see network.messaging.MessagePipeline.MessageContext
+     */
     public CreateCharCommand(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
         this.registry = registry;
         this.sourceClient = sourceClient;
@@ -68,6 +84,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
         }
     }
 
+    /**Run periodically. Quits instantly if the user has not done anything recently. If they have, it will parse and respond to the message here so as to be thread safe*/
     @Override
     public void execute() {
         if(refreshFlag) {
@@ -85,7 +102,6 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     private void checkForUsername(){
         if (stage == STAGE_NO_USERNAME) {
             registry.sendMessage("You must be logged in to create a character", sourceClient);
-            pipeline.removeMessageContext(sourceClient, this);
             stage = STAGE_COMPLETE;
         }
     }
@@ -109,7 +125,6 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 }
             }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("no")){
                 registry.sendMessage("Okay, your account has been preserved. Carry on I guess.", sourceClient);
-                pipeline.removeMessageContext(sourceClient,this);
                 newMessageArgs = null;
                 stage = STAGE_COMPLETE;
             }else{
@@ -196,10 +211,10 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 registry.sendMessage(String.format(Locale.US, "Name: %s\nRace: %s\nStats: %s\n\nIs this correct? [yes/no]",selectedName,selectedRace.getDisplayName(),getCurrentStats()),sourceClient);
             }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("yes")){
                 registry.sendMessage("Very well, your character creation is now complete. Welcome " + selectedName + " to the Simulacrum!", sourceClient);
-                pipeline.removeMessageContext(sourceClient,this);
                 Entity newPlayer = builder.build();
                 newPlayer.transferToWorld(World.getHubWorld());
                 executor.scheduleCommand(new LookCommand("",false, sourceClient,registry));
+                stage = STAGE_COMPLETE;
             }
         }
     }
@@ -223,7 +238,9 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
 
     @Override
     public boolean isComplete() {
-        return stage == STAGE_COMPLETE || getTimeToExpire() < 0;
+        boolean complete = stage == STAGE_COMPLETE || getTimeToExpire() < 0;
+        if(complete) pipeline.removeMessageContext(sourceClient,this);
+        return complete;
     }
 
     @Override
@@ -231,7 +248,14 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
         return EXPIRATION_TIME - (System.currentTimeMillis() - lastUpdateTime);
     }
 
-    //TODO client input comes in here
+    /**
+     * registers messages from the chosen client. This class serves as a MessageContext during character creation so
+     * messages from the client come here before parsing. If our client is talking to us before logging in we do not
+     * consume the result and ignore it.
+     * @param sourceClient the client that sent the message
+     * @param messageArgs  the message that was sent
+     * @return true if the result was processed here and should be consumed. False to release it to other contexts
+     */
     @Override
     public boolean registerMessage(Client sourceClient, String[] messageArgs) {
         if(sourceClient.getAssociatedAccount() != null && sourceClient.getStatus() == Client.ClientStatus.ACTIVE) {

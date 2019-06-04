@@ -12,10 +12,9 @@ import world.playerInterface.messages.ClientLookMessage;
 import java.util.*;
 
 /**
- * Class holds a list of all clients and manages any requests they may make in a single thread in a synchronous matter.
- * Also responsible for managing the process of sending responses to client requests if needed. Maintains a WebServer object and
- * will eventually maintain a WorldSimulation object as well and will facilitate communication between the two.<br> <br>
- * Specifically, clients will be receiving messages and creating commands to be executed by their network.SimulationManager.
+ * Class holds that holds it all together. Makes the server, the client registry, and the message pipeline. Then links them all up to run the server. Also loads the command classes into the message pipeline. All you have to do to run the server is make a command executor for the
+ * server to attach to and pass it into the constructor with the port. Then call init(), then just keep right on calling the step() function
+ * of the executor. That's it.
  *
  * @author Logan Earl
  */
@@ -27,8 +26,12 @@ public class SimulationManager {
     private ClientRegistry clientRegistry;
 
     private static final String DB_NAME = "account.db";
-    //TODO needs a reference to the core database so it can access account info
 
+    /**
+     * Sole constructor
+     * @param port the internet port the server should run on
+     * @param executor an executor for the server to attach to
+     */
     public SimulationManager(int port, CommandExecutor executor) {
         this.commandExecutor = executor;
 
@@ -39,6 +42,7 @@ public class SimulationManager {
         server.setMessageRecievedListener(messagePipeline);
     }
 
+    /**Starts the server and ensures the directory system and world system is all in place*/
     public void init() {
         List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
         tables.add(new AccountTable());
@@ -63,10 +67,18 @@ public class SimulationManager {
         server.startServer();
     }
 
+    /**
+     * gets the WebServer used to maintain client connections
+     * @return the WebServer object
+     */
     public WebServer getServer() {
         return this.server;
     }
 
+    /**
+     * gets the name of the database used to store client accounts
+     * @return the string value of the database name including the file extension.
+     */
     public String getDatabaseName(){
         return DB_NAME;
     }

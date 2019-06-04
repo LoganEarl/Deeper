@@ -6,6 +6,10 @@ import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
 
+/**
+ * A debugging tool the client can use to cause printouts on the server's System.out. Just initiate with debug [any text]
+ * @author Logan Earl
+ */
 public class ClientDebugMessage extends ClientMessage {
     private String message;
 
@@ -13,10 +17,6 @@ public class ClientDebugMessage extends ClientMessage {
 
     public ClientDebugMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
         super(HEADER,sourceClient,executor, registry, pipeline);
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     @Override

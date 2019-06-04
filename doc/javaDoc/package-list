@@ -3,8 +3,8 @@ client.commands
 client.messages
 database
 network
+network.messaging
 world.entity
 world.item
-world.meta
 world.room
 world.story

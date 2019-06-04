@@ -3,13 +3,16 @@ package world.playerInterface.messages;
 import client.Client;
 import client.ClientRegistry;
 import network.CommandExecutor;
-import network.WebServer;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
 import world.playerInterface.commands.LookCommand;
 
 /**
- * Message from a client expressing a desire to get a room's description, examine items, and to look into containers
+ * Message from a client expressing a desire to get a room's description, examine items, and to look into containers. Possible formats include<br><br>
+ *
+ * look<br>
+ * look at [target item, container, or entity]<br>
+ * look into [target entity or container]<br>
  * @author Logan Earl
  */
 public class ClientLookMessage extends ClientMessage {
@@ -29,20 +32,19 @@ public class ClientLookMessage extends ClientMessage {
             isLookingInto = false;
             examineTarget = "";
             return true;
-        }else if(args.length == 1){
-            isLookingInto = false;
-            examineTarget = args[0];
-            return true;
         }else if(args.length == 2 && args[0].equals("in")){
             isLookingInto = true;
             examineTarget = args[1];
             return true;
+        }else if(args.length == 2 && args[0].equals("at")){
+            isLookingInto = false;
+            examineTarget = args[1];
         }
         return false;
     }
 
     @Override
     protected void doActions() {
-        new LookCommand(examineTarget,isLookingInto,getClient(),getClientRegistry()).execute();
+        getExecutor().scheduleCommand(new LookCommand(examineTarget,isLookingInto,getClient()));
     }
 }
