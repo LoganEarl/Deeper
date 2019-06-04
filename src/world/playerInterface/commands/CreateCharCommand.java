@@ -213,7 +213,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 registry.sendMessage("Very well, your character creation is now complete. Welcome " + selectedName + " to the Simulacrum!", sourceClient);
                 Entity newPlayer = builder.build();
                 newPlayer.transferToWorld(World.getHubWorld());
-                executor.scheduleCommand(new LookCommand("",false, sourceClient,registry));
+                executor.scheduleCommand(new LookCommand("",false, sourceClient));
                 stage = STAGE_COMPLETE;
             }
         }

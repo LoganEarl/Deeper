@@ -28,7 +28,7 @@ public class ClientLookMessage extends ClientMessage {
     @Override
     public boolean constructFromString(String rawMessageBody) {
         String[] args = rawMessageBody.toLowerCase().split("\n");
-        if(args.length == 0) {
+        if(args.length == 0 || args.length == 1 && args[0].isEmpty()) {
             isLookingInto = false;
             examineTarget = "";
             return true;

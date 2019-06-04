@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,6 +39,8 @@ public class Room implements DatabaseManager.DatabaseEntry {
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,ROOM_NAME);
     private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
             TABLE_NAME, ROOM_DESCRIPTION, ROOM_VISIBILITY, ROOM_UP_NAME, ROOM_DOWN_NAME, ROOM_NORTH_NAME, ROOM_SOUTH_NAME, ROOM_EAST_NAME, ROOM_WEST_NAME, ROOM_NAME);
+
+    public static final List<String> directions = Arrays.asList("up", "north", "east", "south", "west", "down");
 
     private Room(ResultSet readEntry, String databaseName) throws SQLException{
         roomName = readEntry.getString(ROOM_NAME);
@@ -111,10 +115,9 @@ public class Room implements DatabaseManager.DatabaseEntry {
         return getRoomByRoomName(roomName,databaseName) != null;
     }
 
-    public String displayRoom(String databseName){
+    public String displayRoom(String databaseName){
         String itemSlot = "";
-        List<Item> items = Item.getItemsInRoom(roomName, databseName);
-
+        List<Item> items = Item.getItemsInRoom(roomName, databaseName);
 
         return String.format(Locale.US,
                 "%s\n%s\n\n",roomName, roomDescription);
@@ -150,6 +153,28 @@ public class Room implements DatabaseManager.DatabaseEntry {
 
     public String getWestRoomID() {
         return westRoomID;
+    }
+
+    private String[] getRoomIDs(){
+        return new String[]{getUpRoomID(), getNorthRoomID(), getEastRoomID(), getSouthRoomID(), getWestRoomID(), getDownRoomID()};
+    }
+
+    public String getConnectedRoomID(String direction){
+        int index;
+        if((index = directions.indexOf(direction)) != -1)
+            return getRoomIDs()[index];
+        return "";
+    }
+
+    public String[] getAvailableDirections(){
+        List<String> availableDirections = new ArrayList<>();
+        for(String direction: directions){
+            String roomName = getConnectedRoomID(direction);
+            Room r;
+            if(roomName != null && !roomName.isEmpty() && (r = getRoomByRoomName(roomName,databaseName)) != null && r.getVisibilityCode() == 0)
+                availableDirections.add(direction);
+        }
+        return availableDirections.toArray(new String[0]);
     }
 
     /**

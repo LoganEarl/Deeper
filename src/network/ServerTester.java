@@ -9,7 +9,7 @@ public class ServerTester {
         while(true){
             executor.step();
             try{
-                Thread.sleep(500);
+                Thread.sleep(100);
             }catch (InterruptedException ignored){}
         }
     }

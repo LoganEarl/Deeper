@@ -8,6 +8,7 @@ import network.messaging.MessagePipeline;
 import world.meta.World;
 import world.playerInterface.messages.ClientCreateCharacterMessage;
 import world.playerInterface.messages.ClientLookMessage;
+import world.playerInterface.messages.ClientMoveMessage;
 
 import java.util.*;
 
@@ -62,6 +63,7 @@ public class SimulationManager {
 
         messagePipeline.loadMessage(ClientCreateCharacterMessage.class);
         messagePipeline.loadMessage(ClientLookMessage.class);
+        messagePipeline.loadMessage(ClientMoveMessage.class);
 
 
         server.startServer();

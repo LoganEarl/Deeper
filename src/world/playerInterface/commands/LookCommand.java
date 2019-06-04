@@ -16,7 +16,7 @@ import java.util.Locale;
  * @author Logan Earl
  */
 public class LookCommand extends EntityCommand {
-    private Entity fromEntity;
+
     private Client fromClient;
     private String target;
     private boolean lookInto;
@@ -31,7 +31,7 @@ public class LookCommand extends EntityCommand {
      */
     public LookCommand(String target, boolean lookInto, Client fromClient){
         super(fromClient);
-        this.fromEntity = WorldUtils.getEntityOfClient(fromClient);
+
         this.fromClient = fromClient;
         this.target = target;
         this.lookInto = lookInto;
@@ -39,7 +39,7 @@ public class LookCommand extends EntityCommand {
 
     @Override
     public void executeEntityCommand() {
-        if(fromEntity == null){
+        if(getSourceEntity() == null){
             complete = true;
             System.out.println("Failed to execute a look command for a null entity");
         }
@@ -58,28 +58,39 @@ public class LookCommand extends EntityCommand {
     private String describeRoom(){
         String roomName;
         String roomDesc;
+        String waysDesc;
         String creaturesString;
         String containersString;
         String itemsString;
 
-        roomName = fromEntity.getRoomName();
-        Room r = Room.getRoomByRoomName(roomName,fromEntity.getDatabaseName());
+        roomName = getSourceEntity().getRoomName();
+        Room r = Room.getRoomByRoomName(roomName,getSourceEntity().getDatabaseName());
         if(r == null){
-            System.out.println("Failed to get room info for look command sourced by entityID:" + fromEntity.getID() + " in database " + fromEntity.getDatabaseName());
+            System.out.println("Failed to get room info for look command sourced by entityID:" + getSourceEntity().getID() + " in database " + getSourceEntity().getDatabaseName());
             return "An error has occurred. Unable to get room info for you at this time";
         }
         roomDesc = r.getRoomDescription();
+        waysDesc = getWays(r);
         creaturesString = getCreatureString(r);
         containersString = getContainerString(r);
         itemsString = getItemsString(r);
 
         return String.format(Locale.US,
-                "%s\n\n%s\n\n" +
-                        "%s\n\n%s%s", roomName, roomDesc, creaturesString, containersString, itemsString);
+                "%s\n\n%s\n\n%s\n" +
+                        "%s\n\n%s%s", roomName, roomDesc,waysDesc, creaturesString, containersString, itemsString);
+    }
+
+    private String getWays(Room r){
+        String[] directions = r.getAvailableDirections();
+        if(directions.length == 0)
+            return "There is no way out";
+        if(directions.length == 1)
+            return "There is a way to the " + directions[0];
+        return "There are ways to the " + WorldUtils.commaSeparate(directions);
     }
 
     private String getCreatureString(Room r){
-        List<Entity> nearEntities = Entity.getEntitiesInRoom(r.getRoomName(), r.getDatabaseName(), fromEntity.getID());
+        List<Entity> nearEntities = Entity.getEntitiesInRoom(r.getRoomName(), r.getDatabaseName(), getSourceEntity().getID());
         if(nearEntities.size() == 0)
             return "There are no other entities here";
         else{

@@ -2,6 +2,7 @@ package world.entity;
 
 import database.DatabaseManager;
 import world.meta.World;
+import world.room.Room;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -189,7 +190,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     @Override
     public boolean updateInDatabase(String databaseName) {
         return DatabaseManager.executeStatement(UPDATE_SQL,databaseName,
-                displayName, hp,maxHP,mp,maxMP,stamina,maxStamina,strength,dexterity, intelligence,wisdom,controllerType,roomName, raceID) > 0;
+                displayName, hp,maxHP,mp,maxMP,stamina,maxStamina,strength,dexterity, intelligence,wisdom,controllerType,roomName, raceID, entityID) > 0;
     }
 
     @Override
@@ -223,6 +224,10 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
     public String getRoomName() {
         return roomName;
+    }
+
+    public void setRoom(Room newRoom){
+        this.roomName = newRoom.getRoomName();
     }
 
     public String getDatabaseName() {
