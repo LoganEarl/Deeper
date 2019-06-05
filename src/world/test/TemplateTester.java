@@ -3,19 +3,37 @@ package world.test;
 import database.DatabaseManager;
 import world.entity.Entity;
 import world.entity.EntityTable;
+import world.entity.RaceTable;
+import world.item.ContainerInstanceTable;
+import world.item.ContainerStatTable;
+import world.item.ItemInstanceTable;
+import world.item.ItemStatTable;
 import world.meta.World;
+import world.meta.WorldMetaTable;
+import world.meta.WorldTable;
+import world.room.RoomTable;
+import world.story.DialogTable;
+import world.story.EntityDialogTable;
+import world.story.QuestTable;
+import world.story.StoryArcTable;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class TemplateTester {
-    private static final String TEMPLATE_NAME = "testTemplate";
+    private static final String TEMPLATE_NAME = "rawTemplate";
 
     public static void main(String[] args){
-        /*List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
+        List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
         tables.add(new ItemStatTable());
         tables.add(new ContainerStatTable());
         tables.add(new RoomTable());
         tables.add(new RaceTable());
         tables.add(new EntityTable());
         tables.add(new StoryArcTable());
+        tables.add(new EntityDialogTable());
+        tables.add(new DialogTable());
+        tables.add(new QuestTable());
 
         tables.add(new ItemInstanceTable());
         tables.add(new ContainerInstanceTable());
@@ -25,12 +43,12 @@ public class TemplateTester {
         DatabaseManager.createNewTemplate(TEMPLATE_NAME + ".db");
         DatabaseManager.createTemplateTables(TEMPLATE_NAME + ".db", tables);
 
-        tables.clear();
+        /*tables.clear();
         tables.add(new WorldTable());
 
         DatabaseManager.createNewWorldDatabase(World.META_DATABASE_NAME);
         DatabaseManager.createWorldTables(World.META_DATABASE_NAME,tables);
-*/
+
         DatabaseManager.createDirectories();
 
         World.initWorldSystem();
@@ -56,6 +74,6 @@ public class TemplateTester {
         if(testEntityRetrieval == null){
             System.out.println("Unable to get new entity from test 1");
         }
-
+*/
     }
 }

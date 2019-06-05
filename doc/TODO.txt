@@ -1,0 +1,18 @@
+TODO
+
+- add world related commands.
+    - ability to instantiate a world
+    - ability to view available worlds
+    - ability to remove a world
+    - ability to travel to a world
+- add a stat system and a way to view it
+    - add the burnout stat that works like stamina for magic
+    - make HP, MP, STAM, BURN, be derived by base stats
+- add some basic skills
+    - skills will be their own database table
+    - we need a dodge and a deflect skill first
+    - stealth and perception will be next
+- add combat stances that change rates
+    - some stances are unlocked by skills
+    - skills have a trained bonus to rolls, and an untrained detriment to them
+    - learning a skill means that you no longer get a penalty to doing it?
