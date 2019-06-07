@@ -11,6 +11,9 @@ import world.item.ContainerStatTable;
 import world.item.ItemInstanceTable;
 import world.item.ItemStatTable;
 import world.room.RoomTable;
+import world.story.DialogTable;
+import world.story.EntityDialogTable;
+import world.story.QuestTable;
 import world.story.StoryArcTable;
 
 import java.io.File;
@@ -206,6 +209,24 @@ public class World implements DatabaseManager.DatabaseEntry {
             }catch (Exception e){
                 newWorld = null;
             }
+        }
+
+        if(newWorld != null) {
+            List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
+            tables.add(new ItemStatTable());
+            tables.add(new ContainerStatTable());
+            tables.add(new RoomTable());
+            tables.add(new RaceTable());
+            tables.add(new EntityTable());
+            tables.add(new StoryArcTable());
+            tables.add(new EntityDialogTable());
+            tables.add(new DialogTable());
+            tables.add(new QuestTable());
+
+            tables.add(new ItemInstanceTable());
+            tables.add(new ContainerInstanceTable());
+            tables.add(new WorldMetaTable());
+            DatabaseManager.createWorldTables(newWorld.getWorldID() + ".db",tables);
         }
 
         return newWorld;
