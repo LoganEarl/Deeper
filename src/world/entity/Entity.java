@@ -41,6 +41,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
             TABLE_NAME, DISPLAY_NAME, HP,MAX_HP,MP,MAX_MP,STAMINA,MAX_STAMINA,STR,DEX,INT,WIS,CONTROLLER_TYPE,ROOM_NAME, RACE_ID, ENTITY_ID);
     private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=?)",
             TABLE_NAME, ROOM_NAME);
+    private static final String GET_NAME_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=? AND %s=?)", TABLE_NAME, DISPLAY_NAME, ROOM_NAME);
 
     /**Code returned when an entity has been successfully transferred to a new world by the transferToWorld() method*/
     public static final int CODE_TRANSFER_COMPLETE = 0;
@@ -108,6 +109,38 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         this.roomName = newWorld.getEntryRoomName();
         updateInDatabase(databaseName);
         return CODE_TRANSFER_COMPLETE;
+    }
+
+    public static Entity getPlayableEntityByID(String entityID){
+        World w = World.getWorldOfEntityID(entityID);
+        if(w != null)
+            return Entity.getEntityByEntityID(entityID,w.getDatabaseName());
+        return null;
+    }
+
+    public static Entity getEntityByDisplayName(String displayName, String roomName, String databaseName){
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+        PreparedStatement getSQL = null;
+        Entity toReturn;
+        if(c == null)
+            return null;
+        else{
+            try {
+                getSQL = c.prepareStatement(GET_NAME_ROOM_SQL);
+                getSQL.setString(1,displayName);
+                getSQL.setString(1,roomName);
+                ResultSet accountSet = getSQL.executeQuery();
+                if(accountSet.next())
+                    toReturn = new Entity(accountSet,databaseName);
+                else
+                    toReturn = null;
+                getSQL.close();
+                c.close();
+            }catch (Exception e){
+                toReturn = null;
+            }
+        }
+        return toReturn;
     }
 
     public static Entity getEntityByEntityID(String entityID, String databaseName){

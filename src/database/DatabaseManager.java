@@ -2,12 +2,17 @@ package database;
 
 import java.io.File;
 import java.sql.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DatabaseManager {
     public static final String DATA_DIRECTORY = System.getProperty("user.dir").replace("\\", "/") + "/data/";
-    public static final String TEMPLATE_DIRECTORY = DATA_DIRECTORY + "template/";
+    public static final String TEMPLATE_FOLDER = "template/";
+    public static final String TEMPLATE_DIRECTORY = DATA_DIRECTORY + TEMPLATE_FOLDER;
+
+
+    private static Map<String, Connection> databaseConnections = new HashMap<>();
 
     public static void createDirectories() {
         File f = new File(DATA_DIRECTORY);
@@ -26,42 +31,45 @@ public class DatabaseManager {
         }
     }
 
-    private static void createDatabase(String url){
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-                System.out.println("The driver name is " + meta.getDriverName());
-                System.out.println("A new database has been created.");
-            }
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+    private static void createDatabase(Connection conn){
+       try {
+           if (conn != null) {
+               DatabaseMetaData meta = conn.getMetaData();
+               System.out.println("The driver name is " + meta.getDriverName());
+               System.out.println("A new database has been created.");
+           }
+       }catch (SQLException e){
+           e.printStackTrace();
+       }
     }
 
     public static void createNewTemplate(String templateFileName){
-        createDatabase(getTemplateConnectionURL(templateFileName));
+        createDatabase(getDatabaseConnection(getTemplateConnectionURL(templateFileName)));
     }
 
     public static void createNewWorldDatabase(String fileName) {
-        createDatabase(getWorldConnectionURL(fileName));
+        createDatabase(getDatabaseConnection(fileName));
     }
 
     public static Connection getDatabaseConnection(String fileName) {
         String url = "jdbc:sqlite:" + DATA_DIRECTORY + fileName;
 
+        if(databaseConnections.containsKey(url))
+            return databaseConnections.get(url);
+
         try {
-            return DriverManager.getConnection(url);
+            Connection c = DriverManager.getConnection(url);
+            if(c != null)
+                databaseConnections.put(url,c);
+            return c;
         } catch (SQLException e) {
             return null;
         }
     }
 
-    private static void createTables(String url, List<DatabaseTable> tables){
+    private static void createTables(Connection conn, List<DatabaseTable> tables){
         String curTableName = "";
         try{
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection conn = DriverManager.getConnection(url);
             Statement stmt = conn.createStatement();
 
             for (DatabaseTable table : tables) {
@@ -94,11 +102,11 @@ public class DatabaseManager {
     }
 
     public static void createWorldTables(String fileName, List<DatabaseTable> tables) {
-        createTables(getWorldConnectionURL(fileName),tables);
+        createTables(getDatabaseConnection(fileName),tables);
     }
 
     public static void createTemplateTables(String fileName, List<DatabaseTable> tables){
-        createTables(getTemplateConnectionURL(fileName), tables);
+        createTables(getDatabaseConnection(fileName), tables);
     }
 
     private static String getWorldConnectionURL(String fileName) {
@@ -106,7 +114,7 @@ public class DatabaseManager {
     }
 
     private static String getTemplateConnectionURL(String fileName) {
-        return "jdbc:sqlite:" + TEMPLATE_DIRECTORY + fileName;
+        return TEMPLATE_FOLDER + fileName;
     }
 
     public interface DatabaseTable {

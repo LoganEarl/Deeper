@@ -22,6 +22,7 @@ public class ClientCreateWorldMessage extends ClientMessage {
         String[] args = rawMessage.split("\n");
         if(args.length == 2 && args[0].equals("new") && !args[1].isEmpty()){
             templateName = args[1];
+            return true;
         }
         return false;
     }
