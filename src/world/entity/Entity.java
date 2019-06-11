@@ -135,7 +135,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
                 else
                     toReturn = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 toReturn = null;
             }
@@ -159,7 +159,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
                 else
                     toReturn = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 toReturn = null;
             }
@@ -196,7 +196,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
                         foundItems.add(e);
                 }
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 foundItems = Collections.emptyList();
             }

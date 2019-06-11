@@ -15,6 +15,7 @@ public class MoveCommand extends EntityCommand {
 
     @Override
     protected void executeEntityCommand() {
+        System.out.println("Starting command to move entity");
         if(Room.directions.indexOf(direction) >= 0){
             Entity sourceEntity = getSourceEntity();
             Room curRoom = Room.getRoomByRoomName(sourceEntity.getRoomName(),sourceEntity.getDatabaseName());

@@ -99,7 +99,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
                 }else
                     itemStats = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (SQLException e){
                 itemStats = null;
             }

@@ -263,7 +263,7 @@ public class World implements DatabaseManager.DatabaseEntry {
                 else
                     toReturn = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 toReturn = null;
             }
@@ -308,7 +308,7 @@ public class World implements DatabaseManager.DatabaseEntry {
                     toReturn.add(new World(accountSet));
                 }
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 toReturn.clear();
             }
@@ -339,7 +339,7 @@ public class World implements DatabaseManager.DatabaseEntry {
                 else
                     toReturn = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 toReturn = null;
             }

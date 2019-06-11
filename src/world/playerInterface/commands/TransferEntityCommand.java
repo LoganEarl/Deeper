@@ -28,6 +28,7 @@ public class TransferEntityCommand extends EntityCommand {
 
     @Override
     protected void executeEntityCommand() {
+        System.out.println("starting command to transfer entity");
         if(!WorldUtils.isAuthorized(getSourceClient(),Account.AccountType.ADMIN)) {
             getSourceClient().sendMessage(WorldUtils.getRefusedFlavorText());
         }else {

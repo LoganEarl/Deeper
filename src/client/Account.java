@@ -93,7 +93,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
                 else
                     toReturn = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (SQLException e){
                 toReturn = null;
             }

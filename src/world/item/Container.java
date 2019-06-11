@@ -81,7 +81,7 @@ public class Container implements DatabaseManager.DatabaseEntry {
                 else
                     toReturn = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 toReturn = null;
             }
@@ -113,7 +113,7 @@ public class Container implements DatabaseManager.DatabaseEntry {
                 }else
                     toReturn = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 toReturn = null;
             }
@@ -142,7 +142,7 @@ public class Container implements DatabaseManager.DatabaseEntry {
                     foundContainers.add(new Container(accountSet,databaseName));
                 }
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 foundContainers = Collections.emptyList();
             }

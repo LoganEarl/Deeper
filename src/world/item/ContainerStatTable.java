@@ -67,7 +67,7 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
                 }else
                     containerState = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (SQLException e){
                 containerState = null;
             }

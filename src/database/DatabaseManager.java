@@ -54,8 +54,17 @@ public class DatabaseManager {
     public static Connection getDatabaseConnection(String fileName) {
         String url = "jdbc:sqlite:" + DATA_DIRECTORY + fileName;
 
-        if(databaseConnections.containsKey(url))
-            return databaseConnections.get(url);
+        if(databaseConnections.containsKey(url)) {
+            Connection c = databaseConnections.get(url);
+            try {
+                if (!c.isClosed())
+                    return c;
+                else
+                    databaseConnections.remove(url);
+            }catch (SQLException e){
+                databaseConnections.remove(url);
+            }
+        }
 
         try {
             Connection c = DriverManager.getConnection(url);
@@ -106,7 +115,7 @@ public class DatabaseManager {
     }
 
     public static void createTemplateTables(String fileName, List<DatabaseTable> tables){
-        createTables(getDatabaseConnection(fileName), tables);
+        createTables(getDatabaseConnection(getTemplateConnectionURL(fileName)), tables);
     }
 
     private static String getWorldConnectionURL(String fileName) {
@@ -148,7 +157,7 @@ public class DatabaseManager {
 
             int result = statement.executeUpdate();
             statement.close();
-            c.close();
+            //c.close();
             return result;
         } catch (SQLException e) {
             return -1;

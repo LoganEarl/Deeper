@@ -80,7 +80,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
                 else
                     toReturn = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (SQLException e){
                 toReturn = null;
             }

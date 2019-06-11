@@ -111,7 +111,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 }else
                     toReturn = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 toReturn = null;
             }
@@ -140,7 +140,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                     foundItems.add(new Item(accountSet,databaseName));
                 }
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 foundItems = Collections.emptyList();
             }
@@ -170,7 +170,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 else
                     toReturn = null;
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 toReturn = null;
             }
@@ -199,7 +199,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                     foundItems.add(new Item(accountSet,databaseName));
                 }
                 getSQL.close();
-                c.close();
+                //c.close();
             }catch (Exception e){
                 foundItems = Collections.emptyList();
             }
