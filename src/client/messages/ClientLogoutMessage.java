@@ -43,4 +43,14 @@ public class ClientLogoutMessage extends ClientMessage {
     public void doActions() {
         getClient().tryLogOut(getClient(),targetUserName);
     }
+
+    @Override
+    public String getUsage() {
+        return "logout (player)";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "Used to log out of the game. A chosen few may use this to force others from the game.";
+    }
 }

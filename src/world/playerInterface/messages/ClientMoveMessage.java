@@ -30,4 +30,14 @@ public class ClientMoveMessage extends ClientMessage {
     protected void doActions() {
         getExecutor().scheduleCommand(new MoveCommand(direction,getClient()));
     }
+
+    @Override
+    public String getUsage() {
+        return "go {north/south/east/west/up/down}";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "Used to move about. have caution when walking paths in exotic locations. The way foreword may be clear, but some thresholds once crossed cannot be returned from.";
+    }
 }

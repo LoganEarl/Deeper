@@ -37,4 +37,14 @@ public class ClientRegisterMessage extends ClientMessage {
     protected void doActions() {
         getClient().tryUpdateInfo(getClient(),"",userName,"",hPass,email);
     }
+
+    @Override
+    public String getUsage() {
+        return "register [username] [password] (email)";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "Used to create a new account. It is always nice to see a new face.";
+    }
 }

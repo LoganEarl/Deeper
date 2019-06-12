@@ -33,4 +33,14 @@ public class ClientTransferEntityMessage extends ClientMessage {
     protected void doActions() {
         getExecutor().scheduleCommand(new TransferEntityCommand(entityID,worldID,getExecutor(),getClient()));
     }
+
+    @Override
+    public String getUsage() {
+        return "transfer [player name/entity id] to [world id/world name]";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "The portals that connect the universe are at time limiting. You have transcended these limitations, allowing you to transport yourself and others all throughout the cosmos";
+    }
 }

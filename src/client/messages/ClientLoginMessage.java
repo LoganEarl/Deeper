@@ -43,4 +43,14 @@ public class ClientLoginMessage extends ClientMessage {
     public void doActions() {
         getClient().tryLogIn(getClient(), userName, hashedPassword);
     }
+
+    @Override
+    public String getUsage() {
+        return "login [username] [password]";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "Used to login to a prior created account. Note: each account can have a single playable character associated with it. Note, your account name and your character name are different";
+    }
 }

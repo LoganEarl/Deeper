@@ -31,4 +31,14 @@ public class ClientSayMessage extends ClientMessage {
         else
             getExecutor().scheduleCommand(new SayCommand(message, getClient(),getClientRegistry()));
     }
+
+    @Override
+    public String getUsage() {
+        return "say [message]";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "Communicate with those around you. Uses include but are not limited to, saying hello, pleading for help, starting flame wars, and getting yourself kicked for spamming";
+    }
 }

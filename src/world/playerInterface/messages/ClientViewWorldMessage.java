@@ -55,6 +55,16 @@ public class ClientViewWorldMessage extends ClientMessage {
             getClient().sendMessage("You must be a moderator to do that");
     }
 
+    @Override
+    public String getUsage() {
+        return "{view worlds/view world [world id]}";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "The greatest of auguries see only a hint of what you do, oh esteemed one. You can look into the very threads of creation, seeing what was, what is, and what will be";
+    }
+
     private String getAllWorldsString() {
         Collection<World> allWorlds = World.getAllWorlds();
         StringBuilder worldText = new StringBuilder();

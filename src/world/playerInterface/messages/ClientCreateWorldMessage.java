@@ -40,4 +40,14 @@ public class ClientCreateWorldMessage extends ClientMessage {
             getClient().sendMessage("You must be an admin to do that");
 
     }
+
+    @Override
+    public String getUsage() {
+        return "conjure new [template name]";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "Great is your power and infinite your wisdom. While the semblance of civilization scrounges through the shattered pieces of the universe, you create shards as you would. The power of creation is yours to do with as you please.";
+    }
 }

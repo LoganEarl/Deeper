@@ -50,4 +50,14 @@ public class ClientElevateUserMessage extends ClientMessage {
     public void doActions() {
         getClient().tryElevateUser(getClient(),targetUserName,newAccountType);
     }
+
+    @Override
+    public String getUsage() {
+        return "elevate [username] {1/2/3/4/5}";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "You have been bestowed with limited power over others. You may use this to give and take away the powers of creation from your underlings.";
+    }
 }

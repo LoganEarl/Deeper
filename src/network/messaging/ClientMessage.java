@@ -13,6 +13,13 @@ public abstract class ClientMessage {
     private ClientRegistry hostRegistry;
     private MessagePipeline messagePipeline;
 
+    /**
+     * DO NOT USE TO INSTANTIATE FULL COMMANDS. Used only as a shortcut for use by the message parser
+     */
+    public ClientMessage(){
+
+    }
+
     protected ClientMessage(String messageSignifier,
                             Client sourceClient,
                             CommandExecutor executor,
@@ -47,6 +54,10 @@ public abstract class ClientMessage {
     }
 
     public abstract boolean constructFromString(String rawMessage);
+
+    public abstract String getUsage();
+
+    public abstract String getHelpText();
 
     public final void resolve(){
         executor.scheduleCommand(new CommandExecutor.Command() {

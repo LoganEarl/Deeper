@@ -67,4 +67,14 @@ public class ClientAccountUpdateMessage extends ClientMessage {
     public void doActions() {
         getClient().tryUpdateInfo(getClient(),oldUserName,newUserName,oldHashedPassword,newHashedPassword,newEmailAddress);
     }
+
+    @Override
+    public String getUsage() {
+        return "{update [old user name] [new user name] [old password] [new password] [new email address]/update [username] [password] [new email address]} ";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "An archaic and unwieldy tool from ancient times. This is an outdated and potentially broken command for updating account information. Changing your username may(and probably will) result in loss of character. Use at you own (considerable) risk.";
+    }
 }

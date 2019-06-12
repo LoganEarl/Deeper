@@ -47,4 +47,14 @@ public class ClientLookMessage extends ClientMessage {
     protected void doActions() {
         getExecutor().scheduleCommand(new LookCommand(examineTarget,isLookingInto,getClient()));
     }
+
+    @Override
+    public String getUsage() {
+        return "look ({in/at} [item/container close by])";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "Used to observe your surroundings, this can be used to peer closely at items, survey a new location, or even peep inside of open containers";
+    }
 }

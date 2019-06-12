@@ -34,4 +34,14 @@ public class ClientCreateCharacterMessage extends ClientMessage {
     protected void doActions() {
         getExecutor().scheduleCommand(new CreateCharCommand(getClient(),getExecutor(),getClientRegistry(),getMessagePipeline()));
     }
+
+    @Override
+    public String getUsage() {
+        return "create new character";
+    }
+
+    @Override
+    public String getHelpText() {
+        return "Used to start fresh on a bran new Journey. Note, you can only have one character per account. In order to create a new one, the old must be annihilated. ";
+    }
 }
