@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static world.entity.EntityTable.*;
 
@@ -15,17 +16,8 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
     private String entityID;
     private String displayName;
-    private int hp;
-    private int maxHP;
-    private int mp;
-    private int maxMP;
-    private int stamina;
-    private int maxStamina;
 
-    private int strength;
-    private int dexterity;
-    private int intelligence;
-    private int wisdom;
+    private LinkedHashMap<String, SqlExtender> extenders = new LinkedHashMap<>();
 
     private String controllerType;
     private String roomName;
@@ -34,11 +26,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     private String databaseName;
 
     private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,ENTITY_ID);
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            TABLE_NAME,ENTITY_ID,DISPLAY_NAME, HP,MAX_HP,MP,MAX_MP,STAMINA,MAX_STAMINA,STR,DEX,INT,WIS,CONTROLLER_TYPE,ROOM_NAME, RACE_ID);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,ENTITY_ID);
-    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
-            TABLE_NAME, DISPLAY_NAME, HP,MAX_HP,MP,MAX_MP,STAMINA,MAX_STAMINA,STR,DEX,INT,WIS,CONTROLLER_TYPE,ROOM_NAME, RACE_ID, ENTITY_ID);
     private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=?)",
             TABLE_NAME, ROOM_NAME);
     private static final String GET_NAME_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=? AND %s=?)", TABLE_NAME, DISPLAY_NAME, ROOM_NAME);
@@ -55,19 +43,11 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     }
 
     private Entity(ResultSet readEntry, String databaseName) throws Exception {
+        extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(readEntry));
+        extenders.put(StatContainer.SIGNIFIER, new StatContainer(readEntry));
+
         entityID = readEntry.getString(ENTITY_ID);
         displayName = readEntry.getString(DISPLAY_NAME);
-
-        hp = readEntry.getInt(HP);
-        maxHP = readEntry.getInt(MAX_HP);
-        mp = readEntry.getInt(MP);
-        maxMP = readEntry.getInt(MAX_MP);
-        stamina = readEntry.getInt(STAMINA);
-        maxStamina = readEntry.getInt(MAX_STAMINA);
-        strength = readEntry.getInt(STR);
-        dexterity = readEntry.getInt(DEX);
-        intelligence = readEntry.getInt(INT);
-        wisdom = readEntry.getInt(WIS);
 
         raceID = readEntry.getString(RACE_ID);
         if(Race.getFromID(raceID) == null)
@@ -208,8 +188,9 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     public boolean saveToDatabase(String databaseName) {
         Entity entity = getEntityByEntityID(entityID,databaseName);
         if(entity == null){
-            return DatabaseManager.executeStatement(CREATE_SQL,databaseName,
-                    entityID,displayName, hp,maxHP,mp,maxMP,stamina,maxStamina,strength,dexterity, intelligence,wisdom,controllerType,roomName, raceID) > 0;
+            return DatabaseManager.executeStatement(makeInsertSQL(extenders,
+                    ENTITY_ID,DISPLAY_NAME,CONTROLLER_TYPE,ROOM_NAME,RACE_ID), databaseName, appendData(extenders,
+                    entityID,displayName,controllerType,roomName,raceID)) > 0;
         }else{
             return updateInDatabase(databaseName);
         }
@@ -222,13 +203,46 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
     @Override
     public boolean updateInDatabase(String databaseName) {
-        return DatabaseManager.executeStatement(UPDATE_SQL,databaseName,
-                displayName, hp,maxHP,mp,maxMP,stamina,maxStamina,strength,dexterity, intelligence,wisdom,controllerType,roomName, raceID, entityID) > 0;
+        return DatabaseManager.executeStatement(makeInsertSQL(extenders,
+                ENTITY_ID,DISPLAY_NAME,CONTROLLER_TYPE,ROOM_NAME,RACE_ID), databaseName, appendData(extenders,
+                entityID,displayName,controllerType,roomName,raceID)) > 0;
     }
 
     @Override
     public boolean existsInDatabase(String databaseName) {
         return getEntityByEntityID(entityID,databaseName) != null;
+    }
+
+    private static String makeInsertSQL(LinkedHashMap<String, SqlExtender> extenders, String... baseColumns){
+        StringBuilder statement = new StringBuilder("REPLACE INTO ").append(EntityTable.TABLE_NAME).append("(");
+        StringBuilder questionMarks = new StringBuilder("(");
+        boolean first = true;
+        for(String column:baseColumns){
+            if(first)
+                first = false;
+            else {
+                statement.append(",");
+                questionMarks.append(",");
+            }
+            statement.append(column);
+            questionMarks.append("?");
+        }
+        for(SqlExtender extender: extenders.values()){
+            for(String column: extender.getSqlColumnHeaders()){
+                statement.append(",").append(column);
+                questionMarks.append(",").append("?");
+            }
+        }
+        return statement.append(") VALUES ").append(questionMarks).append(")").toString();
+    }
+
+    private static Object[] appendData(LinkedHashMap<String,SqlExtender> extenders, Object... additionalParams){
+        List<Object[]> arrays = new ArrayList<>();
+        for(SqlExtender extender:extenders.values())
+            arrays.add(extender.getInsertSqlValues());
+        for(Object[] toAdd: arrays)
+            additionalParams = Stream.of(additionalParams,toAdd).flatMap(Stream::of).toArray();
+        return additionalParams;
     }
 
     public String getID(){
@@ -288,6 +302,8 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         private int maxMP = 10;
         private int stamina = 10;
         private int maxStamina = 10;
+        private int burnout = 10;
+        private int maxBurnout = 10;
 
         private int strength = 10;
         private int dexterity = 10;
@@ -302,18 +318,12 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
         public Entity build(){
             Entity e = new Entity();
-            e.hp = hp;
-            e.maxHP = maxHP;
-            e.mp = mp;
-            e.maxMP = maxMP;
-            e.stamina = stamina;
-            e.maxStamina = maxStamina;
+            LinkedHashMap<String,SqlExtender> extenders = new LinkedHashMap<>();
+            extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(hp,maxHP,mp,maxMP,stamina,maxStamina,burnout,maxBurnout));
+            extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom));
+            e.extenders = extenders;
             e.entityID = entityID;
             e.displayName = displayName;
-            e.strength = strength;
-            e.dexterity = dexterity;
-            e.intelligence = intelligence;
-            e.wisdom = wisdom;
             e.controllerType = controllerType;
             e.roomName = roomName;
             e.raceID = raceID;
@@ -384,6 +394,14 @@ public class Entity implements DatabaseManager.DatabaseEntry {
             return this;
         }
 
+        public void setBurnout(int burnout) {
+            this.burnout = burnout;
+        }
+
+        public void setMaxBurnout(int maxBurnout) {
+            this.maxBurnout = maxBurnout;
+        }
+
         /**
          * sets the race of the building entity and also sets it's stats to the defaults specified in the race
          * @param r the race to pull data from
@@ -412,5 +430,11 @@ public class Entity implements DatabaseManager.DatabaseEntry {
             return this;
         }
 
+    }
+
+    interface SqlExtender{
+        String getSignifier();
+        Object[] getInsertSqlValues();
+        String[] getSqlColumnHeaders();
     }
 }

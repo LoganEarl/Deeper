@@ -141,10 +141,10 @@ public class World implements DatabaseManager.DatabaseEntry {
         DatabaseManager.createNewTemplate(LIMBO_TEMPLATE_NAME + ".db");
         DatabaseManager.createTemplateTables(LIMBO_TEMPLATE_NAME + ".db",tables);
 
-        tables.clear();
-        tables.add(new WorldTable());
-        tables.add(new EntityWorldTable());
-        DatabaseManager.createWorldTables(META_DATABASE_NAME,tables);
+        List<DatabaseManager.DatabaseTable> metaTables = new LinkedList<>();
+        metaTables.add(new WorldTable());
+        metaTables.add(new EntityWorldTable());
+        DatabaseManager.createWorldTables(META_DATABASE_NAME,metaTables);
 
         createWorldWithID(HUB_WORLD_ID, HUB_TEMPLATE_NAME);
         createWorldWithID(LIMBO_WORLD_ID, LIMBO_TEMPLATE_NAME);
@@ -153,6 +153,11 @@ public class World implements DatabaseManager.DatabaseEntry {
         Race.writePlayableRacesToDatabaseFile(hubWorld.getDatabaseName());
         limbo = getWorldByWorldID(LIMBO_WORLD_ID);
         Race.writePlayableRacesToDatabaseFile(limbo.getDatabaseName());
+
+        for(World w : getAllWorlds()){
+            DatabaseManager.createWorldTables(w.getDatabaseName(),tables);
+            Race.writePlayableRacesToDatabaseFile(w.getDatabaseName());
+        }
     }
 
     /**

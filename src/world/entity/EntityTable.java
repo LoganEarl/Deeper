@@ -29,6 +29,10 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
     public static final String STAMINA = "stamina";
     /**The maximum amount of stamina points the entity can have*/
     public static final String MAX_STAMINA = "maxStamina";
+    /**The amount of mental burnout the entity is under*/
+    public static final String BURNOUT = "burnout";
+    /**The maximum amount of mental burnout the entity is capable of.*/
+    public static final String MAX_BURNOUT = "maxBurnout";
     /**The race of the entity. Foreign key to the race table*/
     public static final String RACE_ID = RaceTable.RACE_ID;
 
@@ -64,6 +68,8 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(MAX_MP,"INT");
         TABLE_DEFINITION.put(STAMINA,"INT");
         TABLE_DEFINITION.put(MAX_STAMINA,"INT");
+        TABLE_DEFINITION.put(BURNOUT,"INT");
+        TABLE_DEFINITION.put(MAX_BURNOUT,"INT");
         TABLE_DEFINITION.put(STR,"INT");
         TABLE_DEFINITION.put(DEX,"INT");
         TABLE_DEFINITION.put(INT,"INT");
@@ -77,7 +83,6 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 RACE_ID, RaceTable.TABLE_NAME, RaceTable.RACE_ID));
     }
-
 
     @Override
     public String getTableName() {
