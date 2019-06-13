@@ -53,6 +53,7 @@ public class SimulationManager {
         DatabaseManager.createDirectories();
         World.initWorldSystem();
 
+        messagePipeline.loadMessage(ClientHelpMessage.class);
         messagePipeline.loadMessage(ClientLoginMessage.class);
         messagePipeline.loadMessage(ClientAccountUpdateMessage.class);
         messagePipeline.loadMessage(ClientDebugMessage.class);

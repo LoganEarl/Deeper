@@ -15,6 +15,8 @@ import java.util.Map;
 
 public class MessagePipeline implements WebServer.OnMessageReceivedListener {
     private Map<String, Constructor<? extends ClientMessage>> loadedMessageBuilders = new HashMap<>();
+    private Map<String, String> usageMessages = new HashMap<>();
+    private Map<String, String> helpMessages = new HashMap<>();
     private Map<Client, List<MessageContext>> specificContexts = new HashMap<>();
     private ClientRegistry registry;
     private CommandExecutor executor;
@@ -53,7 +55,7 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
             }
 
         } else
-            registry.sendMessage("Im sorry, but I did not recognize that. Please try again or use [help] if you have any questions", client);
+            registry.sendMessage("Im sorry, but I did not recognize that. Please try again or use 'help' if you have any questions", client);
     }
 
     public void loadMessage(Class<? extends ClientMessage> messageClass) {
@@ -64,9 +66,12 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
                 if (loadedMessageBuilders.containsKey(header))
                     System.out.println("Unable to load class " + messageClass.getName() + " as it's header " + header + " is already bound to a different message");
                 Constructor<? extends ClientMessage> messageConstructor = ClientMessage.getConstructor(messageClass);
-                if (messageConstructor != null)
+                if (messageConstructor != null) {
+                    ClientMessage tempInstance = messageConstructor.newInstance(null,null,null,null);
+                    usageMessages.put(header,tempInstance.getUsage());
+                    helpMessages.put(header,tempInstance.getHelpText());
                     loadedMessageBuilders.put(header, messageConstructor);
-                else
+                }else
                     System.out.println("Unable to load message" + messageClass.getName() + " because it has no appropriate constructor");
             }
         } catch (Exception e) {
@@ -101,6 +106,26 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
         if(specificContexts.containsKey(client) && specificContexts.get(client) != null){
             specificContexts.get(client).remove(messageContext);
         }
+    }
+
+    public Map<String,String> getUsageMessages(){
+        return usageMessages;
+    }
+
+    public Map<String,String> getHelpMessages(){
+        return helpMessages;
+    }
+
+    public String getUsageForHeader(String header){
+        if(usageMessages.containsKey(header))
+            return usageMessages.get(header);
+        return header;
+    }
+
+    public String getHelpForHeader(String header){
+        if(helpMessages.containsKey(header))
+            return helpMessages.get(header);
+        return "";
     }
 
     /**

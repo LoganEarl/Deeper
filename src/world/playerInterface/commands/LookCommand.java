@@ -92,7 +92,7 @@ public class LookCommand extends EntityCommand {
     private String getCreatureString(Room r){
         List<Entity> nearEntities = Entity.getEntitiesInRoom(r.getRoomName(), r.getDatabaseName(), getSourceEntity().getID());
         if(nearEntities.size() == 0)
-            return "There are no other entities here";
+            return "You are alone";
         else{
             StringBuilder creatureStringBuilder = new StringBuilder();
             boolean first = true;

@@ -48,7 +48,10 @@ public class ClientElevateUserMessage extends ClientMessage {
 
     @Override
     public void doActions() {
-        getClient().tryElevateUser(getClient(),targetUserName,newAccountType);
+        if(getClient().getStatus() == Client.ClientStatus.ACTIVE && getClient().getAssociatedAccount() != null)
+            getClient().tryElevateUser(getClient(),targetUserName,newAccountType);
+        else
+            getClient().sendMessage("You must be logged in to do that");
     }
 
     @Override

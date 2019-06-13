@@ -2,6 +2,7 @@ package network.messaging;
 
 import client.Client;
 import client.ClientRegistry;
+import com.sun.istack.internal.Nullable;
 import network.CommandExecutor;
 
 import java.lang.reflect.Constructor;
@@ -13,18 +14,11 @@ public abstract class ClientMessage {
     private ClientRegistry hostRegistry;
     private MessagePipeline messagePipeline;
 
-    /**
-     * DO NOT USE TO INSTANTIATE FULL COMMANDS. Used only as a shortcut for use by the message parser
-     */
-    public ClientMessage(){
-
-    }
-
-    protected ClientMessage(String messageSignifier,
-                            Client sourceClient,
-                            CommandExecutor executor,
-                            ClientRegistry registry,
-                            MessagePipeline messagePipeline){
+    protected ClientMessage(@Nullable String messageSignifier,
+                            @Nullable Client sourceClient,
+                            @Nullable CommandExecutor executor,
+                            @Nullable ClientRegistry registry,
+                            @Nullable MessagePipeline messagePipeline){
         this.signifier = messageSignifier;
         this.executor = executor;
         this.sourceClient = sourceClient;
@@ -60,20 +54,22 @@ public abstract class ClientMessage {
     public abstract String getHelpText();
 
     public final void resolve(){
-        executor.scheduleCommand(new CommandExecutor.Command() {
-            private boolean complete = false;
+        if(executor != null) {
+            executor.scheduleCommand(new CommandExecutor.Command() {
+                private boolean complete = false;
 
-            @Override
-            public void execute() {
-                doActions();
-                complete = true;
-            }
+                @Override
+                public void execute() {
+                    doActions();
+                    complete = true;
+                }
 
-            @Override
-            public boolean isComplete() {
-                return complete;
-            }
-        });
+                @Override
+                public boolean isComplete() {
+                    return complete;
+                }
+            });
+        }
     }
 
     /**will start any actions needed to complete this message*/
