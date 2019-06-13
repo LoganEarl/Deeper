@@ -2,6 +2,7 @@ package world.entity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Random;
 
 import static world.entity.EntityTable.*;
 
@@ -10,6 +11,8 @@ public class StatContainer implements Entity.SqlExtender {
     private int dexterity;
     private int intelligence;
     private int wisdom;
+
+    private static final Random RND = new Random(System.currentTimeMillis());
 
     public static final String SIGNIFIER = "stats";
     private static final String[] HEADERS = new String[]{STR,DEX,INT,WIS};
@@ -26,6 +29,27 @@ public class StatContainer implements Entity.SqlExtender {
         dexterity = readEntry.getInt(DEX);
         intelligence = readEntry.getInt(INT);
         wisdom = readEntry.getInt(WIS);
+    }
+
+    public int preformStatCheck(String stat, int difficultyModifier){
+        int baseStat = getStat(stat);
+        
+        return baseStat - RND.nextInt(100)+difficultyModifier;
+    }
+
+    private int getStat(String columnName) {
+        switch (columnName) {
+            case STR:
+                return strength;
+            case DEX:
+                return dexterity;
+            case INT:
+               return intelligence;
+            case WIS:
+                return wisdom;
+            default:
+                throw new IllegalArgumentException("Column name " + columnName + " is not an entity stat");
+        }
     }
 
     @Override

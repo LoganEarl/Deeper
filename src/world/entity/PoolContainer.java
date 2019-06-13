@@ -56,6 +56,14 @@ public class PoolContainer implements Entity.SqlExtender{
         return HEADERS;
     }
 
+    /**Recalculates the maximum hp/mp/stamina/burnout values based on the entity's stats*/
+    public void calculatePoolMaxes(StatContainer stats){
+        maxHP = stats.getStrength() * 2 + stats.getDexterity();
+        maxStamina = stats.getDexterity() * 2 + stats.getStrength();
+        maxMP = stats.getIntelligence() * 2 + stats.getWisdom();
+        maxBurnout = stats.getWisdom() * 2 + stats.getIntelligence();
+    }
+
     public int getHp() {
         return hp;
     }
