@@ -1,16 +1,13 @@
 package world.test;
 
 import database.DatabaseManager;
-import world.entity.Entity;
 import world.entity.EntityTable;
 import world.entity.RaceTable;
-import world.item.ContainerInstanceTable;
-import world.item.ContainerStatTable;
+import world.item.container.ContainerInstanceTable;
+import world.item.container.ContainerStatTable;
 import world.item.ItemInstanceTable;
 import world.item.ItemStatTable;
-import world.meta.World;
 import world.meta.WorldMetaTable;
-import world.meta.WorldTable;
 import world.room.RoomTable;
 import world.story.DialogTable;
 import world.story.EntityDialogTable;

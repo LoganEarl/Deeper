@@ -2,6 +2,7 @@ package world.item;
 
 import database.DatabaseManager.DatabaseTable;
 import world.entity.EntityTable;
+import world.item.container.ContainerInstanceTable;
 import world.room.RoomTable;
 
 import java.util.*;

@@ -1,4 +1,4 @@
-package world.item;
+package world.item.container;
 
 import database.DatabaseManager;
 import world.entity.EntityTable;

@@ -45,6 +45,26 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
     /**The wisdom attribute of the entity. 10 is average*/
     public static final String WIS = "wisdom";
 
+    public static final String SLOT_HEAD = "slotHead";
+
+    public static final String SLOT_CHEST = "slotChest";
+
+    public static final String SLOT_LEGS = "slotLegs";
+
+    public static final String SLOT_FEET = "slotFeet";
+
+    public static final String SLOT_HANDS = "slotHands";
+
+    public static final String SLOT_HAND_LEFT = "leftHand";
+
+    public static final String SLOT_HAND_RIGHT = "rightHand";
+
+    public static final String SLOT_BACK = "slotBack";
+
+    public static final String SLOT_BELT_POUCH = "slotBeltPouch";
+
+    public static final String SLOT_BELT_UTIL = "slotBeltUtil";
+
     /**The type of controller responsible for the entity. Example, {@value CONTROLLER_TYPE_PLAYER} or {@value CONTROLLER_TYPE_STATIC}*/
     public static final String CONTROLLER_TYPE = "controller";
 
@@ -78,10 +98,23 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(CONTROLLER_TYPE,"VARCHAR(16)");
         TABLE_DEFINITION.put(ROOM_NAME, "VARCHAR(32)");
 
+        TABLE_DEFINITION.put(SLOT_HEAD, "INT");
+        TABLE_DEFINITION.put(SLOT_CHEST, "INT");
+        TABLE_DEFINITION.put(SLOT_LEGS, "INT");
+        TABLE_DEFINITION.put(SLOT_FEET, "INT");
+        TABLE_DEFINITION.put(SLOT_HANDS, "INT");
+        TABLE_DEFINITION.put(SLOT_HAND_LEFT, "INT");
+        TABLE_DEFINITION.put(SLOT_HAND_RIGHT, "INT");
+        TABLE_DEFINITION.put(SLOT_BACK, "INT");
+        TABLE_DEFINITION.put(SLOT_BELT_POUCH, "INT");
+        TABLE_DEFINITION.put(SLOT_BELT_UTIL, "INT");
+
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 RACE_ID, RaceTable.TABLE_NAME, RaceTable.RACE_ID));
+
+        //no constraints placed on equipment slots. These need to be checked programmatically as they can be items or containers
     }
 
     @Override

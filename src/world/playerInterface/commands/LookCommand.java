@@ -4,7 +4,7 @@ import client.Client;
 import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.Race;
-import world.item.Container;
+import world.item.container.Container;
 import world.item.Item;
 import world.room.Room;
 

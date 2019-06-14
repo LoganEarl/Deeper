@@ -99,7 +99,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>world.item.ContainerInstanceTable</li>
+<li>world.item.container.ContainerInstanceTable</li>
 </ul>
 </li>
 </ul>
@@ -264,7 +264,7 @@ implements <a href="../../database/DatabaseManager.DatabaseTable.html" title="in
 <div class="block">The name of the table storing container instances</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../constant-values.html#world.item.ContainerInstanceTable.TABLE_NAME">Constant Field Values</a></dd>
+<dd><a href="../../constant-values.html#world.item.container.ContainerInstanceTable.TABLE_NAME">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -278,7 +278,7 @@ implements <a href="../../database/DatabaseManager.DatabaseTable.html" title="in
 <div class="block">The identifier of this container instance</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../constant-values.html#world.item.ContainerInstanceTable.CONTAINER_ID">Constant Field Values</a></dd>
+<dd><a href="../../constant-values.html#world.item.container.ContainerInstanceTable.CONTAINER_ID">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -292,7 +292,7 @@ implements <a href="../../database/DatabaseManager.DatabaseTable.html" title="in
 <div class="block">The name of the container. References the ContainerStateTable, and is used to get container state</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../constant-values.html#world.item.ContainerInstanceTable.CONTAINER_NAME">Constant Field Values</a></dd>
+<dd><a href="../../constant-values.html#world.item.container.ContainerInstanceTable.CONTAINER_NAME">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -307,7 +307,7 @@ implements <a href="../../database/DatabaseManager.DatabaseTable.html" title="in
  a value in this field, the value of stored under ROOM_NAME should be ignored</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../constant-values.html#world.item.ContainerInstanceTable.ENTITY_ID">Constant Field Values</a></dd>
+<dd><a href="../../constant-values.html#world.item.container.ContainerInstanceTable.ENTITY_ID">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -321,7 +321,7 @@ implements <a href="../../database/DatabaseManager.DatabaseTable.html" title="in
 <div class="block">The name of the room this container is sitting in. References the RoomTable</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../constant-values.html#world.item.ContainerInstanceTable.ROOM_NAME">Constant Field Values</a></dd>
+<dd><a href="../../constant-values.html#world.item.container.ContainerInstanceTable.ROOM_NAME">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -335,7 +335,7 @@ implements <a href="../../database/DatabaseManager.DatabaseTable.html" title="in
 <div class="block">The current state of this container. Must store one of the STATE_* constants defined in this class;</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../constant-values.html#world.item.ContainerInstanceTable.CONTAINER_STATE">Constant Field Values</a></dd>
+<dd><a href="../../constant-values.html#world.item.container.ContainerInstanceTable.CONTAINER_STATE">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -349,7 +349,7 @@ implements <a href="../../database/DatabaseManager.DatabaseTable.html" title="in
 <div class="block">The code of this container's lock. Null if not used. When trying to unlock the container, the lock number of the key is compared with this field.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../constant-values.html#world.item.ContainerInstanceTable.LOCK_NUMBER">Constant Field Values</a></dd>
+<dd><a href="../../constant-values.html#world.item.container.ContainerInstanceTable.LOCK_NUMBER">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -363,7 +363,7 @@ implements <a href="../../database/DatabaseManager.DatabaseTable.html" title="in
 <div class="block">Value stored in the <a href="../../world/item/ContainerInstanceTable.html#CONTAINER_STATE">"state"</a> field, means the container is locked</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../constant-values.html#world.item.ContainerInstanceTable.STATE_LOCKED">Constant Field Values</a></dd>
+<dd><a href="../../constant-values.html#world.item.container.ContainerInstanceTable.STATE_LOCKED">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>
@@ -377,7 +377,7 @@ implements <a href="../../database/DatabaseManager.DatabaseTable.html" title="in
 <div class="block">Value stored in the <a href="../../world/item/ContainerInstanceTable.html#CONTAINER_STATE">"state"</a> field, means the container is unlocked</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../constant-values.html#world.item.ContainerInstanceTable.STATE_UNLOCKED">Constant Field Values</a></dd>
+<dd><a href="../../constant-values.html#world.item.container.ContainerInstanceTable.STATE_UNLOCKED">Constant Field Values</a></dd>
 </dl>
 </li>
 </ul>

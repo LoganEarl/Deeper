@@ -1,13 +1,14 @@
-package world.item;
+package world.item.container;
 
 import database.DatabaseManager;
+import world.item.Item;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 
-import static world.item.ContainerInstanceTable.*;
+import static world.item.container.ContainerInstanceTable.*;
 
 /**
  * Holds the data for a container. Containers can hold any item as long as the item does not

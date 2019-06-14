@@ -15,24 +15,23 @@ import static world.item.ItemInstanceTable.*;
  * the same stats.
  * @author Logan Earl
  */
-public class Item implements DatabaseManager.DatabaseEntry {
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
-            TABLE_NAME, ITEM_ID, ENTITY_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME);
+public abstract class Item implements DatabaseManager.DatabaseEntry {
+    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
+            TABLE_NAME, ITEM_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
-    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
-            TABLE_NAME, ENTITY_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, ITEM_ID);
+    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=? WHERE %s=?",
+            TABLE_NAME, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, ITEM_ID);
     private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
-    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE (%s=? AND %s=? AND %s IS NULL AND %s IS NULL)",
-            TABLE_NAME, ITEM_NAME, ROOM_NAME, ENTITY_ID, CONTAINER_ID);
-    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=? AND %s IS NULL AND %s IS NULL)",
-            TABLE_NAME, ROOM_NAME, ENTITY_ID, CONTAINER_ID);
+    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE (%s=? AND %s=? AND %s IS NULL)",
+            TABLE_NAME, ITEM_NAME, ROOM_NAME,  CONTAINER_ID);
+    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=? AND %s IS NULL)",
+            TABLE_NAME, ROOM_NAME, CONTAINER_ID);
     private static final String GET_OF_CONTAINER_ID_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?",
             ItemInstanceTable.TABLE_NAME, CONTAINER_ID);
 
     private int itemID;
-    private String entityID;
     private String roomName;
     private String itemName;
     private String displayName;
@@ -41,9 +40,8 @@ public class Item implements DatabaseManager.DatabaseEntry {
     private int lockNumber;
     private Map<String,String> itemStats;
 
-    private Item(ResultSet entry, String databaseName) throws Exception{
+    protected Item(ResultSet entry, String databaseName) throws Exception{
         itemID = entry.getInt(ITEM_ID);
-        entityID = entry.getString(ENTITY_ID);
         roomName = entry.getString(ROOM_NAME);
         if(roomName == null)
             roomName = "";
@@ -73,7 +71,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
      * @param displayName the custom displayed name for the item
      * @param databaseName the name of the database containing the item's stats. item is stored in that database
      */
-    public Item(String itemName, String displayName, String databaseName){
+    protected Item(String itemName, String displayName, String databaseName){
         int id = Long.valueOf(System.currentTimeMillis()).hashCode();
         while(getItemByID(id, databaseName) != null)
             id++;
@@ -107,7 +105,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setString(2,roomName);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next()) {
-                    toReturn = new Item(accountSet,databaseName);
+                    toReturn = ItemFactory.getInstance().parseFromResultSet(accountSet,databaseName);
                 }else
                     toReturn = null;
                 getSQL.close();
@@ -137,7 +135,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setString(1,roomName);
                 ResultSet accountSet = getSQL.executeQuery();
                 while(accountSet.next()) {
-                    foundItems.add(new Item(accountSet,databaseName));
+                    foundItems.add(ItemFactory.getInstance().parseFromResultSet(accountSet,databaseName));
                 }
                 getSQL.close();
                 //c.close();
@@ -166,7 +164,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setInt(1,itemID);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next())
-                    toReturn = new Item(accountSet,databaseName);
+                    toReturn = ItemFactory.getInstance().parseFromResultSet(accountSet,databaseName);
                 else
                     toReturn = null;
                 getSQL.close();
@@ -196,7 +194,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setInt(1,containerID);
                 ResultSet accountSet = getSQL.executeQuery();
                 while(accountSet.next()) {
-                    foundItems.add(new Item(accountSet,databaseName));
+                    foundItems.add(ItemFactory.getInstance().parseFromResultSet(accountSet,databaseName));
                 }
                 getSQL.close();
                 //c.close();
@@ -212,7 +210,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
         Item item = getItemByID(itemID,databaseName);
         if(item == null)
             return DatabaseManager.executeStatement(CREATE_SQL, databaseName,
-                    itemID, entityID, roomName, itemName, displayName) > 0;
+                    itemID, roomName, itemName, displayName) > 0;
         else
             return updateInDatabase(databaseName);
     }
@@ -225,7 +223,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
     @Override
     public boolean updateInDatabase(String databaseName) {
         return DatabaseManager.executeStatement(UPDATE_SQL,databaseName,
-                entityID, roomName, itemName, displayName, containerID, itemID) > 0;
+                roomName, itemName, displayName, containerID, itemID) > 0;
     }
 
     @Override
@@ -285,37 +283,7 @@ public class Item implements DatabaseManager.DatabaseEntry {
 
     public double getVolume(){
         initStats();
-        return getCastDouble(ItemStatTable.SIZE);
-    }
-
-    public int getMinDamage(){
-        initStats();
-        return getCastInt(ItemStatTable.MIN_DAMAGE);
-    }
-
-    public int getMaxDamage(){
-        initStats();
-        return getCastInt(ItemStatTable.MAX_DAMAGE);
-    }
-
-    public int getHitChance(){
-        initStats();
-        return getCastInt(ItemStatTable.HIT_CHANCE);
-    }
-
-    public int getArmorClass(){
-        initStats();
-        return getCastInt(ItemStatTable.ARMOR_CLASS);
-    }
-
-    public int getHPRegen(){
-        initStats();
-        return getCastInt(ItemStatTable.HP_REGEN);
-    }
-
-    public int getMPRegen(){
-        initStats();
-        return getCastInt(ItemStatTable.MP_REGEN);
+        return getCastDouble(ItemStatTable.VOLUME);
     }
 
     public String getItemType(){
@@ -337,7 +305,6 @@ public class Item implements DatabaseManager.DatabaseEntry {
      */
     public void setContainerID(int containerID){
         this.containerID = containerID;
-        this.entityID = "";
         this.roomName = "";
         updateInDatabase(databaseName);
     }

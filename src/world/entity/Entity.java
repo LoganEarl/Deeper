@@ -45,6 +45,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     private Entity(ResultSet readEntry, String databaseName) throws Exception {
         extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(readEntry));
         extenders.put(StatContainer.SIGNIFIER, new StatContainer(readEntry));
+        extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(readEntry));
 
         entityID = readEntry.getString(ENTITY_ID);
         displayName = readEntry.getString(DISPLAY_NAME);
@@ -321,6 +322,8 @@ public class Entity implements DatabaseManager.DatabaseEntry {
             LinkedHashMap<String,SqlExtender> extenders = new LinkedHashMap<>();
             extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(hp,maxHP,mp,maxMP,stamina,maxStamina,burnout,maxBurnout));
             extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom));
+            extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer());
+
             e.extenders = extenders;
             e.entityID = entityID;
             e.displayName = displayName;

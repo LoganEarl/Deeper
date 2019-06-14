@@ -31,9 +31,16 @@ public class StatContainer implements Entity.SqlExtender {
         wisdom = readEntry.getInt(WIS);
     }
 
+    /**
+     * performs a stat check on the specified stat and difficulty
+     * @param stat the column name of the stat to roll for.
+     * @param difficultyModifier the amount to add or subtract from the result
+     * @throws IllegalArgumentException if you pass in a column name for stat that is not recognized
+     * @return the net stat, with 0 and up being a success
+     */
     public int preformStatCheck(String stat, int difficultyModifier){
         int baseStat = getStat(stat);
-        
+
         return baseStat - RND.nextInt(100)+difficultyModifier;
     }
 
