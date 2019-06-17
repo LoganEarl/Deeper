@@ -19,7 +19,7 @@ public class EntityDialogTable implements DatabaseManager.DatabaseTable {
     public static final String DIALOG_ID = DialogTable.DIALOG_ID;
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
-    private final List<String> CONSTRAINTS = new ArrayList<>();
+    private final Set<String> CONSTRAINTS = new HashSet<>();
 
     public EntityDialogTable(){
         TABLE_DEFINITION.put(ENTITY_ID, "VARCHAR(32) NOT NULL");
@@ -42,7 +42,7 @@ public class EntityDialogTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List getConstraints() {
+    public Set<String> getConstraints() {
         return CONSTRAINTS;
     }
 }

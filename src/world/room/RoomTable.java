@@ -5,6 +5,7 @@ import database.DatabaseManager;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Holds information relating to the creation of a SQL table that holds each room that has been created.
@@ -55,7 +56,7 @@ public class RoomTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List getConstraints() {
+    public Set<String> getConstraints() {
         return null;
     }
 }

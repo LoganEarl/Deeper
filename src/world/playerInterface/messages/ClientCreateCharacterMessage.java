@@ -4,10 +4,7 @@ import client.Client;
 import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
-import network.WebServer;
 import network.messaging.MessagePipeline;
-import world.entity.Entity;
-import world.meta.World;
 import world.playerInterface.commands.CreateCharCommand;
 
 /**

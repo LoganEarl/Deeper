@@ -5,6 +5,7 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class DatabaseManager {
     public static final String DATA_DIRECTORY = System.getProperty("user.dir").replace("\\", "/") + "/data/";
@@ -131,7 +132,7 @@ public class DatabaseManager {
 
         Map<String, String> getColumnDefinitions();
 
-        List<String> getConstraints();
+        Set<String> getConstraints();
     }
 
     public static int executeStatement(String sql, String databaseName, Object... args) {

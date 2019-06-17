@@ -1,10 +1,7 @@
 package world.item.weapon;
 
 import database.DatabaseManager;
-import world.item.Item;
-import world.item.ItemFactory;
 import world.item.ItemStatTable;
-import world.item.ItemType;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,9 +26,9 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private static final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
-    public final List<String> CONSTRAINTS = new ArrayList<>(1);
+    private static final Set<String> CONSTRAINTS = new HashSet<>(1);
 
     public WeaponStatTable(){
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
@@ -52,7 +49,7 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
     public static Map<String,String> getStatsForWeapon(String itemName, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
-        Map<String, String> itemStats = new HashMap<>();
+        Map<String, String> itemStats;
         if(c == null)
             return null;
         else{
@@ -61,15 +58,7 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
                 getSQL.setString(1,itemName);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next()) {
-                    itemStats.put(ITEM_NAME, accountSet.getString(ITEM_NAME));
-                    itemStats.put(MIN_BASE_DAMAGE, accountSet.getString(MIN_BASE_DAMAGE));
-                    itemStats.put(MAX_BASE_DAMAGE, accountSet.getString(MAX_BASE_DAMAGE));
-                    itemStats.put(STR_SCALAR, accountSet.getString(STR_SCALAR));
-                    itemStats.put(DEX_SCALAR, accountSet.getString(STR_SCALAR));
-                    itemStats.put(INT_SCALAR, accountSet.getString(STR_SCALAR));
-                    itemStats.put(WIS_SCALAR, accountSet.getString(STR_SCALAR));
-                    itemStats.put(HIT_BONUS, accountSet.getString(HIT_BONUS));
-                    itemStats.put(DAMAGE_TYPE, accountSet.getString(DAMAGE_TYPE));
+                    itemStats = ItemStatTable.getStatsFromResultSet(accountSet, TABLE_DEFINITION);
                 }else
                     itemStats = null;
                 getSQL.close();
@@ -91,7 +80,7 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
+    public Set<String> getConstraints() {
         return CONSTRAINTS;
     }
 }

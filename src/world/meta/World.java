@@ -6,10 +6,9 @@ import world.entity.Entity;
 import world.entity.EntityTable;
 import world.entity.Race;
 import world.entity.RaceTable;
-import world.item.container.ContainerInstanceTable;
-import world.item.container.ContainerStatTable;
 import world.item.ItemInstanceTable;
 import world.item.ItemStatTable;
+import world.item.container.ContainerStatTable;
 import world.room.RoomTable;
 import world.story.DialogTable;
 import world.story.EntityDialogTable;
@@ -132,7 +131,6 @@ public class World implements DatabaseManager.DatabaseEntry {
         tables.add(new StoryArcTable());
 
         tables.add(new ItemInstanceTable());
-        tables.add(new ContainerInstanceTable());
         tables.add(new WorldMetaTable());
 
         DatabaseManager.createNewTemplate(HUB_TEMPLATE_NAME + ".db");
@@ -229,7 +227,6 @@ public class World implements DatabaseManager.DatabaseEntry {
             tables.add(new QuestTable());
 
             tables.add(new ItemInstanceTable());
-            tables.add(new ContainerInstanceTable());
             tables.add(new WorldMetaTable());
             DatabaseManager.createWorldTables(newWorld.getWorldID() + ".db",tables);
         }

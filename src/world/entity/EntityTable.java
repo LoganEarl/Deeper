@@ -77,7 +77,7 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
     public static final String ROOM_NAME = RoomTable.ROOM_NAME;
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
-    private final List<String> CONSTRAINTS = new ArrayList<>();
+    private final Set<String> CONSTRAINTS = new HashSet<>(2);
 
     public EntityTable(){
         TABLE_DEFINITION.put(ENTITY_ID, "VARCHAR(32) PRIMARY KEY NOT NULL");
@@ -128,7 +128,7 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List getConstraints() {
+    public Set<String> getConstraints() {
         return CONSTRAINTS;
     }
 }

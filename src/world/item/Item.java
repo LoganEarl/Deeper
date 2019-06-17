@@ -330,6 +330,10 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         updateInDatabase(databaseName);
     }
 
+    public int getItemID() {
+        return itemID;
+    }
+
     public final String getDatabaseName(){
         return databaseName;
     }

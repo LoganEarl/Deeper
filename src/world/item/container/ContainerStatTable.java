@@ -1,6 +1,7 @@
 package world.item.container;
 
 import database.DatabaseManager;
+import world.item.ItemStatTable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,7 +22,7 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     /**If the MAX_KGS, MAX_LITERS, MAX_NUMBER, or LOCK_DIFFICULTY has this value the value is not applicable or not used*/
     public static final int CODE_NOT_USED = -1;
     /**The name of the container*/
-    public static final String CONTAINER_NAME = "containerName";
+    public static final String ITEM_NAME = ItemStatTable.ITEM_NAME;
     /**The description of the container*/
     public static final String CONTAINER_DESCRIPTION = "containerDescription";
     /**The maximum storage potential of the container in KGs*/
@@ -34,16 +35,21 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     public static final String LOCK_DIFFICULTY = "lockDifficulty";
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private static final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
-    private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, CONTAINER_NAME);
+    private static final Set<String> CONSTRAINTS = new HashSet<>(1);
+
+    private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);
 
     public ContainerStatTable(){
-        TABLE_DEFINITION.put(CONTAINER_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
+        TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
         TABLE_DEFINITION.put(CONTAINER_DESCRIPTION, "TEXT");
         TABLE_DEFINITION.put(MAX_KGS,"DECIMAL");
         TABLE_DEFINITION.put(MAX_LITERS,"DECIMAL");
         TABLE_DEFINITION.put(MAX_NUMBER,"INT");
+
+        CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+                ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME));
     }
 
     public static Map<String,String> getStatsForContainer(String itemName, String databaseName){
@@ -58,12 +64,7 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
                 getSQL.setString(1,itemName);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next()) {
-                    containerState.put(CONTAINER_NAME, accountSet.getString(CONTAINER_NAME));
-                    containerState.put(CONTAINER_DESCRIPTION, accountSet.getString(CONTAINER_DESCRIPTION));
-                    containerState.put(MAX_KGS, accountSet.getString(MAX_KGS));
-                    containerState.put(MAX_LITERS, accountSet.getString(MAX_LITERS));
-                    containerState.put(MAX_NUMBER, accountSet.getString(MAX_NUMBER));
-                    containerState.put(LOCK_DIFFICULTY, accountSet.getString(LOCK_DIFFICULTY));
+                    containerState = ItemStatTable.getStatsFromResultSet(accountSet,TABLE_DEFINITION);
                 }else
                     containerState = null;
                 getSQL.close();
@@ -86,7 +87,7 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
-        return null;
+    public Set<String> getConstraints() {
+        return CONSTRAINTS;
     }
 }

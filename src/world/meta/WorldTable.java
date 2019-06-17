@@ -2,10 +2,7 @@ package world.meta;
 
 import database.DatabaseManager;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WorldTable implements DatabaseManager.DatabaseTable {
     public static final String TABLE_NAME = "world";
@@ -48,7 +45,7 @@ public class WorldTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
-        return Collections.emptyList();
+    public Set<String> getConstraints() {
+        return null;
     }
 }

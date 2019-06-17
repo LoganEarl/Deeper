@@ -1,14 +1,11 @@
 package world.item.container;
 
-import database.DatabaseManager;
 import world.item.Item;
+import world.item.ItemInstanceTable;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.*;
-
-import static world.item.container.ContainerInstanceTable.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Holds the data for a container. Containers can hold any item as long as the item does not
@@ -18,75 +15,25 @@ import static world.item.container.ContainerInstanceTable.*;
  * @author Logan Earl
  */
 public class Container extends Item {
-    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=? AND %s IS NULL",
-            TABLE_NAME, ROOM_NAME, ENTITY_ID);
-    private static final String GET_NAME_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=? AND %s=? AND %s IS NULL",
-            TABLE_NAME, ROOM_NAME, CONTAINER_NAME, ENTITY_ID);
+    private ContainerState state;
 
+    public enum ContainerState{
+        locked, unlocked
+    }
 
     public Container(ResultSet entry, String databaseName) throws Exception {
         super(entry,databaseName);
+
+        try{
+            state = ContainerState.valueOf(entry.getString(ItemInstanceTable.STATE));
+        }catch (Exception e){
+            state = ContainerState.unlocked;
+        }
     }
 
-    /**
-     * used to get the first container in the given room with the given name
-     * @param containerName the name of the container
-     * @param roomName the name of the room the container is in
-     * @param databaseName the name of the database containing the container
-     * @return a Container instance or null if not found
-     */
-    public static Container getContainerByNameRoom(String containerName, String roomName, String databaseName){
-        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL = null;
-        Container toReturn;
-        if(c == null)
-            return null;
-        else{
-            try {
-                getSQL = c.prepareStatement(GET_NAME_ROOM_SQL);
-                getSQL.setString(1,roomName);
-                getSQL.setString(2,containerName);
-                ResultSet accountSet = getSQL.executeQuery();
-                if(accountSet.next()) {
-                    toReturn = new Container(accountSet,databaseName);
-                }else
-                    toReturn = null;
-                getSQL.close();
-                //c.close();
-            }catch (Exception e){
-                toReturn = null;
-            }
-        }
-        return toReturn;
-    }
-
-    /**
-     * gets all the containers in the given room
-     * @param roomName the name of the room to check for containers
-     * @param databaseName the name of the database containing the containers
-     * @return a list of all containers in the room
-     */
-    public static List<Container> getContainersInRoom(String roomName, String databaseName){
-        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL;
-        List<Container> foundContainers = new LinkedList<>();
-        if(c == null)
-            return Collections.emptyList();
-        else{
-            try {
-                getSQL = c.prepareStatement(GET_ROOM_SQL);
-                getSQL.setString(1,roomName);
-                ResultSet accountSet = getSQL.executeQuery();
-                while(accountSet.next()) {
-                    foundContainers.add(new Container(accountSet,databaseName));
-                }
-                getSQL.close();
-                //c.close();
-            }catch (Exception e){
-                foundContainers = Collections.emptyList();
-            }
-        }
-        return foundContainers;
+    @Override
+    protected Map<String, String> getDerivedStats() {
+        return ContainerStatTable.getStatsForContainer(getItemName(),getDatabaseName());
     }
 
     /**
@@ -95,37 +42,11 @@ public class Container extends Item {
      * @see Item
      */
     public List<Item> getStoredItems(){
-        return Item.getItemsOfContainerID(containerID,databaseName);
-    }
-
-    public int getContainerID() {
-        return containerID;
-    }
-
-    public String getContainerName() {
-        return containerName;
-    }
-
-    public String getRoomName() {
-        return roomName;
-    }
-
-    public int getLockNumber() {
-        return lockNumber;
+        return Item.getItemsOfContainerID(getItemID(),getDatabaseName());
     }
 
     public boolean getIsLocked(){
-        return this.containerState.equals(STATE_LOCKED);
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public String getContainerDescription(){
-        initStats();
-        String s =  containerStats.get(ContainerStatTable.CONTAINER_DESCRIPTION);
-        return s == null? "":s;
+        return this.state == ContainerState.locked;
     }
 
     /**
@@ -156,10 +77,10 @@ public class Container extends Item {
             return false;
         if(getLockNumber() == i.getLockNumber()){
             if(wantToBeLocked)
-                containerState = STATE_LOCKED;
+                state = ContainerState.locked;
             else
-                containerState = STATE_UNLOCKED;
-            updateInDatabase(databaseName);
+                state = ContainerState.unlocked;
+            updateInDatabase(getDatabaseName());
             return true;
         }
         return false;
@@ -167,13 +88,13 @@ public class Container extends Item {
 
     /**
      * will attempt to store the given item in this container. Will fail to do id this container is locked or cannot hold the item due to container constraints.
-     * @param toStore the item to store in teh container
+     * @param toStore the item to store in the container
      * @return true if the item was stored successfully
      */
     public boolean tryStoreItem(Item toStore){
-        if(containerState.equals(STATE_LOCKED) || !canHoldItem(toStore))
+        if(state == ContainerState.locked || !canHoldItem(toStore))
             return false;
-        toStore.setContainerID(containerID);
+        toStore.setContainerID(getItemID());
         return true;
     }
 

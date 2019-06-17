@@ -2,10 +2,7 @@ package client;
 
 import database.DatabaseManager;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Holds information relating to the creation of a SQL table that holds each account that has been created.
@@ -42,7 +39,7 @@ public class AccountTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
-        return Collections.emptyList();
+    public Set<String> getConstraints() {
+        return Collections.emptySet();
     }
 }

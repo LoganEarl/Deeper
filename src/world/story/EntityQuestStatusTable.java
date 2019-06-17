@@ -28,7 +28,7 @@ public class EntityQuestStatusTable implements DatabaseManager.DatabaseTable {
     public static final String REWARDED = "rewarded";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
-    private final List<String> CONSTRAINTS = new ArrayList<>();
+    private final Set<String> CONSTRAINTS = new HashSet<>();
 
     public EntityQuestStatusTable(){
         TABLE_DEFINITION.put(ENTITY_ID,"VARCHAR(32) NOT NULL");
@@ -53,7 +53,7 @@ public class EntityQuestStatusTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List getConstraints() {
+    public Set<String> getConstraints() {
         return CONSTRAINTS;
     }
 }

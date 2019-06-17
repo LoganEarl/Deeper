@@ -41,7 +41,7 @@ public class QuestTable implements DatabaseManager.DatabaseTable {
     public static final String TYPE_DEFEND = "defend";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
-    private final List<String> CONSTRAINTS = new ArrayList<>();
+    private final Set<String> CONSTRAINTS = new HashSet<>();
 
     public QuestTable(){
         TABLE_DEFINITION.put(QUEST_ID, "INT PRIMARY KEY NOT NULL");
@@ -69,7 +69,7 @@ public class QuestTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
+    public Set<String> getConstraints() {
         return CONSTRAINTS;
     }
 }

@@ -34,7 +34,7 @@ public class DialogTable implements DatabaseManager.DatabaseTable {
     public static final String ARC_NUM_ON_COMPLETION = "arcNumOnCompletion";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
-    private final List<String> CONSTRAINTS = new ArrayList<>();
+    private final Set<String> CONSTRAINTS = new HashSet<>();
 
     public DialogTable(){
         TABLE_DEFINITION.put(DIALOG_ID, "INT PRIMARY KEY NOT NULL");
@@ -67,7 +67,7 @@ public class DialogTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List getConstraints() {
+    public Set<String> getConstraints() {
         return CONSTRAINTS;
     }
 }

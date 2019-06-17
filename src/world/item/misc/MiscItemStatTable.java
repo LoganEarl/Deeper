@@ -2,8 +2,8 @@ package world.item.misc;
 
 import database.DatabaseManager;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MiscItemStatTable implements  DatabaseManager.DatabaseTable {
     @Override
@@ -17,7 +17,7 @@ public class MiscItemStatTable implements  DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
+    public Set<String> getConstraints() {
         return null;
     }
 }

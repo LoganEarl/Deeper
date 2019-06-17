@@ -4,7 +4,6 @@ import client.Account;
 import client.Client;
 import client.ClientRegistry;
 import network.CommandExecutor;
-import network.WebServer;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
 

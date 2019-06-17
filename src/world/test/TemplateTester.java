@@ -3,10 +3,9 @@ package world.test;
 import database.DatabaseManager;
 import world.entity.EntityTable;
 import world.entity.RaceTable;
-import world.item.container.ContainerInstanceTable;
-import world.item.container.ContainerStatTable;
 import world.item.ItemInstanceTable;
 import world.item.ItemStatTable;
+import world.item.container.ContainerStatTable;
 import world.meta.WorldMetaTable;
 import world.room.RoomTable;
 import world.story.DialogTable;
@@ -33,7 +32,6 @@ public class TemplateTester {
         tables.add(new QuestTable());
 
         tables.add(new ItemInstanceTable());
-        tables.add(new ContainerInstanceTable());
         tables.add(new WorldMetaTable());
 
         DatabaseManager.createDirectories();

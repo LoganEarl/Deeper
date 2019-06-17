@@ -1,7 +1,6 @@
 package world.item;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public enum ItemType {
     weapon, armor, consumable, ammo, container, misc;

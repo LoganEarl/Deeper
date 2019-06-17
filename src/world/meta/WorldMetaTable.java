@@ -21,9 +21,9 @@ public class WorldMetaTable implements DatabaseManager.DatabaseTable {
     public static final String ESTIMATED_DIFFICULTY = "difficulty";
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    private static final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
-    public final List<String> CONSTRAINTS = new ArrayList<>();
+    private static final Set<String> CONSTRAINTS = new HashSet<>();
 
     public WorldMetaTable(){
         TABLE_DEFINITION.put(WORLD_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
@@ -50,7 +50,7 @@ public class WorldMetaTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
+    public Set<String> getConstraints() {
         return CONSTRAINTS;
     }
 }

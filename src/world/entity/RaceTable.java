@@ -2,10 +2,7 @@ package world.entity;
 
 import database.DatabaseManager;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Instantiated form of the table of available races. Contains the definition for the table.
@@ -54,7 +51,7 @@ public class RaceTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
-        return Collections.emptyList();
+    public Set<String> getConstraints() {
+        return Collections.emptySet();
     }
 }

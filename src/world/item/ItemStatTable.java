@@ -34,7 +34,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     }
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    public static final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public ItemStatTable(){
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
@@ -49,7 +49,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     public static Map<String,String> getStatsForItem(String itemName, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
-        Map<String, String> itemStats = new HashMap<>();
+        Map<String, String> itemStats;
         if(c == null)
             return null;
         else{
@@ -58,11 +58,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
                 getSQL.setString(1,itemName);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next()) {
-                    itemStats.put(ITEM_NAME, accountSet.getString(ITEM_NAME));
-                    itemStats.put(ITEM_DESCRIPTION, accountSet.getString(ITEM_DESCRIPTION));
-                    itemStats.put(WEIGHT, accountSet.getString(WEIGHT));
-                    itemStats.put(VOLUME, accountSet.getString(VOLUME));
-                    itemStats.put(ITEM_TYPE, accountSet.getString(ITEM_TYPE));
+                    itemStats= getStatsFromResultSet(accountSet, TABLE_DEFINITION);
                 }else
                     itemStats = null;
                 getSQL.close();
@@ -85,7 +81,16 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
+    public Set<String> getConstraints() {
         return null;
+    }
+
+    public static Map<String,String> getStatsFromResultSet(ResultSet statEntry, Map<String,String> tableConstraints) throws SQLException{
+        Map<String,String> results = new HashMap<>();
+
+        for(String key: tableConstraints.keySet()){
+            results.put(key,statEntry.getString(key));
+        }
+        return results;
     }
 }

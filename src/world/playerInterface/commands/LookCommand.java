@@ -4,8 +4,8 @@ import client.Client;
 import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.Race;
-import world.item.container.Container;
 import world.item.Item;
+import world.item.container.Container;
 import world.room.Room;
 
 import java.util.List;
@@ -60,7 +60,6 @@ public class LookCommand extends EntityCommand {
         String roomDesc;
         String waysDesc;
         String creaturesString;
-        String containersString;
         String itemsString;
 
         roomName = getSourceEntity().getRoomName();
@@ -72,12 +71,11 @@ public class LookCommand extends EntityCommand {
         roomDesc = r.getRoomDescription();
         waysDesc = getWays(r);
         creaturesString = getCreatureString(r);
-        containersString = getContainerString(r);
         itemsString = getItemsString(r);
 
         return String.format(Locale.US,
                 "%s\n\n%s\n\n%s\n" +
-                        "%s\n\n%s%s", roomName, roomDesc,waysDesc, creaturesString, containersString, itemsString);
+                        "%s\n\n%s", roomName, roomDesc,waysDesc, creaturesString, itemsString);
     }
 
     private String getWays(Room r){
@@ -111,41 +109,22 @@ public class LookCommand extends EntityCommand {
         }
     }
 
-    private String getContainerString(Room r){
-        List<Container> nearContainers = Container.getContainersInRoom(r.getRoomName(), r.getDatabaseName());
-        if(nearContainers.size() == 0)
-            return "";
-        else{
-            StringBuilder containerStringBuilder = new StringBuilder();
-            boolean first = true;
-            for(Container c: nearContainers){
-                if(first)
-                    first = false;
-                else
-                    containerStringBuilder.append("\n");
-                containerStringBuilder.
-                        append("There is a ")
-                        .append(c.getContainerName())
-                        .append(" nearby, it is ")
-                        .append(c.getIsLocked()? "locked": "unlocked");
-            }
-            return containerStringBuilder.toString();
-        }
-    }
-
     private String getItemsString(Room r){
         List<Item> nearItems = Item.getItemsInRoom(r.getRoomName(),r.getDatabaseName());
         if(nearItems.size() == 0)
             return "";
         else{
             StringBuilder itemStringBuilder = new StringBuilder();
-            boolean first = false;
+            boolean first = true;
             for(Item i : nearItems){
                 if(first)
                     first = false;
                 else
                     itemStringBuilder.append("\n");
                 itemStringBuilder.append("There is a ").append(i.getDisplayableName()).append(" nearby");
+                if(i instanceof Container){
+                    itemStringBuilder.append(". It is ").append(((Container)i).getIsLocked()? "locked": "unlocked");
+                }
             }
             return itemStringBuilder.toString();
         }

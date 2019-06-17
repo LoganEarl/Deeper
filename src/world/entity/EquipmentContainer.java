@@ -1,7 +1,6 @@
 package world.entity;
 
 import world.item.Item;
-import world.item.ItemStatTable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

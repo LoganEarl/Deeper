@@ -36,8 +36,8 @@ public class EntityWorldTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
-        return Collections.singletonList(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
+    public Set<String> getConstraints() {
+        return Collections.singleton(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
         WORLD_ID, WorldTable.TABLE_NAME, WorldTable.WORLD_ID));
     }
 }

@@ -5,6 +5,7 @@ import database.DatabaseManager;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Contains the database schema for the table that holds the story arcs.
@@ -46,7 +47,7 @@ public class StoryArcTable implements DatabaseManager.DatabaseTable {
     }
 
     @Override
-    public List getConstraints() {
+    public Set<String> getConstraints() {
         return null;
     }
 }

@@ -1,5 +1,6 @@
 package world.item.weapon;
 
+import world.item.DamageType;
 import world.item.Item;
 import world.item.ItemFactory;
 import world.item.ItemType;
@@ -17,10 +18,6 @@ public class Weapon extends Item {
     @Override
     protected Map<String, String> getDerivedStats() {
         return WeaponStatTable.getStatsForWeapon(getItemName(),getDatabaseName());
-    }
-
-    public enum DamageType{
-        pierce, slash, crush, heat, cold, corrosive, electric, plasma, oblivion
     }
 
     public int getMinBaseDamage(){

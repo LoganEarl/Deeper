@@ -2,7 +2,6 @@ package world.item;
 
 import database.DatabaseManager.DatabaseTable;
 import world.entity.EntityTable;
-import world.item.container.ContainerInstanceTable;
 import world.room.RoomTable;
 
 import java.util.*;
@@ -26,7 +25,7 @@ public class ItemInstanceTable implements DatabaseTable {
     /**The unique identifier of this item. stored as an int*/
     public static final String ITEM_ID = "itemID";
     /**The unique identifier of the container that the item is in. If null, check the value under ENTITY_ID, then ROOM_NAME. Foreign key to the ContainerInstanceTable*/
-    public static final String CONTAINER_ID = ContainerInstanceTable.CONTAINER_ID;
+    public static final String CONTAINER_ID = "containerID";
     /**The unique identifier of the entity holding this item. Use the ROOM_NAME value if this is null. Always check the Container field first as the item may be stored*/
     public static final String ENTITY_ID = EntityTable.ENTITY_ID;
     /**If the item is not stored in a container and is not being held, this contains the room it is laying about in*/
@@ -36,10 +35,12 @@ public class ItemInstanceTable implements DatabaseTable {
     /**The default displayed name of the item is the value stored under ITEM_NAME, but if this contains a value, it is used instead. Used for specifically named weapons and items*/
     public static final String DISPLAY_NAME = "displayName";
     /**The code this item can unlock. If attempting to unlock a container, this will be compared to the lock number of the container. If they match, the item can serve as a key to it. If 0 or NULL it is not a key*/
-    public static final String LOCK_NUMBER = ContainerInstanceTable.LOCK_NUMBER;
+    public static final String LOCK_NUMBER = "lockNumber";
+
+    public static final String STATE = "state";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
-    private final List<String> CONSTRAINTS = new ArrayList<>();
+    private final Set<String> CONSTRAINTS = new HashSet<>();
 
     public ItemInstanceTable(){
         TABLE_DEFINITION.put(ITEM_ID,"INT PRIMARY KEY NOT NULL");
@@ -48,12 +49,13 @@ public class ItemInstanceTable implements DatabaseTable {
         TABLE_DEFINITION.put(ENTITY_ID, "VARCHAR(32)");
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32)");
         TABLE_DEFINITION.put(DISPLAY_NAME,"VARCHAR(32)");
+        TABLE_DEFINITION.put(STATE, "VARCHAR(16)");
         TABLE_DEFINITION.put(LOCK_NUMBER, "INT");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME));
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
-                CONTAINER_ID, ContainerInstanceTable.TABLE_NAME, ContainerInstanceTable.CONTAINER_ID));
+                CONTAINER_ID, TABLE_NAME, ITEM_ID));
     }
 
     @Override
@@ -67,7 +69,7 @@ public class ItemInstanceTable implements DatabaseTable {
     }
 
     @Override
-    public List<String> getConstraints() {
+    public Set<String> getConstraints() {
         return CONSTRAINTS;
     }
 }
