@@ -3,10 +3,6 @@ package world.item.consumable;
 import database.DatabaseManager;
 import world.item.ItemStatTable;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 public class ConsumableStatTable implements  DatabaseManager.DatabaseTable {
@@ -67,28 +63,8 @@ public class ConsumableStatTable implements  DatabaseManager.DatabaseTable {
         return CONSTRAINTS;
     }
 
-    public static Map<String,String> getStatsForContainer(String itemName, String databaseName){
-        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL;
-        Map<String, String> containerState;
-        if(c == null)
-            return null;
-        else{
-            try {
-                getSQL = c.prepareStatement(GET_SQL);
-                getSQL.setString(1,itemName);
-                ResultSet accountSet = getSQL.executeQuery();
-                if(accountSet.next()) {
-                    containerState = ItemStatTable.getStatsFromResultSet(accountSet, TABLE_DEFINITION);
-                }else
-                    containerState = null;
-                getSQL.close();
-                //c.close();
-            }catch (SQLException e){
-                containerState = null;
-            }
-        }
-        return containerState;
+    public static Map<String,String> getStatsForConsumable(String itemName, String databaseName){
+        return ItemStatTable.getStatsForRawItem(itemName,databaseName,GET_SQL,TABLE_DEFINITION.keySet());
     }
 
 }

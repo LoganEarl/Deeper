@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class ArmorStatTable implements DatabaseManager.DatabaseTable {
+    public static final String TABLE_NAME = "armorStats";
+
     @Override
     public String getTableName() {
         return null;

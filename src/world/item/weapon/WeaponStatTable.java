@@ -47,26 +47,7 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
     }
 
     public static Map<String,String> getStatsForWeapon(String itemName, String databaseName){
-        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL;
-        Map<String, String> itemStats;
-        if(c == null)
-            return null;
-        else{
-            try {
-                getSQL = c.prepareStatement(GET_SQL);
-                getSQL.setString(1,itemName);
-                ResultSet accountSet = getSQL.executeQuery();
-                if(accountSet.next()) {
-                    itemStats = ItemStatTable.getStatsFromResultSet(accountSet, TABLE_DEFINITION);
-                }else
-                    itemStats = null;
-                getSQL.close();
-            }catch (SQLException e){
-                itemStats = null;
-            }
-        }
-        return itemStats;
+        return ItemStatTable.getStatsForRawItem(itemName,databaseName,GET_SQL,TABLE_DEFINITION.keySet());
     }
 
     @Override

@@ -58,7 +58,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
                 getSQL.setString(1,itemName);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next()) {
-                    itemStats= getStatsFromResultSet(accountSet, TABLE_DEFINITION);
+                    itemStats= getStatsFromResultSet(accountSet, TABLE_DEFINITION.keySet());
                 }else
                     itemStats = null;
                 getSQL.close();
@@ -85,12 +85,36 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
         return null;
     }
 
-    public static Map<String,String> getStatsFromResultSet(ResultSet statEntry, Map<String,String> tableConstraints) throws SQLException{
+    public static Map<String,String> getStatsFromResultSet(ResultSet statEntry, Set<String> columns) throws SQLException{
         Map<String,String> results = new HashMap<>();
 
-        for(String key: tableConstraints.keySet()){
+        for(String key: columns){
             results.put(key,statEntry.getString(key));
         }
         return results;
+    }
+
+    public static Map<String,String> getStatsForRawItem(String itemName, String databaseName, String rawGetSQL, Set<String> columns){
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+        PreparedStatement getSQL;
+        Map<String, String> containerState;
+        if(c == null)
+            return null;
+        else{
+            try {
+                getSQL = c.prepareStatement(rawGetSQL);
+                getSQL.setString(1,itemName);
+                ResultSet accountSet = getSQL.executeQuery();
+                if(accountSet.next()) {
+                    containerState = ItemStatTable.getStatsFromResultSet(accountSet, columns);
+                }else
+                    containerState = null;
+                getSQL.close();
+                //c.close();
+            }catch (SQLException e){
+                containerState = null;
+            }
+        }
+        return containerState;
     }
 }

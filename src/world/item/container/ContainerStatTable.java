@@ -53,27 +53,7 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     }
 
     public static Map<String,String> getStatsForContainer(String itemName, String databaseName){
-        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL;
-        Map<String, String> containerState = new HashMap<>();
-        if(c == null)
-            return null;
-        else{
-            try {
-                getSQL = c.prepareStatement(GET_SQL);
-                getSQL.setString(1,itemName);
-                ResultSet accountSet = getSQL.executeQuery();
-                if(accountSet.next()) {
-                    containerState = ItemStatTable.getStatsFromResultSet(accountSet,TABLE_DEFINITION);
-                }else
-                    containerState = null;
-                getSQL.close();
-                //c.close();
-            }catch (SQLException e){
-                containerState = null;
-            }
-        }
-        return containerState;
+        return ItemStatTable.getStatsForRawItem(itemName,databaseName,GET_SQL,TABLE_DEFINITION.keySet());
     }
 
     @Override
