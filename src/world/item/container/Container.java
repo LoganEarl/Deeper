@@ -17,77 +17,15 @@ import static world.item.container.ContainerInstanceTable.*;
  * constraints. Or none if you want to make a bag of holding or something
  * @author Logan Earl
  */
-public class Container implements DatabaseManager.DatabaseEntry {
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)",
-            TABLE_NAME, CONTAINER_ID, CONTAINER_NAME, ENTITY_ID, ROOM_NAME, CONTAINER_STATE, LOCK_NUMBER);
-    private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?",
-            TABLE_NAME, CONTAINER_ID);
-    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
-            TABLE_NAME, CONTAINER_NAME, ENTITY_ID, ROOM_NAME, CONTAINER_STATE, LOCK_NUMBER, CONTAINER_ID);
-    private static final String GET_ID_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?",
-            TABLE_NAME, CONTAINER_ID);
+public class Container extends Item {
     private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=? AND %s IS NULL",
             TABLE_NAME, ROOM_NAME, ENTITY_ID);
     private static final String GET_NAME_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=? AND %s=? AND %s IS NULL",
             TABLE_NAME, ROOM_NAME, CONTAINER_NAME, ENTITY_ID);
 
-    private int containerID;
-    private String containerName;
-    private String entityID;
-    private String roomName;
-    private String containerState;
-    private int lockNumber;
-    private String databaseName;
 
-    private Map<String,String> containerStats;
-
-    private Container(ResultSet entry, String databaseName) throws Exception {
-        containerID = entry.getInt(CONTAINER_ID);
-        containerName = entry.getString(CONTAINER_NAME);
-        if(containerName == null || containerName.isEmpty() || ContainerStatTable.getStatsForContainer(containerName,databaseName) == null)
-            throw new IllegalArgumentException("Passed in an entry without a container name");
-
-        entityID = entry.getString(ENTITY_ID);
-        if(entityID == null || entityID.isEmpty()) {
-            entityID = "";
-            roomName = entry.getString(ROOM_NAME);
-        }else
-            roomName = "";
-        containerState = entry.getString(CONTAINER_STATE);
-        if (containerState == null || containerState.isEmpty())
-            containerState = STATE_UNLOCKED;
-        lockNumber = entry.getInt(LOCK_NUMBER);
-        this.databaseName = databaseName;
-    }
-
-    /**
-     * gets the container with the specified unique identifier
-     * @param containerID the unique identifier of the container
-     * @param databaseName the name of the database the item is stored in
-     * @return the instantiated container or null if it was not found
-     */
-    public static Container getContainerByContainerID(int containerID, String databaseName){
-        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL;
-        Container toReturn;
-        if(c == null)
-            return null;
-        else{
-            try {
-                getSQL = c.prepareStatement(GET_ID_SQL);
-                getSQL.setInt(1,containerID);
-                ResultSet accountSet = getSQL.executeQuery();
-                if(accountSet.next())
-                    toReturn = new Container(accountSet,databaseName);
-                else
-                    toReturn = null;
-                getSQL.close();
-                //c.close();
-            }catch (Exception e){
-                toReturn = null;
-            }
-        }
-        return toReturn;
+    public Container(ResultSet entry, String databaseName) throws Exception {
+        super(entry,databaseName);
     }
 
     /**
@@ -151,32 +89,6 @@ public class Container implements DatabaseManager.DatabaseEntry {
         return foundContainers;
     }
 
-    @Override
-    public boolean saveToDatabase(String databaseName) {
-        Container container = getContainerByContainerID(containerID,databaseName);
-        if(container == null)
-            return DatabaseManager.executeStatement(CREATE_SQL,databaseName,
-                    containerID, containerName, entityID, roomName, containerState, lockNumber) > 0;
-        else
-            return updateInDatabase(databaseName);
-    }
-
-    @Override
-    public boolean removeFromDatabase(String databaseName) {
-        return DatabaseManager.executeStatement(DELETE_SQL,databaseName,containerID) > 0;
-    }
-
-    @Override
-    public boolean updateInDatabase(String databaseName) {
-        return DatabaseManager.executeStatement(UPDATE_SQL, databaseName,
-                containerName, entityID, roomName, containerState, lockNumber, containerID) > 0;
-    }
-
-    @Override
-    public boolean existsInDatabase(String databaseName) {
-        return getContainerByContainerID(containerID,databaseName) != null;
-    }
-
     /**
      * shortcut to Item.getItemsOfContainerID().
      * @return all items stored in this container
@@ -192,10 +104,6 @@ public class Container implements DatabaseManager.DatabaseEntry {
 
     public String getContainerName() {
         return containerName;
-    }
-
-    public String getEntityID() {
-        return entityID;
     }
 
     public String getRoomName() {
@@ -271,51 +179,26 @@ public class Container implements DatabaseManager.DatabaseEntry {
 
     public double getMaxKilograms(){
         initStats();
-        return getCastDouble(ContainerStatTable.MAX_KGS,containerStats);
+        return getCastDouble(ContainerStatTable.MAX_KGS);
     }
 
     public double getMaxLiters(){
         initStats();
-        return getCastDouble(ContainerStatTable.MAX_LITERS,containerStats);
+        return getCastDouble(ContainerStatTable.MAX_LITERS);
     }
 
     public int getMaxItems(){
         initStats();
-        return getCastInt(ContainerStatTable.MAX_NUMBER,containerStats);
+        return getCastInt(ContainerStatTable.MAX_NUMBER);
     }
 
     public int getLockDifficulty(){
         initStats();
-        return getCastInt(ContainerStatTable.LOCK_DIFFICULTY, containerStats);
+        return getCastInt(ContainerStatTable.LOCK_DIFFICULTY);
     }
 
     public boolean getIsLockable(){
         initStats();
         return getLockDifficulty() != ContainerStatTable.CODE_NOT_USED;
-    }
-
-    private void initStats(){
-        if(containerStats == null)
-            containerStats = ContainerStatTable.getStatsForContainer(containerName,databaseName);
-    }
-
-    private double getCastDouble(String tag, Map<String,String> stats){
-        String s = stats.get(tag);
-        if(s != null) {
-            try {
-                return Double.parseDouble(s);
-            }catch (Exception ignored){}
-        }
-        return 0.0;
-    }
-
-    private int getCastInt(String tag, Map<String,String> stats){
-        String s = stats.get(tag);
-        if(s != null) {
-            try {
-                return Integer.parseInt(s);
-            }catch (Exception ignored){}
-        }
-        return 0;
     }
 }

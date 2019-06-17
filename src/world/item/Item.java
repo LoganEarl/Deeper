@@ -241,22 +241,33 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     /**
      * @return the name of the item, as it's unique identifier in the ItemStatTable. Not affected by the item having a display name
      */
-    public String getItemName(){
+    public final String getItemName(){
         return itemName;
     }
 
-    private void initStats(){
+    protected final void initStats(){
         if(itemStats == null)
             itemStats = ItemStatTable.getStatsForItem(itemName,databaseName);
+        itemStats.putAll(getDerivedStats());
     }
 
-    public String getItemDescription(){
+    protected abstract Map<String, String> getDerivedStats();
+
+    public final String getItemDescription(){
         initStats();
         String s = itemStats.get(ItemStatTable.ITEM_DESCRIPTION);
         return s == null? "":s;
     }
 
-    private double getCastDouble(String tag){
+    protected final String getCastString(String tag){
+        String s = itemStats.get(tag);
+        if(s != null) {
+            return s;
+        }
+        return "";
+    }
+
+    protected final double getCastDouble(String tag){
         String s = itemStats.get(tag);
         if(s != null) {
             try {
@@ -266,7 +277,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         return 0.0;
     }
 
-    private int getCastInt(String tag){
+    protected final int getCastInt(String tag){
         String s = itemStats.get(tag);
         if(s != null) {
             try {
@@ -276,37 +287,51 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         return 0;
     }
 
-    public double getWeight(){
+    protected final float getCastFloat(String tag){
+        String s = itemStats.get(tag);
+        if(s != null) {
+            try {
+                return Float.parseFloat(s);
+            }catch (Exception ignored){}
+        }
+        return 0;
+    }
+
+    public final double getWeight(){
         initStats();
         return getCastDouble(ItemStatTable.WEIGHT);
     }
 
-    public double getVolume(){
+    public final double getVolume(){
         initStats();
         return getCastDouble(ItemStatTable.VOLUME);
     }
 
-    public String getItemType(){
+    public final String getItemType(){
         initStats();
         String s = itemStats.get(ItemStatTable.ITEM_DESCRIPTION);
         return s == null? "":s;
     }
 
-    public int getLockNumber(){
+    public final int getLockNumber(){
         return lockNumber;
     }
 
-    public int getContainerID(){
+    public final int getContainerID(){
         return containerID;
     }
 
     /**
      * stores the item in the container with the given ID. NOTE!!!, this ignores any constraints that the container may have. Do not manually place items inside of containers with this method. Instead, use the tryStoreItem() of the container. This method will null out the entityID and the roomName of the item, to show the location of the item is dependant on that of the container it is stored in. Persists changes automatically
      */
-    public void setContainerID(int containerID){
+    public final void setContainerID(int containerID){
         this.containerID = containerID;
         this.roomName = "";
         updateInDatabase(databaseName);
+    }
+
+    public final String getDatabaseName(){
+        return databaseName;
     }
 
     @Override

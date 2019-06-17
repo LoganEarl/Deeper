@@ -25,7 +25,7 @@ public class ItemFactory {
             if (parsers.containsKey(type)) {
                 try {
                     return parsers.get(type).parseFromResultSet(resultSet, databaseName);
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     System.out.println("Unable to parse item of type " + type.toString());
                     e.printStackTrace();
                 }
@@ -39,8 +39,8 @@ public class ItemFactory {
             parsers.put(parser.getAssociatedType(),parser);
     }
 
-    interface ItemParser{
+    public interface ItemParser{
         ItemType getAssociatedType();
-        Item parseFromResultSet(ResultSet fromEntry, String databaseName) throws SQLException;
+        Item parseFromResultSet(ResultSet fromEntry, String databaseName) throws Exception;
     }
 }

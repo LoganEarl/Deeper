@@ -26,16 +26,6 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     /**The size of the item in Liters*/
     public static final String VOLUME = "volume";
 
-    public static final String ARMOR_STATS = "armorStats";
-
-    public static final String CONSUMABLE_STATS = "consumableStats";
-
-    public static final String CONTAINER_STATS = "containerStats";
-
-    public static final String WEAPON_STATS = "weaponStats";
-
-    public static final String MISC_STATS = "miscStats";
-
     /**The type of the item. Must be one of the TYPE_* constants defined in this class*/
     public static final String ITEM_TYPE = "itemType";
 
