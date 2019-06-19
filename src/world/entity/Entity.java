@@ -45,7 +45,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     private Entity(ResultSet readEntry, String databaseName) throws Exception {
         extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(readEntry));
         extenders.put(StatContainer.SIGNIFIER, new StatContainer(readEntry));
-        extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(readEntry));
+        extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(readEntry, this));
 
         entityID = readEntry.getString(ENTITY_ID);
         displayName = readEntry.getString(DISPLAY_NAME);

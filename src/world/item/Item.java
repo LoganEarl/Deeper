@@ -253,6 +253,8 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
 
     protected abstract Map<String, String> getDerivedStats();
 
+    public abstract ItemType getItemType();
+
     public final String getItemDescription(){
         initStats();
         String s = itemStats.get(ItemStatTable.ITEM_DESCRIPTION);
@@ -307,7 +309,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         return getCastDouble(ItemStatTable.VOLUME);
     }
 
-    public final String getItemType(){
+    public final String getDescription(){
         initStats();
         String s = itemStats.get(ItemStatTable.ITEM_DESCRIPTION);
         return s == null? "":s;
@@ -328,6 +330,10 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         this.containerID = containerID;
         this.roomName = "";
         updateInDatabase(databaseName);
+    }
+
+    public void setRoomName(String roomName){
+        this.roomName = roomName;
     }
 
     public int getItemID() {
