@@ -15,7 +15,7 @@ import static world.item.armor.ArmorSlot.*;
 public class EquipmentContainer implements Entity.SqlExtender {
     static final String SIGNIFIER = "items";
 
-    private Map<ArmorSlot,Integer> slots = new HashMap<>();
+    private Map<ArmorSlot, Integer> slots = new HashMap<>();
 
     private Entity entity;
 
@@ -23,46 +23,79 @@ public class EquipmentContainer implements Entity.SqlExtender {
 
     private static final List<ArmorSlot> SLOTS = Arrays.asList(head, chest, legs, feet, hands, leftHand, rightHand, back, beltPouch, beltUtil);
 
-    EquipmentContainer(){}
+    EquipmentContainer() {
+    }
 
-    EquipmentContainer(ResultSet readFrom, Entity entity) throws SQLException{
-        for(int i = 0; i < HEADERS.size(); i++){
-            slots.put(SLOTS.get(i),readFrom.getInt(HEADERS.get(i)));
+    EquipmentContainer(ResultSet readFrom, Entity entity) throws SQLException {
+        for (int i = 0; i < HEADERS.size(); i++) {
+            slots.put(SLOTS.get(i), readFrom.getInt(HEADERS.get(i)));
         }
 
         this.entity = entity;
     }
 
-    public int getEquipmentAC(){
+    public int getEquipmentAC() {
         int total = 0;
-        for(Integer i: slots.values()){
+        for (Integer i : slots.values()) {
             Item item;
-            if( i != null && (item = Item.getItemByID(i,entity.getDatabaseName())) != null){
-                if(item.getItemType() == ItemType.armor){
-                    total += ((Armor)item).getArmorClass();
+            if (i != null && (item = Item.getItemByID(i, entity.getDatabaseName())) != null) {
+                if (item.getItemType() == ItemType.armor) {
+                    total += ((Armor) item).getArmorClass();
                 }
             }
         }
         return total;
     }
 
+    public Item getEquippedItem(int itemID){
+        for(Integer slotItemID : slots.values()){
+            if(slotItemID != null && slotItemID.equals(itemID)){
+                Item equipped = Item.getItemByID(slotItemID, entity.getDatabaseName());
+                if(equipped != null)
+                    return equipped;
+            }
+        }
+        return null;
+    }
+
+    public Item getEquippedItem(String itemName){
+        for(Integer itemID : slots.values()){
+            if(itemID != null){
+                Item equipped = Item.getItemByID(itemID, entity.getDatabaseName());
+                if(equipped != null && equipped.getItemName().equals(itemName))
+                    return equipped;
+            }
+        }
+        return null;
+    }
+
+    public boolean hasItemEquipped(Item equipped) {
+        for (Integer itemID : slots.values())
+            if (itemID != null &&
+                    itemID.equals(equipped.getItemID()) &&
+                    entity.getDatabaseName().equals(equipped.getDatabaseName()))
+                return true;
+        return false;
+    }
+
     /**
      * equips the given piece of armor from either the left or right hand into the fitting slot. If there was already an item in that slot, it will be placed in the hand that equipped it
+     *
      * @param armorPiece the armor piece in either the left or right hand
      * @return true if item was equipped
      */
-    public boolean equipArmor(Armor armorPiece){
+    public boolean equipArmor(Armor armorPiece) {
         ArmorSlot sourceSlot = getSlotOfPiece(armorPiece);
         ArmorSlot slotType = armorPiece.getSlot();
         Integer curEquipID = slots.get(slotType);
 
-        if(sourceSlot == leftHand || sourceSlot == rightHand){
-            if(curEquipID != null) {
+        if (sourceSlot == leftHand || sourceSlot == rightHand) {
+            if (curEquipID != null) {
                 Item curEquip = Item.getItemByID(curEquipID, entity.getDatabaseName());
                 if (curEquip != null)
                     slots.put(sourceSlot, curEquipID);
             }
-            slots.put(slotType,armorPiece.getItemID());
+            slots.put(slotType, armorPiece.getItemID());
             return true;
         }
         return false;
@@ -70,35 +103,36 @@ public class EquipmentContainer implements Entity.SqlExtender {
 
     /**
      * unequipps the given piece of armor if equipped, and places it in a free hand
+     *
      * @param armorPiece the piece of armor to remove
      * @return the previously free hand if successful. null if not successful
      */
-    public ArmorSlot unequipArmor(Armor armorPiece){
+    public ArmorSlot unequipArmor(Armor armorPiece) {
         ArmorSlot freeHand = getFreeHand();
         ArmorSlot sourceSlot = getSlotOfPiece(armorPiece);
 
-        if(freeHand != null && sourceSlot != null){
-            slots.put(freeHand,armorPiece.getItemID());
+        if (freeHand != null && sourceSlot != null) {
+            slots.put(freeHand, armorPiece.getItemID());
             slots.remove(sourceSlot);
             return freeHand;
         }
         return null;
     }
 
-    private ArmorSlot getSlotOfPiece(Armor armorPiece){
-        for(ArmorSlot slot: slots.keySet()){
+    private ArmorSlot getSlotOfPiece(Armor armorPiece) {
+        for (ArmorSlot slot : slots.keySet()) {
             Integer equipped = slots.get(slot);
-            if(equipped != null && equipped.equals(armorPiece.getItemID())){
+            if (equipped != null && equipped.equals(armorPiece.getItemID())) {
                 return slot;
             }
         }
         return null;
     }
 
-    private ArmorSlot getFreeHand(){
-        if(slots.get(rightHand) == null)
+    private ArmorSlot getFreeHand() {
+        if (slots.get(rightHand) == null)
             return rightHand;
-        if(slots.get(leftHand) == null)
+        if (slots.get(leftHand) == null)
             return leftHand;
         return null;
     }
@@ -111,7 +145,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
     @Override
     public Object[] getInsertSqlValues() {
         List<Object> values = new ArrayList<>(10);
-        for(ArmorSlot slot: SLOTS)
+        for (ArmorSlot slot : SLOTS)
             values.add(slots.get(slot));
         return values.toArray(new Object[0]);
     }

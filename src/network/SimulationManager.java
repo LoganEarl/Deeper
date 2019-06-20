@@ -69,6 +69,7 @@ public class SimulationManager {
         messagePipeline.loadMessage(ClientCreateWorldMessage.class);
         messagePipeline.loadMessage(ClientViewWorldMessage.class);
         messagePipeline.loadMessage(ClientTransferEntityMessage.class);
+        messagePipeline.loadMessage(ClientLockContainerMessage.class);
 
 
         server.startServer();

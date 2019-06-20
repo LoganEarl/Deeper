@@ -294,6 +294,18 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         return this.raceID;
     }
 
+    public EquipmentContainer getEquipment(){
+        return (EquipmentContainer)extenders.get(EquipmentContainer.SIGNIFIER);
+    }
+
+    public PoolContainer getPools(){
+        return (PoolContainer) extenders.get(PoolContainer.SIGNIFIER);
+    }
+
+    public StatContainer getStats(){
+        return (StatContainer) extenders.get(StatContainer.SIGNIFIER);
+    }
+
     public static class EntityBuilder{
         private String entityID = "";
         private String displayName = "";

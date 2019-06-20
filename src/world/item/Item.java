@@ -1,6 +1,7 @@
 package world.item;
 
 import database.DatabaseManager;
+import world.entity.Entity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -83,6 +84,27 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         if(itemStats == null)
             throw new IllegalArgumentException("No stats exists for item name (" + itemName + ") in database (" + databaseName + ")");
         saveToDatabase(databaseName);
+    }
+
+    /**
+     * Will attempt to get an item as if the given entity was searching for it in the same room
+     * @param identifier either the item name or item id in an integer-parsable format
+     * @param sourceEntity the entity doing to \"searching\"
+     * @return either the Item or null if it could not be found
+     */
+    public static Item getFromEntityContext(String identifier, Entity sourceEntity){
+        Item rawItem;
+        try {
+            int itemID = Integer.parseInt(identifier);
+            rawItem = Item.getItemByID(itemID, sourceEntity.getDatabaseName());
+            if (rawItem == null)
+                rawItem = sourceEntity.getEquipment().getEquippedItem(itemID);
+        } catch (NumberFormatException e) {
+            rawItem = Item.getItemByNameRoom(identifier, sourceEntity.getRoomName(), sourceEntity.getDatabaseName());
+            if (rawItem == null)
+                rawItem = sourceEntity.getEquipment().getEquippedItem(identifier);
+        }
+        return rawItem;
     }
 
     /**

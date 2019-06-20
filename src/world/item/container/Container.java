@@ -2,6 +2,7 @@ package world.item.container;
 
 import world.item.Item;
 import world.item.ItemInstanceTable;
+import world.item.ItemType;
 
 import java.sql.ResultSet;
 import java.util.List;
@@ -29,6 +30,11 @@ public class Container extends Item {
         }catch (Exception e){
             state = ContainerState.unlocked;
         }
+    }
+
+    @Override
+    public ItemType getItemType() {
+        return ItemType.container;
     }
 
     @Override

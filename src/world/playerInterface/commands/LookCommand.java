@@ -5,6 +5,7 @@ import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.Race;
 import world.item.Item;
+import world.item.ItemType;
 import world.item.container.Container;
 import world.room.Room;
 
@@ -48,11 +49,49 @@ public class LookCommand extends EntityCommand {
 
         if(target == null || target.isEmpty())
             response = describeRoom();
-        else
+        else if(lookInto){
+            response = lookInContainer(target);
+        }else{
             response = "Not yet implemented";
+        }
+
         fromClient.sendMessage(response);
 
         complete = true;
+    }
+
+    private String lookInContainer(String target){
+        String response;
+        Item rawItem = Item.getFromEntityContext(target,getSourceEntity());
+        if(rawItem != null){
+            if(rawItem.getItemType() == ItemType.container && rawItem instanceof Container) {
+                Container container = (Container)rawItem;
+                response = readContainer(container);
+            }else{
+                response = "You peer closely at the " + rawItem.getDisplayableName() + ". It has no openings you can see.";
+            }
+        }else{
+            response = "You cannot find a " + target + " to look into";
+        }
+
+        return response;
+    }
+
+    private String readContainer(Container container){
+        if(container.getIsLocked()){
+            return "It is locked. You are unable to discover it's contents";
+        }else {
+            List<Item> storedItems = container.getStoredItems();
+            if(storedItems.size() == 0)
+                return "It is empty";
+            if(storedItems.size() == 1)
+                return "It contains a " + storedItems.get(0).getDisplayableName();
+            StringBuilder contents = new StringBuilder("The ");
+            contents.append(container.getDisplayableName()).append(" contains the following:\n");
+            for(Item i: storedItems)
+                contents.append(i.getDisplayableName()).append("\n");
+            return contents.toString();
+        }
     }
 
     private String describeRoom(){

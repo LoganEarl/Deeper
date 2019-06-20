@@ -217,7 +217,10 @@ public class World implements DatabaseManager.DatabaseEntry {
         if(newWorld != null) {
             List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
             tables.add(new ItemStatTable());
+
             tables.add(new ContainerStatTable());
+
+
             tables.add(new RoomTable());
             tables.add(new RaceTable());
             tables.add(new EntityTable());
