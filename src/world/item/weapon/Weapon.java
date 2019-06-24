@@ -28,15 +28,14 @@ public class Weapon extends Item {
         return WeaponStatTable.getStatsForWeapon(getItemName(),getDatabaseName());
     }
 
-    public int getStaminaUsage(){
+    public double getStaminaUsage(int str, int dex){
         double weight = super.getWeight();
-        //1 kg = 5
-        //5 kg = 25
+        double balance = getBalance();
+        double base = 5 + weight * 4;
+        double strengthReduction = 0.05 * str;
+        double balanceReduction = (50-dex)/100.0*balance*weight;
 
-        //~40dex, ~30str @ 1kg: 120 stam = 24 swings
-        //~40dex, ~30str @ 5kg: 120 stam = ~5 swings
-        //~30dex, ~40str @ 1kg: 70 stam  = 14 swings
-        //~30dex, ~40str & 5kg: 70 stam  = ~3 swings
+        return base - strengthReduction - balanceReduction;
     }
 
     public int rollDamage(int str, int dex, int intel, int wis){
@@ -55,12 +54,22 @@ public class Weapon extends Item {
 
     public int getMinBaseDamage(){
         initStats();
-        return getCastInt(WeaponStatTable.MIN_BASE_DAMAGE);
+        return getCastInt(MIN_BASE_DAMAGE);
     }
 
     public int getMaxBaseDamage(){
         initStats();
-        return getCastInt(WeaponStatTable.MAX_BASE_DAMAGE);
+        return getCastInt(MAX_BASE_DAMAGE);
+    }
+
+    public float getAttackSpeed(){
+        initStats();
+        return getCastFloat(ATTACK_SPEED);
+    }
+
+    public float getBalance(){
+        initStats();
+        return getCastFloat(BALANCE);
     }
 
     public float getStrScalar(){

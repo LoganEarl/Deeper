@@ -15,6 +15,8 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
     public static final String ITEM_NAME = ItemStatTable.ITEM_NAME;
     public static final String MIN_BASE_DAMAGE = "minBaseDmg";
     public static final String MAX_BASE_DAMAGE = "maxBaseDmg";
+    public static final String BALANCE = "balance";
+    public static final String ATTACK_SPEED = "attackSpeed";
     public static final String STR_SCALAR = "strScalar";
     public static final String DEX_SCALAR = "dexScalar";
     public static final String INT_SCALAR = "intScalar";
@@ -34,6 +36,8 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
         TABLE_DEFINITION.put(MIN_BASE_DAMAGE, "INT");
         TABLE_DEFINITION.put(MAX_BASE_DAMAGE, "INT");
+        TABLE_DEFINITION.put(BALANCE, "DECIMAL");
+        TABLE_DEFINITION.put(ATTACK_SPEED, "DECIMAL");
         TABLE_DEFINITION.put(STR_SCALAR, "DECIMAL");
         TABLE_DEFINITION.put(DEX_SCALAR, "DECIMAL");
         TABLE_DEFINITION.put(INT_SCALAR, "DECIMAL");
