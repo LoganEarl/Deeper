@@ -14,7 +14,8 @@ public class CommandExecutor {
         commandQueue = new LinkedList<>();
 
         for (Command c : toExecute) {
-            c.execute();
+            if(c.getStartTimestamp() <= System.currentTimeMillis())
+                c.execute();
             if (!c.isComplete())
                 continuingCommands.add(c);
         }
@@ -37,6 +38,9 @@ public class CommandExecutor {
         /**Called by the server thread when executing the command.*/
         void execute();
 
+        default long getStartTimestamp(){
+            return 0;
+        }
         /**
          * Called by the server thread after executing the command. Determines if the command was consumed by the last execute call.
          * If so, it will not be called again and removed from the command queue. If not, it will continue to be executed

@@ -1,6 +1,9 @@
 package world.entity;
 
+import client.Client;
+import client.commands.PromptCommand;
 import database.DatabaseManager;
+import network.CommandExecutor;
 import world.meta.World;
 import world.room.Room;
 
@@ -18,6 +21,8 @@ public class Entity implements DatabaseManager.DatabaseEntry {
     private String displayName;
 
     private LinkedHashMap<String, SqlExtender> extenders = new LinkedHashMap<>();
+
+    private long balanceRecoveryTimestamp = 0;
 
     private String controllerType;
     private String roomName;
@@ -306,6 +311,33 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         return (StatContainer) extenders.get(StatContainer.SIGNIFIER);
     }
 
+    /**
+     * gets if the entity is off cool-down and ready to act again
+     * @return true if ready to act
+     */
+    public boolean isBalanced(){
+        return System.currentTimeMillis() >= balanceRecoveryTimestamp;
+    }
+    /**
+     * puts the entity on cool-down, Allowing them to act once they have recovered their balance from an action
+     * @param waitMs how long they should remain imbalanced before recovering
+     */
+    public void setBalanceTime(long waitMs){
+        setBalanceTime(waitMs,null);
+    }
+
+    /**
+     * puts the entity on cool-down, Allowing them to act once they have recovered their balance from an action
+     * @param waitMs how long they should remain imbalanced before recovering
+     * @param attachedClient an optional client to notify once balance is restored
+     */
+    public void setBalanceTime(long waitMs, Client attachedClient){
+        balanceRecoveryTimestamp = System.currentTimeMillis() + waitMs;
+        if(attachedClient != null){
+            attachedClient.sendMessage("You recover your balance", balanceRecoveryTimestamp);
+        }
+    }
+
     public static class EntityBuilder{
         private String entityID = "";
         private String displayName = "";
@@ -444,7 +476,6 @@ public class Entity implements DatabaseManager.DatabaseEntry {
                 throw new IllegalArgumentException("Cannot assign a controller type that is not one of the EntityTable.CONTROLLER_TYPE_* constants");
             return this;
         }
-
     }
 
     interface SqlExtender{

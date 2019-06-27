@@ -136,6 +136,10 @@ public class Client {
         clientRegistry.sendMessage(message,this);
     }
 
+    public void sendMessage(String message, long messageTimestamp){
+        clientRegistry.sendMessage(message,messageTimestamp,this);
+    }
+
     public Account getAssociatedAccount() {
         return associatedAccount;
     }

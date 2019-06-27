@@ -35,6 +35,11 @@ public class SayCommand extends EntityCommand {
     }
 
     @Override
+    protected boolean requiresBalance() {
+        return false;
+    }
+
+    @Override
     public boolean entityCommandIsComplete() {
         return complete;
     }

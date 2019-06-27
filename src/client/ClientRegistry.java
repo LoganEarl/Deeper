@@ -90,6 +90,16 @@ public class ClientRegistry {
     /**
      * sends the given message in the form of a {@link PromptCommand} to all the given clients
      *
+     * @param message         the message to send
+     * @param clientAddresses the address(es) of the clients to receive the message
+     */
+    public void sendMessage(String message, long messageTimestamp, String... clientAddresses) {
+        commandExecutor.scheduleCommand(new PromptCommand(message, messageTimestamp, localServer, clientAddresses));
+    }
+
+    /**
+     * sends the given message in the form of a {@link PromptCommand} to all the given clients
+     *
      * @param message the message to send
      * @param clients the client(s) to receive the message
      */
@@ -98,6 +108,13 @@ public class ClientRegistry {
         for (int i = 0; i < clients.length; i++)
             addresses[i] = clients[i].getAddress();
         sendMessage(message, addresses);
+    }
+
+    public void sendMessage(String message, long sendTimestamp, Client... clients){
+        String[] addresses = new String[clients.length];
+        for (int i = 0; i < clients.length; i++)
+            addresses[i] = clients[i].getAddress();
+        sendMessage(message, sendTimestamp, addresses);
     }
 
     /**

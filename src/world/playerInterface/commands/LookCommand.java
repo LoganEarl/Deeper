@@ -60,6 +60,11 @@ public class LookCommand extends EntityCommand {
         complete = true;
     }
 
+    @Override
+    protected boolean requiresBalance() {
+        return true;
+    }
+
     private String lookInContainer(String target){
         String response;
         Item rawItem = Item.getFromEntityContext(target,getSourceEntity());

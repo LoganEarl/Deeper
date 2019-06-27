@@ -45,6 +45,11 @@ public class LockContainerCommand extends EntityCommand {
         complete = true;
     }
 
+    @Override
+    protected boolean requiresBalance() {
+        return true;
+    }
+
     private Container parseContainer(String identifier) {
         Item rawContainer = Item.getFromEntityContext(identifier, getSourceEntity());
 

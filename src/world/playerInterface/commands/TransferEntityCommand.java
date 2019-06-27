@@ -65,4 +65,9 @@ public class TransferEntityCommand extends EntityCommand {
         }
         complete = true;
     }
+
+    @Override
+    protected boolean requiresBalance() {
+        return true;
+    }
 }

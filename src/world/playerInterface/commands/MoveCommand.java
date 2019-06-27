@@ -36,6 +36,11 @@ public class MoveCommand extends EntityCommand {
     }
 
     @Override
+    protected boolean requiresBalance() {
+        return true;
+    }
+
+    @Override
     public boolean entityCommandIsComplete() {
         return complete;
     }
