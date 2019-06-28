@@ -59,6 +59,16 @@ public class StatContainer implements Entity.SqlExtender {
         }
     }
 
+    public double getWeightSoftLimit(){
+        //15 to 100 kg based on str
+        return strength/100.0 * 85 + 15;
+    }
+
+    public double getWeightHardLimit(){
+        //40 to 400 kg based on str
+        return strength/100.0 * 360 + 40;
+    }
+
     @Override
     public String getSignifier() {
         return SIGNIFIER;

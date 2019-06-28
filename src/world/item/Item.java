@@ -358,6 +358,10 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         this.roomName = roomName;
     }
 
+    public String getRoomName() {
+        return roomName;
+    }
+
     public int getItemID() {
         return itemID;
     }

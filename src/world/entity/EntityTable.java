@@ -57,7 +57,11 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
 
     public static final String SLOT_HAND_LEFT = "leftHand";
 
+    public static final String SLOT_SHEATH_LEFT = "leftHandSheath";
+
     public static final String SLOT_HAND_RIGHT = "rightHand";
+
+    public static final String SLOT_SHEATH_RIGHT = "rightHandSheath";
 
     public static final String SLOT_BACK = "slotBack";
 
@@ -104,7 +108,9 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(SLOT_FEET, "INT");
         TABLE_DEFINITION.put(SLOT_HANDS, "INT");
         TABLE_DEFINITION.put(SLOT_HAND_LEFT, "INT");
+        TABLE_DEFINITION.put(SLOT_SHEATH_LEFT, "INT");
         TABLE_DEFINITION.put(SLOT_HAND_RIGHT, "INT");
+        TABLE_DEFINITION.put(SLOT_SHEATH_RIGHT, "INT");
         TABLE_DEFINITION.put(SLOT_BACK, "INT");
         TABLE_DEFINITION.put(SLOT_BELT_POUCH, "INT");
         TABLE_DEFINITION.put(SLOT_BELT_UTIL, "INT");

@@ -19,9 +19,17 @@ public class EquipmentContainer implements Entity.SqlExtender {
 
     private Entity entity;
 
-    private static final List<String> HEADERS = Arrays.asList(SLOT_HEAD, SLOT_CHEST, SLOT_LEGS, SLOT_FEET, SLOT_HANDS, SLOT_HAND_LEFT, SLOT_HAND_RIGHT, SLOT_BACK, SLOT_BELT_POUCH, SLOT_BELT_UTIL);
+    private static final List<String> HEADERS = Arrays.asList(SLOT_HEAD, SLOT_CHEST, SLOT_LEGS, SLOT_FEET, SLOT_HANDS, SLOT_HAND_LEFT, SLOT_SHEATH_LEFT,  SLOT_HAND_RIGHT, SLOT_SHEATH_RIGHT, SLOT_BACK, SLOT_BELT_POUCH, SLOT_BELT_UTIL);
 
-    private static final List<ArmorSlot> SLOTS = Arrays.asList(head, chest, legs, feet, hands, leftHand, rightHand, back, beltPouch, beltUtil);
+    private static final List<ArmorSlot> SLOTS = Arrays.asList(head, chest, legs, feet, hands, leftHand, leftSheath, rightHand, rightSheath, back, beltPouch, beltUtil);
+
+    public static final int CODE_SUCCESS = 0;
+    public static final int CODE_CONTAINER_FULL = -1;
+    public static final int CODE_TOO_HEAVY = -2;
+    public static final int CODE_NOT_NEAR = -3;
+    public static final int CODE_NO_ITEM = -4;
+    public static final int CODE_WRONG_TYPE = -5;
+    public static final int CODE_ERROR = -100;
 
     EquipmentContainer() {
     }
@@ -42,6 +50,17 @@ public class EquipmentContainer implements Entity.SqlExtender {
                 if (item.getItemType() == ItemType.armor) {
                     total += ((Armor) item).getArmorClass();
                 }
+            }
+        }
+        return total;
+    }
+
+    public double getEquipmentWeight() {
+        double total = 0;
+        for (Integer i: slots.values()){
+            Item item;
+            if (i != null && (item = Item.getItemByID(i, entity.getDatabaseName())) != null) {
+                total += item.getWeight();
             }
         }
         return total;
@@ -85,7 +104,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
      * @return true if item was equipped
      */
     public boolean equipArmor(Armor armorPiece) {
-        ArmorSlot sourceSlot = getSlotOfPiece(armorPiece);
+        ArmorSlot sourceSlot = getSlotOfItem(armorPiece);
         ArmorSlot slotType = armorPiece.getSlot();
         Integer curEquipID = slots.get(slotType);
 
@@ -101,6 +120,79 @@ public class EquipmentContainer implements Entity.SqlExtender {
         return false;
     }
 
+    public boolean holdItem(Item toHold){
+        if(canHoldItem(toHold) != CODE_SUCCESS)
+            return false;
+
+        ArmorSlot freeHand = getFreeHand();
+        slots.put(freeHand, toHold.getItemID());
+        toHold.setRoomName("");
+        return true;
+    }
+
+    public boolean dropItem(Item toDrop){
+        if(!hasItemEquipped(toDrop))
+            return false;
+        ArmorSlot holdingSlot = getSlotOfItem(toDrop);
+        if(holdingSlot == rightHand || holdingSlot == leftHand){
+            slots.remove(holdingSlot);
+            toDrop.setRoomName(entity.getRoomName());
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasFreeHand(){
+        return getFreeHand() != null;
+    }
+
+    public boolean isEncumbered(){
+        return entity.getStats().getWeightSoftLimit() < getEquipmentWeight();
+    }
+
+    /**
+     * will stow the weapon in the given hand slot into its sheath/holster slot
+     * @param handSlot wither ArmorSlot.rightHand or ArmorSlot.leftHand
+     * @return one of the CODE_* constants. {@link #CODE_SUCCESS} if successful
+     */
+    public int stowWeapon(ArmorSlot handSlot){
+        if(handSlot != leftHand && handSlot != rightHand)
+            return CODE_ERROR;
+
+        Integer handID = slots.get(leftHand);
+        if(handID == null)
+            return CODE_NO_ITEM;
+
+        if(slots.get(leftSheath) != null)
+            return CODE_CONTAINER_FULL;
+
+        Item leftWeapon = Item.getItemByID(handID,entity.getDatabaseName());
+        if(leftWeapon == null)
+            return CODE_NO_ITEM;
+        if(leftWeapon.getItemType() != ItemType.weapon)
+            return CODE_WRONG_TYPE;
+
+        slots.put(rightSheath,leftWeapon.getItemID());
+        slots.remove(rightHand);
+        return CODE_SUCCESS;
+    }
+
+    /**
+     * determines if it is possible to hold the given item in a free hand
+     * @param toHold the item to hold
+     * @return one of teh CODE_* constants. CODE_SUCCESS if able to hold
+     */
+    public int canHoldItem(Item toHold){
+        if(!hasFreeHand())
+            return CODE_CONTAINER_FULL;
+        if(toHold.getWeight() + getEquipmentWeight() > entity.getStats().getWeightHardLimit())
+            return CODE_TOO_HEAVY;
+        if(!toHold.getRoomName().equals(entity.getRoomName())){
+            return CODE_NOT_NEAR;
+        }
+        return CODE_SUCCESS;
+    }
+
     /**
      * unequipps the given piece of armor if equipped, and places it in a free hand
      *
@@ -109,7 +201,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
      */
     public ArmorSlot unequipArmor(Armor armorPiece) {
         ArmorSlot freeHand = getFreeHand();
-        ArmorSlot sourceSlot = getSlotOfPiece(armorPiece);
+        ArmorSlot sourceSlot = getSlotOfItem(armorPiece);
 
         if (freeHand != null && sourceSlot != null) {
             slots.put(freeHand, armorPiece.getItemID());
@@ -119,10 +211,10 @@ public class EquipmentContainer implements Entity.SqlExtender {
         return null;
     }
 
-    private ArmorSlot getSlotOfPiece(Armor armorPiece) {
+    private ArmorSlot getSlotOfItem(Item item) {
         for (ArmorSlot slot : slots.keySet()) {
             Integer equipped = slots.get(slot);
-            if (equipped != null && equipped.equals(armorPiece.getItemID())) {
+            if (equipped != null && equipped.equals(item.getItemID())) {
                 return slot;
             }
         }
