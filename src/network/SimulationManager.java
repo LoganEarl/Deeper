@@ -5,6 +5,11 @@ import client.ClientRegistry;
 import client.messages.*;
 import database.DatabaseManager;
 import network.messaging.MessagePipeline;
+import world.item.Item;
+import world.item.ItemFactory;
+import world.item.container.Container;
+import world.item.misc.MiscItem;
+import world.item.weapon.Weapon;
 import world.meta.World;
 import world.playerInterface.messages.*;
 
@@ -70,7 +75,16 @@ public class SimulationManager {
         messagePipeline.loadMessage(ClientViewWorldMessage.class);
         messagePipeline.loadMessage(ClientTransferEntityMessage.class);
         messagePipeline.loadMessage(ClientLockContainerMessage.class);
+        messagePipeline.loadMessage(ClientUnlockContainerMessage.class);
 
+        messagePipeline.loadMessage(ClientDropMessage.class);
+        messagePipeline.loadMessage(ClientGrabMessage.class);
+        messagePipeline.loadMessage(ClientPutMessage.class);
+
+        ItemFactory factory = ItemFactory.getInstance();
+        factory.addParser(Weapon.factory());
+        factory.addParser(MiscItem.factory());
+        factory.addParser(Container.factory());
 
         server.startServer();
     }

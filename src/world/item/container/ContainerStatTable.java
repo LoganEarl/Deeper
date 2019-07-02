@@ -23,8 +23,6 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     public static final int CODE_NOT_USED = -1;
     /**The name of the container*/
     public static final String ITEM_NAME = ItemStatTable.ITEM_NAME;
-    /**The description of the container*/
-    public static final String CONTAINER_DESCRIPTION = "containerDescription";
     /**The maximum storage potential of the container in KGs*/
     public static final String MAX_KGS = "maxKgs";
     /**The maximum storage potential of the container in Liters*/
@@ -43,7 +41,6 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
 
     public ContainerStatTable(){
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
-        TABLE_DEFINITION.put(CONTAINER_DESCRIPTION, "TEXT");
         TABLE_DEFINITION.put(MAX_KGS,"DECIMAL");
         TABLE_DEFINITION.put(MAX_LITERS,"DECIMAL");
         TABLE_DEFINITION.put(MAX_NUMBER,"INT");

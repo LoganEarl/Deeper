@@ -44,7 +44,7 @@ public class ClientHelpMessage extends ClientMessage {
                 "   help ([command]) indicates that you can either type 'help', 'help go', 'help look' or on any other command\n" +
                 "   login [username] [password] indicates that you must type the word 'login' every time, but your username and password\n" +
                 "       change and are up to your discretion. You must however, type something in for both for the command to work\n" +
-                "   look ({in/at} [item/container close by]) indicates that you must type 'look'. You may or may not decide to continue.\n" +
+                "   look ({in/at} [item or container name close by]) indicates that you must type 'look'. You may or may not decide to continue.\n" +
                 "       If you do, the format must be 'look' followed by either 'in' or 'at' followed by either an item or a container you\n" +
                 "       are close to. 'look', 'look at Joe' 'look in box' are all examples of this format";
     }

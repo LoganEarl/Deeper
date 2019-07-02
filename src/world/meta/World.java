@@ -8,7 +8,12 @@ import world.entity.Race;
 import world.entity.RaceTable;
 import world.item.ItemInstanceTable;
 import world.item.ItemStatTable;
+import world.item.ammo.AmmoStatTable;
+import world.item.armor.ArmorStatTable;
+import world.item.consumable.ConsumableStatTable;
 import world.item.container.ContainerStatTable;
+import world.item.misc.MiscItemStatTable;
+import world.item.weapon.WeaponStatTable;
 import world.room.RoomTable;
 import world.story.DialogTable;
 import world.story.EntityDialogTable;
@@ -125,6 +130,12 @@ public class World implements DatabaseManager.DatabaseEntry {
         List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
         tables.add(new ItemStatTable());
         tables.add(new ContainerStatTable());
+        tables.add(new ArmorStatTable());
+        tables.add(new ConsumableStatTable());
+        //tables.add(new MiscItemStatTable());
+        //tables.add(new AmmoStatTable());
+        tables.add(new WeaponStatTable());
+
         tables.add(new RoomTable());
         tables.add(new RaceTable());
         tables.add(new EntityTable());

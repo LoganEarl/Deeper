@@ -62,7 +62,7 @@ public class LookCommand extends EntityCommand {
 
     @Override
     protected boolean requiresBalance() {
-        return true;
+        return lookInto;
     }
 
     private String lookInContainer(String target){

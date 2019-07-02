@@ -89,7 +89,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     /**
      * Will attempt to get an item as if the given entity was searching for it in the same room
      * @param identifier either the item name or item id in an integer-parsable format
-     * @param sourceEntity the entity doing to \"searching\"
+     * @param sourceEntity the entity doing the \"searching\"
      * @return either the Item or null if it could not be found
      */
     public static Item getFromEntityContext(String identifier, Entity sourceEntity){
@@ -321,7 +321,11 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         return 0;
     }
 
-    public final double getWeight(){
+    public double getWeight(){
+        return getIntrinsicWeight();
+    }
+
+    public final double getIntrinsicWeight(){
         initStats();
         return getCastDouble(ItemStatTable.WEIGHT);
     }

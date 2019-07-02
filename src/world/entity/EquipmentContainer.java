@@ -66,6 +66,12 @@ public class EquipmentContainer implements Entity.SqlExtender {
         return total;
     }
 
+    public Item getEquippedItem(ArmorSlot selectedSlot){
+        Integer itemID = slots.get(selectedSlot);
+        if(itemID == null) return null;
+        return Item.getItemByID(itemID, entity.getDatabaseName());
+    }
+
     public Item getEquippedItem(int itemID){
         for(Integer slotItemID : slots.values()){
             if(slotItemID != null && slotItemID.equals(itemID)){
@@ -120,26 +126,32 @@ public class EquipmentContainer implements Entity.SqlExtender {
         return false;
     }
 
-    public boolean holdItem(Item toHold){
-        if(canHoldItem(toHold) != CODE_SUCCESS)
-            return false;
+    public int holdItem(Item toHold){
+        int holdCode;
+        if((holdCode = canHoldItem(toHold)) != CODE_SUCCESS)
+            return holdCode;
 
         ArmorSlot freeHand = getFreeHand();
         slots.put(freeHand, toHold.getItemID());
         toHold.setRoomName("");
-        return true;
+        return CODE_SUCCESS;
     }
 
-    public boolean dropItem(Item toDrop){
+    public int dropItem(Item toDrop){
         if(!hasItemEquipped(toDrop))
-            return false;
+            return CODE_NO_ITEM;
         ArmorSlot holdingSlot = getSlotOfItem(toDrop);
         if(holdingSlot == rightHand || holdingSlot == leftHand){
             slots.remove(holdingSlot);
             toDrop.setRoomName(entity.getRoomName());
-            return true;
+            return CODE_SUCCESS;
         }
-        return false;
+        return CODE_ERROR;
+    }
+
+    public boolean isHoldingItem(Item item){
+        ArmorSlot holdingSlot = getSlotOfItem(item);
+        return (holdingSlot == rightHand || holdingSlot == leftHand);
     }
 
     public boolean hasFreeHand(){
