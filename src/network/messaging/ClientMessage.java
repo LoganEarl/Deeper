@@ -14,7 +14,7 @@ public abstract class ClientMessage {
     private ClientRegistry hostRegistry;
     private MessagePipeline messagePipeline;
 
-    protected ClientMessage(@Nullable String messageSignifier,
+    public ClientMessage(@Nullable String messageSignifier,
                             @Nullable Client sourceClient,
                             @Nullable CommandExecutor executor,
                             @Nullable ClientRegistry registry,

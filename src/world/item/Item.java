@@ -23,14 +23,14 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
             TABLE_NAME, ITEM_ID);
     private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=? WHERE %s=?",
             TABLE_NAME, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, ITEM_ID);
-    private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",
-            TABLE_NAME, ITEM_ID);
-    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE (%s=? AND %s=? AND %s IS NULL)",
-            TABLE_NAME, ITEM_NAME, ROOM_NAME,  CONTAINER_ID);
-    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE (%s=? AND %s IS NULL)",
-            TABLE_NAME, ROOM_NAME, CONTAINER_ID);
-    private static final String GET_OF_CONTAINER_ID_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?",
-            ItemInstanceTable.TABLE_NAME, CONTAINER_ID);
+    private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE %s=?",
+            TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, ITEM_ID);
+    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE ((%s.%s=? OR %s=?) AND %s=?)",
+            TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, TABLE_NAME,ITEM_NAME,DISPLAY_NAME, ROOM_NAME);
+    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE (%s=?)",
+            TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, ROOM_NAME);
+    private static final String GET_OF_CONTAINER_ID_SQL = String.format(Locale.US, "SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE %s=?",
+            TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, CONTAINER_ID);
 
     private int itemID;
     private String roomName;
@@ -124,7 +124,8 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
             try {
                 getSQL = c.prepareStatement(GET_NAME_SQL);
                 getSQL.setString(1,itemName);
-                getSQL.setString(2,roomName);
+                getSQL.setString(2,itemName);
+                getSQL.setString(3,roomName);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next()) {
                     toReturn = ItemFactory.getInstance().parseFromResultSet(accountSet,databaseName);
@@ -270,7 +271,9 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     protected final void initStats(){
         if(itemStats == null)
             itemStats = ItemStatTable.getStatsForItem(itemName,databaseName);
-        itemStats.putAll(getDerivedStats());
+        Map<String,String> derived = getDerivedStats();
+        if(derived != null)
+            itemStats.putAll(getDerivedStats());
     }
 
     protected abstract Map<String, String> getDerivedStats();

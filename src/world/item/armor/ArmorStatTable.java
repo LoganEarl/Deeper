@@ -31,7 +31,7 @@ public class ArmorStatTable implements DatabaseManager.DatabaseTable {
     private static final Set<String> CONSTRAINTS = new HashSet<>(1);
 
     public ArmorStatTable(){
-        TABLE_DEFINITION.put(ITEM_NAME,"VARCHAR(32) PRIMARY KEY NOT NULL");
+        TABLE_DEFINITION.put(ITEM_NAME,"VARCHAR(32) PRIMARY KEY NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(ARMOR_CLASS,"INT");
 
         TABLE_DEFINITION.put(PIERCE_DEFENCE, "DECIMAL");

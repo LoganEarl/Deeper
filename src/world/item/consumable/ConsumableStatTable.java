@@ -29,7 +29,7 @@ public class ConsumableStatTable implements  DatabaseManager.DatabaseTable {
     private static final Set<String> CONSTRAINTS = new HashSet<>(1);
 
     public ConsumableStatTable(){
-        TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
+        TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL COLLATE NOCASE");
 
         TABLE_DEFINITION.put(EFFECT_DURATION_MILLIS, "INT");
         TABLE_DEFINITION.put(HP_GAIN, "INT");

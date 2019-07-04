@@ -50,9 +50,11 @@ public class GrabDropCommand extends EntityCommand {
         else if(containerIdentifier.isEmpty()){
             //drop it to the floor
             int result = getSourceEntity().getEquipment().dropItem(toPutIn);
-            if(result == CODE_SUCCESS)
+            if(result == CODE_SUCCESS) {
                 getSourceClient().sendMessage("You drop the " + toPutIn.getDisplayableName());
-            else if(result == CODE_NO_ITEM)
+                toPutIn.updateInDatabase(toPutIn.getDatabaseName());
+                getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
+            }else if(result == CODE_NO_ITEM)
                 getSourceClient().sendMessage("You are not holding a " + itemIdentifier);
             else
                 getSourceClient().sendMessage("An error has occurred. You are unable to drop a " + itemIdentifier + " (" + result + ")");
@@ -73,6 +75,9 @@ public class GrabDropCommand extends EntityCommand {
                     getSourceClient().sendMessage("You put the " +
                             toPutIn.getDisplayableName() + " in the " +
                             container.getDisplayableName());
+                    toPutIn.updateInDatabase(toPutIn.getDatabaseName());
+                    container.updateInDatabase(container.getDatabaseName());
+                    getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
                 }else
                     getSourceClient().sendMessage("You are unable to put the " +
                             toPutIn.getDisplayableName() + " in the " +
@@ -114,9 +119,12 @@ public class GrabDropCommand extends EntityCommand {
             }
 
             if(proceed) {
+                getSourceEntity().getEquipment().holdItem(toPickUp);
                 toPickUp.setContainerID(0);
                 toPickUp.setRoomName("");
-                getSourceEntity().getEquipment().holdItem(toPickUp);
+                getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
+                toPickUp.updateInDatabase(toPickUp.getDatabaseName());
+
                 getSourceClient().sendMessage("You pick up the " + toPickUp.getDisplayableName());
             }
         }

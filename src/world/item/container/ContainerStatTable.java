@@ -40,7 +40,7 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);
 
     public ContainerStatTable(){
-        TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
+        TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(MAX_KGS,"DECIMAL");
         TABLE_DEFINITION.put(MAX_LITERS,"DECIMAL");
         TABLE_DEFINITION.put(MAX_NUMBER,"INT");

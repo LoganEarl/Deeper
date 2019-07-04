@@ -33,7 +33,7 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
     private static final Set<String> CONSTRAINTS = new HashSet<>(1);
 
     public WeaponStatTable(){
-        TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
+        TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(MIN_BASE_DAMAGE, "INT");
         TABLE_DEFINITION.put(MAX_BASE_DAMAGE, "INT");
         TABLE_DEFINITION.put(BALANCE, "DECIMAL");

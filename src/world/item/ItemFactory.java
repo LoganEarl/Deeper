@@ -23,7 +23,9 @@ public class ItemFactory {
             ItemType type = ItemType.extractFromResultSet(resultSet);
             if (parsers.containsKey(type)) {
                 try {
-                    return parsers.get(type).parseFromResultSet(resultSet, databaseName);
+                    Item i = parsers.get(type).parseFromResultSet(resultSet, databaseName);
+                    i.initStats();
+                    return i;
                 } catch (Exception e) {
                     System.out.println("Unable to parse item of type " + type.toString());
                     e.printStackTrace();

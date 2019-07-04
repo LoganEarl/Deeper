@@ -37,7 +37,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     public static final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public ItemStatTable(){
-        TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL");
+        TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(ITEM_DESCRIPTION, "TEXT");
         TABLE_DEFINITION.put(WEIGHT,"DECIMAL");
         TABLE_DEFINITION.put(VOLUME,"DECIMAL");

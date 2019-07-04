@@ -3,9 +3,7 @@ package world.playerInterface.commands;
 import client.Client;
 import world.entity.Entity;
 import world.item.Item;
-import world.item.ItemType;
 import world.item.armor.ArmorSlot;
-import world.item.container.Container;
 
 import java.util.Locale;
 
@@ -35,11 +33,11 @@ public class InventoryCommand extends EntityCommand {
     }
 
     private String getEntityDescription(){
-        ArmorSlot[] loopOrder = {rightHand,rightSheath,leftHand,leftSheath,head,chest,legs,feet,hands,beltPouch,beltUtil};
+        ArmorSlot[] loopOrder = {rightHand,leftHand,rightSheath,leftSheath,head,chest,legs,feet,hands,beltPouch,beltUtil};
         Entity entity = getSourceEntity();
 
         StringBuilder desc = new StringBuilder(
-                String.format(Locale.US, "%s ths %s\n", entity.getDisplayName(), entity.getRace().getDisplayName()));
+                String.format(Locale.US, "%s the %s\n", entity.getDisplayName(), entity.getRace().getDisplayName()));
 
         for(ArmorSlot slot: loopOrder){
             String itemName;

@@ -34,8 +34,8 @@ public class RoomTable implements DatabaseManager.DatabaseTable {
     public final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
     public RoomTable(){
-        TABLE_DEFINITION.put(ROOM_NAME,"VARCHAR(32) PRIMARY KEY NOT NULL");
-        TABLE_DEFINITION.put(ROOM_DESCRIPTION,"TEXT");
+        TABLE_DEFINITION.put(ROOM_NAME,"VARCHAR(32) PRIMARY KEY NOT NULL COLLATE NOCASE");
+        TABLE_DEFINITION.put(ROOM_DESCRIPTION,"TEXT COLLATE NOCASE");
         TABLE_DEFINITION.put(ROOM_VISIBILITY,"INT NOT NULL");
         TABLE_DEFINITION.put(ROOM_UP_NAME,"TEXT");
         TABLE_DEFINITION.put(ROOM_DOWN_NAME,"TEXT");

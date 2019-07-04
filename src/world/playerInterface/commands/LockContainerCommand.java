@@ -37,6 +37,7 @@ public class LockContainerCommand extends EntityCommand {
                 getSourceClient().sendMessage("You cannot seem to fit the " + targetKey.getDisplayableName() + " into the lock");
             else if(targetContainer.setLockedWithItem(targetKey,desiredLockState)){
                 getSourceClient().sendMessage("You slide the " + targetKey.getDisplayableName() + " into the lock and it " + lock + "s with a turn and a click");
+
             }else{
                 getSourceClient().sendMessage("You are unable to " + lock + " the " + targetContainer.getDisplayableName());
             }
