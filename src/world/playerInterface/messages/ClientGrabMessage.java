@@ -8,7 +8,7 @@ import network.messaging.MessagePipeline;
 import world.playerInterface.commands.GrabDropCommand;
 
 public class ClientGrabMessage extends ClientMessage {
-    public static final String HEADER = "grab";
+    public static final String HEADER = "take";
 
     private String itemID = "";
     private String fromContainer = "";

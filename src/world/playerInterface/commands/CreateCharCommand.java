@@ -164,7 +164,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
             if(newMessageArgs == null){
                 registry.sendMessage("Please choose a race from the following...\n\n" +
                         Race.getPlayableRaceDescriptions(),sourceClient);
-            }else if(newMessageArgs.length == 1 && (selectedRace = Race.getFromID(newMessageArgs[0])) != null){
+            }else if(newMessageArgs.length == 1 && (selectedRace = Race.getFromID(newMessageArgs[0],World.getHubWorld().getDatabaseName())) != null){
                 stage = STAGE_STATS;
                 newMessageArgs = null;
             }else{

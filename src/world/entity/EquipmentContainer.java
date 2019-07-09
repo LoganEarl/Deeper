@@ -132,9 +132,9 @@ public class EquipmentContainer implements Entity.SqlExtender {
         return false;
     }
 
-    public int holdItem(Item toHold){
+    public int holdItem(Item toHold, boolean overrideNearness){
         int holdCode;
-        if((holdCode = canHoldItem(toHold)) != CODE_SUCCESS)
+        if((holdCode = canHoldItem(toHold, overrideNearness)) != CODE_SUCCESS)
             return holdCode;
 
         ArmorSlot freeHand = getFreeHand();
@@ -200,12 +200,12 @@ public class EquipmentContainer implements Entity.SqlExtender {
      * @param toHold the item to hold
      * @return one of teh CODE_* constants. CODE_SUCCESS if able to hold
      */
-    public int canHoldItem(Item toHold){
+    public int canHoldItem(Item toHold, boolean overrideNearness){
         if(!hasFreeHand())
             return CODE_CONTAINER_FULL;
         if(toHold.getWeight() + getEquipmentWeight() > entity.getStats().getWeightHardLimit())
             return CODE_TOO_HEAVY;
-        if(!toHold.getRoomName().equals(entity.getRoomName())){
+        if(!toHold.getRoomName().equals(entity.getRoomName()) && !overrideNearness){
             return CODE_NOT_NEAR;
         }
         return CODE_SUCCESS;
@@ -229,7 +229,30 @@ public class EquipmentContainer implements Entity.SqlExtender {
         return null;
     }
 
-    private ArmorSlot getSlotOfItem(Item item) {
+    /**
+     * This will put the given item in the given slot. Ignores traditional constraints. If the slot is occupied, will attempt to put the
+     * item in a free hand. Failing that, it will be dropped to the floor
+     * @param toPut the item to put in the slot
+     * @param where the slot to put the item in
+     */
+    public void forcePutItemInSlot(Item toPut, ArmorSlot where){
+        Integer existingItem = slots.get(where);
+        if(existingItem != null && existingItem != 0){
+            ArmorSlot freeHand = getFreeHand();
+            if(freeHand == null){
+                Item heldItem = Item.getItemByID(existingItem,entity.getDatabaseName());
+                if(heldItem != null) {
+                    heldItem.setRoomName(entity.getRoomName());
+                    heldItem.saveToDatabase(heldItem.getDatabaseName());
+                }
+            }else{
+                slots.put(freeHand,existingItem);
+            }
+        }
+        slots.put(where, toPut.getItemID());
+    }
+
+    public ArmorSlot getSlotOfItem(Item item) {
         for (ArmorSlot slot : slots.keySet()) {
             Integer equipped = slots.get(slot);
             if (!empty(equipped) && equipped.equals(item.getItemID())) {

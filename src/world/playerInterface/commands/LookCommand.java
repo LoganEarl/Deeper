@@ -40,11 +40,6 @@ public class LookCommand extends EntityCommand {
 
     @Override
     public void executeEntityCommand() {
-        if(getSourceEntity() == null){
-            complete = true;
-            System.out.println("Failed to execute a look command for a null entity");
-        }
-
         String response;
 
         if(target == null || target.isEmpty())

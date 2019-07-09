@@ -4,6 +4,7 @@ import client.Client;
 import world.entity.EquipmentContainer;
 import world.item.Item;
 import world.item.ItemType;
+import world.item.armor.ArmorSlot;
 import world.item.container.Container;
 
 import static world.entity.EquipmentContainer.*;
@@ -44,7 +45,7 @@ public class GrabDropCommand extends EntityCommand {
 
     private void putIn(){
         Item toPutIn = Item.getFromEntityContext(itemIdentifier,getSourceEntity());
-
+//TODO remove the key or item from player inventory too
         if(toPutIn == null || !getSourceEntity().getEquipment().isHoldingItem(toPutIn))
             getSourceClient().sendMessage("You are not holding a " + itemIdentifier);
         else if(containerIdentifier.isEmpty()){
@@ -69,30 +70,54 @@ public class GrabDropCommand extends EntityCommand {
                 getSourceClient().sendMessage("You attempt to " + toPutIn.getDisplayableName() + " inside of itself. You fail. Honestly what did you expect?");
             else{
                 Container container = (Container) toStoreIn;
-                if(!container.canHoldItem(toPutIn))
-                    getSourceClient().sendMessage("The " + container.getDisplayableName() + " cannot hold that item");
-                else if(container.tryStoreItem(toPutIn)){
-                    getSourceClient().sendMessage("You put the " +
-                            toPutIn.getDisplayableName() + " in the " +
-                            container.getDisplayableName());
-                    toPutIn.updateInDatabase(toPutIn.getDatabaseName());
-                    container.updateInDatabase(container.getDatabaseName());
-                    getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
-                }else
-                    getSourceClient().sendMessage("You are unable to put the " +
-                            toPutIn.getDisplayableName() + " in the " +
-                            container.getDisplayableName());
+                ArmorSlot returnSlot = getSourceEntity().getEquipment().getSlotOfItem(toPutIn);
+                int result = getSourceEntity().getEquipment().dropItem(toPutIn);
+                if(result == CODE_SUCCESS) {
+                    if (!container.canHoldItem(toPutIn)) {
+                        getSourceClient().sendMessage("The " + container.getDisplayableName() + " cannot hold that item");
+
+                        getSourceEntity().getEquipment().forcePutItemInSlot(toPutIn,returnSlot);
+                    }else if (container.tryStoreItem(toPutIn)) {
+                        getSourceClient().sendMessage("You put the " +
+                                toPutIn.getDisplayableName() + " in the " +
+                                container.getDisplayableName());
+                        toPutIn.updateInDatabase(toPutIn.getDatabaseName());
+                        container.updateInDatabase(container.getDatabaseName());
+                        getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
+                    } else {
+                        getSourceClient().sendMessage("You are unable to put the " +
+                                toPutIn.getDisplayableName() + " in the " +
+                                container.getDisplayableName());
+
+                        getSourceEntity().getEquipment().forcePutItemInSlot(toPutIn,returnSlot);
+                    }
+                }else{
+                    getSourceClient().sendMessage("You are unable to release the " + toPutIn.getDisplayableName());
+                }
             }
         }
     }
 
+    private Container getLocalContainer(String identifier){
+        Item container = Item.getFromEntityContext(identifier, getSourceEntity());
+        if(container != null && container.getItemType() == ItemType.container)
+            return (Container) container;
+        return null;
+    }
+
     private void pickUp(){
         Item toPickUp = Item.getFromEntityContext(itemIdentifier,getSourceEntity());
+        Container pickupFrom = null;
+        if(toPickUp == null && !containerIdentifier.isEmpty() &&
+                (pickupFrom = getLocalContainer(containerIdentifier)) != null) {
+            toPickUp = pickupFrom.getContainedItem(itemIdentifier);
+        }
+
         int holdCode;
 
         if(toPickUp == null)
             getSourceClient().sendMessage("There is no " + itemIdentifier + " nearby");
-        else if((holdCode = getSourceEntity().getEquipment().canHoldItem(toPickUp)) != EquipmentContainer.CODE_SUCCESS){
+        else if((holdCode = getSourceEntity().getEquipment().canHoldItem(toPickUp, pickupFrom != null)) != EquipmentContainer.CODE_SUCCESS){
             if(holdCode == CODE_CONTAINER_FULL)
                 getSourceClient().sendMessage("Your hands are full. You cannot pick up the " + toPickUp.getDisplayableName());
             else if(holdCode == CODE_TOO_HEAVY)
@@ -104,12 +129,9 @@ public class GrabDropCommand extends EntityCommand {
         }else{
             boolean proceed = false;
             if(!containerIdentifier.isEmpty()){
-                Item pickupFrom = Item.getFromEntityContext(containerIdentifier, getSourceEntity());
                 if(pickupFrom == null)
                     getSourceClient().sendMessage("There is no " + containerIdentifier + " nearby");
-                else if(pickupFrom.getItemType() != ItemType.container)
-                    getSourceClient().sendMessage("The " + pickupFrom.getDisplayableName() + " is not a container. It cannot hold items in it");
-                else if(!((Container)pickupFrom).containsItem(toPickUp))
+                else if(!(pickupFrom).containsItem(toPickUp))
                     getSourceClient().sendMessage("The " + pickupFrom.getDisplayableName() + " does not contain a " + toPickUp.getDisplayableName());
                 else {
                     proceed = true;
@@ -119,7 +141,7 @@ public class GrabDropCommand extends EntityCommand {
             }
 
             if(proceed) {
-                getSourceEntity().getEquipment().holdItem(toPickUp);
+                getSourceEntity().getEquipment().holdItem(toPickUp, pickupFrom != null);
                 toPickUp.setContainerID(0);
                 toPickUp.setRoomName("");
                 getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());

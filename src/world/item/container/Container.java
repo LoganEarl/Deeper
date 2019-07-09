@@ -1,10 +1,6 @@
 package world.item.container;
 
-import world.item.Item;
-import world.item.ItemFactory;
-import world.item.ItemInstanceTable;
-import world.item.ItemType;
-import world.item.misc.MiscItem;
+import world.item.*;
 
 import java.sql.ResultSet;
 import java.util.List;
@@ -19,9 +15,8 @@ import java.util.Map;
  * @author Logan Earl
  */
 public class Container extends Item {
-    private ContainerState state;
 
-    public enum ContainerState {
+    public enum ContainerState implements Item.ItemState {
         locked, unlocked
     }
 
@@ -29,9 +24,9 @@ public class Container extends Item {
         super(entry, databaseName);
 
         try {
-            state = ContainerState.valueOf(entry.getString(ItemInstanceTable.STATE));
+            setState(ContainerState.valueOf(entry.getString(ItemInstanceTable.STATE)));
         } catch (Exception e) {
-            state = ContainerState.unlocked;
+            setState(ContainerState.unlocked);
         }
     }
 
@@ -62,8 +57,21 @@ public class Container extends Item {
         return false;
     }
 
+    public Item getContainedItem(String identifier) {
+        if (identifier == null)
+            return null;
+        identifier = identifier.toLowerCase();
+        for (Item i : getStoredItems()) {
+            if (identifier.equals(i.getDisplayableName().toLowerCase()) ||
+                    identifier.equals(String.valueOf(i.getItemID()).toLowerCase()) ||
+                    identifier.equals(i.getItemName().toLowerCase()))
+                return i;
+        }
+        return null;
+    }
+
     public boolean getIsLocked() {
-        return this.state == ContainerState.locked;
+        return getState() == ContainerState.locked;
     }
 
     /**
@@ -79,9 +87,9 @@ public class Container extends Item {
             totalKgs += stored.getWeight();
             totalLiters += stored.getVolume();
         }
-        return (getMaxItems() != ContainerStatTable.CODE_NOT_USED && getMaxItems() < heldItems.size() + 1) ||
-                (getMaxKilograms() != ContainerStatTable.CODE_NOT_USED && getMaxKilograms() < totalKgs + i.getWeight()) ||
-                (getMaxLiters() != ContainerStatTable.CODE_NOT_USED && getMaxLiters() < totalLiters + i.getVolume());
+        return (getMaxItems() != ContainerStatTable.CODE_NOT_USED && getMaxItems() >= heldItems.size() + 1) ||
+                (getMaxKilograms() != ContainerStatTable.CODE_NOT_USED && getMaxKilograms() >= totalKgs + i.getWeight()) ||
+                (getMaxLiters() != ContainerStatTable.CODE_NOT_USED && getMaxLiters() >= totalLiters + i.getVolume());
     }
 
     /**
@@ -96,9 +104,9 @@ public class Container extends Item {
             return false;
         if (getLockNumber() == i.getLockNumber()) {
             if (wantToBeLocked)
-                state = ContainerState.locked;
+                setState(ContainerState.locked);
             else
-                state = ContainerState.unlocked;
+                setState(ContainerState.unlocked);
             updateInDatabase(getDatabaseName());
             return true;
         }
@@ -112,20 +120,20 @@ public class Container extends Item {
      * @return true if the item was stored successfully
      */
     public boolean tryStoreItem(Item toStore) {
-        if (state == ContainerState.locked || !canHoldItem(toStore))
+        if (getState() == ContainerState.locked || !canHoldItem(toStore))
             return false;
         toStore.setContainerID(getItemID());
         return true;
     }
 
     @Override
-    public double getWeight(){
+    public double getWeight() {
         double totalKgs = 0;
         List<Item> heldItems = getStoredItems();
         for (Item stored : heldItems) {
             totalKgs += stored.getWeight();
         }
-        return totalKgs;
+        return totalKgs + getIntrinsicWeight();
     }
 
     public double getMaxKilograms() {
@@ -161,11 +169,11 @@ public class Container extends Item {
 
         @Override
         public Item parseFromResultSet(ResultSet fromEntry, String databaseName) throws Exception {
-            return new Container(fromEntry,databaseName);
+            return new Container(fromEntry, databaseName);
         }
     };
 
-    public static ItemFactory.ItemParser factory(){
+    public static ItemFactory.ItemParser factory() {
         return parser;
     }
 }

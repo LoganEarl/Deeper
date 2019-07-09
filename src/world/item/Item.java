@@ -17,12 +17,12 @@ import static world.item.ItemInstanceTable.*;
  * @author Logan Earl
  */
 public abstract class Item implements DatabaseManager.DatabaseEntry {
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
-            TABLE_NAME, ITEM_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME);
+    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)",
+            TABLE_NAME, ITEM_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, STATE);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
-    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=? WHERE %s=?",
-            TABLE_NAME, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, ITEM_ID);
+    private final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
+            TABLE_NAME, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, STATE, ITEM_ID);
     private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE %s=?",
             TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, ITEM_ID);
     private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE ((%s.%s=? OR %s=?) AND %s=?)",
@@ -37,6 +37,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     private String itemName;
     private String displayName;
     private String databaseName;
+    private ItemState state;
     private int containerID;
     private int lockNumber;
     private Map<String,String> itemStats;
@@ -231,9 +232,12 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     @Override
     public boolean saveToDatabase(String databaseName) {
         Item item = getItemByID(itemID,databaseName);
+        String stateString = "";
+        if(state != null)
+            stateString = state.toString();
         if(item == null)
             return DatabaseManager.executeStatement(CREATE_SQL, databaseName,
-                    itemID, roomName, itemName, displayName) > 0;
+                    itemID, roomName, itemName, displayName, stateString) > 0;
         else
             return updateInDatabase(databaseName);
     }
@@ -245,8 +249,12 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
 
     @Override
     public boolean updateInDatabase(String databaseName) {
+        String stateString = "";
+        if(state != null)
+            stateString = state.toString();
+
         return DatabaseManager.executeStatement(UPDATE_SQL,databaseName,
-                roomName, itemName, displayName, containerID, itemID) > 0;
+                roomName, itemName, displayName, containerID, stateString, itemID) > 0;
     }
 
     @Override
@@ -361,6 +369,17 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         updateInDatabase(databaseName);
     }
 
+    public interface ItemState{
+    }
+
+    public ItemState getState(){
+        return state;
+    }
+
+    public void setState(ItemState state){
+        this.state = state;
+    }
+
     public void setRoomName(String roomName){
         this.roomName = roomName;
     }
@@ -380,5 +399,18 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     @Override
     public String toString(){
         return displayName;
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(this == obj)
+            return true;
+        if(obj == null)
+            return false;
+        if(obj instanceof Item){
+            Item that = (Item)obj;
+            return that.itemID == this.itemID;
+        }
+        return false;
     }
 }

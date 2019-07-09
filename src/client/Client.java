@@ -18,7 +18,7 @@ public class Client {
         this.clientRegistry = clientRegistry;
         this.address = address;
         this.clientRegistry.sendMessage("Hello, Welcome to the project.\n" +
-                "Please use the (login 'username' 'password') or the (register 'username' 'password' 'email' commands to login or register respectively.", address);
+                "Please use the login or register commands to proceed. If you have any questions on command usage, use 'help [your command here]' or just 'help' to get more info", address);
     }
 
     public void setStatus(ClientStatus newStatus) {

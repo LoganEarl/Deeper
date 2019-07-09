@@ -56,7 +56,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         displayName = readEntry.getString(DISPLAY_NAME);
 
         raceID = readEntry.getString(RACE_ID);
-        if(Race.getFromID(raceID) == null)
+        if(Race.getFromID(raceID, databaseName) == null)
             throw new IllegalArgumentException("Race of the entity is not recognized");
 
         controllerType = readEntry.getString(CONTROLLER_TYPE);
@@ -263,7 +263,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         if(displayName != null && !displayName.isEmpty()) {
             return displayName;
         }else{
-            Race myRace = Race.getFromID(this.raceID);
+            Race myRace = Race.getFromID(this.raceID, databaseName);
             if(myRace == null)
                 return this.entityID;
             else
@@ -292,7 +292,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
      * @return the instantiated form of this entity's race. Can be null
      */
     public Race getRace(){
-        return Race.getFromID(this.raceID);
+        return Race.getFromID(this.raceID, databaseName);
     }
 
     public String getRaceID(){

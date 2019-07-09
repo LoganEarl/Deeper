@@ -4,9 +4,11 @@ import database.DatabaseManager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * instantiated from of a race. Note, all playable races are stored as constants of this class. When a new world is instantiated, these playable races need to be replaced into the new file to ensure that players migrating to the world do not fail their foreign key restraints.
@@ -25,17 +27,20 @@ public class Race {
     );
 
     private static final String INSERT_SQL = String.format(Locale.US, "REPLACE INTO %s(%s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?)", RaceTable.TABLE_NAME, RaceTable.RACE_ID, RaceTable.DISPLAY_NAME, RaceTable.DESCRIPTION, RaceTable.BASE_INT, RaceTable.BASE_WIS, RaceTable.BASE_STR, RaceTable.BASE_DEX);
+    private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", RaceTable.TABLE_NAME, RaceTable.RACE_ID);
 
+    private static final Map<String,Race> unplayableRaceCache = new HashMap<>();
 
     private String displayName;
     private String identifier;
     private String description;
+    private String databaseName;
     private int baseStr;
     private int baseDex;
     private int baseInt;
     private int baseWis;
 
-    Race(String displayName, String identifier, String description, int baseStr, int baseDex, int baseInt, int baseWis){
+    private Race(String displayName, String identifier, String description, int baseStr, int baseDex, int baseInt, int baseWis){
         this.displayName = displayName;
         this.identifier = identifier;
         this.description = description;
@@ -43,6 +48,16 @@ public class Race {
         this.baseInt = baseInt;
         this.baseStr = baseStr;
         this.baseWis = baseWis;
+    }
+
+    private Race(ResultSet entry, String databaseName) throws SQLException {
+        displayName = entry.getString(RaceTable.DISPLAY_NAME);
+        identifier = entry.getString(RaceTable.RACE_ID);
+        description = entry.getString(RaceTable.DESCRIPTION);
+        baseDex = entry.getInt(RaceTable.BASE_DEX);
+        baseInt = entry.getInt(RaceTable.BASE_INT);
+        baseStr = entry.getInt(RaceTable.BASE_STR);
+        baseWis = entry.getInt(RaceTable.BASE_WIS);
     }
 
     public static List<Race> defaultRaces(){
@@ -58,11 +73,39 @@ public class Race {
         return defaultRaces;
     }
 
-    public static Race getFromID(String raceName){
+    public static Race getFromID(String raceName, String databaseName){
         for(Race r: defaultRaces())
             if(r.getRaceID().equals(raceName))
                 return r;
-        return null;
+        return getUnplayableRaceByID(raceName,databaseName);
+    }
+
+    private static Race getUnplayableRaceByID(String id, String databaseName){
+        final String tag = id + "<!SUB!>" + databaseName;
+        if(unplayableRaceCache.containsKey(tag))
+            return unplayableRaceCache.get(tag);
+
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+        PreparedStatement getSQL = null;
+        Race newRace;
+        if(c == null)
+            return null;
+        else{
+            try {
+                getSQL = c.prepareStatement(GET_SQL);
+                getSQL.setString(1,id);
+                ResultSet raceEntries = getSQL.executeQuery();
+                if(raceEntries.next())
+                    newRace = new Race(raceEntries,databaseName);
+                else
+                    newRace = null;
+                getSQL.close();
+                //c.close();
+            }catch (Exception e){
+                newRace = null;
+            }
+        }
+        return newRace;
     }
 
     public static void writePlayableRacesToDatabaseFile(String databaseName){
@@ -103,6 +146,10 @@ public class Race {
 
     public int getBaseWis() {
         return baseWis;
+    }
+
+    public String getDatabaseName(){
+        return databaseName;
     }
 
     public static String getPlayableRaceDescriptions(){

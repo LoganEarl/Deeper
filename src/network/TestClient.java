@@ -19,7 +19,12 @@ public class TestClient {
                     if (available > 0) {
                         byte[] message = new byte[available];
                         in.read(message, 0, available);
-                        System.out.println(new String(message));
+                        String rawMessages = new String(message);
+                        rawMessages = rawMessages.replace("SERVER_PROMPT_MESSAGE\n","");
+                        String[] messages = rawMessages.split("<!EOM!>");
+
+                        for(String msg: messages)
+                            System.out.println(msg);
                     }
                     Thread.sleep(100);
                 } catch (Exception e) {

@@ -22,7 +22,7 @@ public class ClientPutMessage extends ClientMessage {
         String[] args = rawMessage.split("\n");
         if(args.length == 3 && !args[0].isEmpty() && "in".equals(args[1]) && !args[2].isEmpty()){
             toStore = args[0];
-            toStoreIn = args[1];
+            toStoreIn = args[2];
             return true;
         }
         return false;
