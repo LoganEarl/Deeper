@@ -26,7 +26,7 @@ public class TestClient {
                         for(String msg: messages)
                             System.out.println(msg);
                     }
-                    Thread.sleep(100);
+                    Thread.sleep(50);
                 } catch (Exception e) {
                     quit = true;
                 }
@@ -38,22 +38,26 @@ public class TestClient {
         Scanner keyBoard = new Scanner(System.in);
         String entry = "";
         while (!entry.toLowerCase().equals("q") && !entry.toLowerCase().equals("quit")) {
-            entry = keyBoard.nextLine();
-            String[] words = entry.split(" ");
-            StringBuilder messageToSend = new StringBuilder();
+            if(keyBoard.hasNext()) {
+                entry = keyBoard.nextLine();
+                String[] words = entry.split(" ");
+                StringBuilder messageToSend = new StringBuilder();
 
-            boolean firstLine = true;
-            for (String word : words) {
-                if (firstLine)
-                    firstLine = false;
-                else
-                    messageToSend.append("\n");
-                messageToSend.append(word);
+                boolean firstLine = true;
+                for (String word : words) {
+                    if (firstLine)
+                        firstLine = false;
+                    else
+                        messageToSend.append("\n");
+                    messageToSend.append(word);
+                }
+
+                messageToSend.append(WebServer.MESSAGE_DIVIDER);
+                out.write(messageToSend.toString().getBytes());
+                out.flush();
+            }else {
+                Thread.yield();
             }
-
-            messageToSend.append(WebServer.MESSAGE_DIVIDER);
-            out.write(messageToSend.toString().getBytes());
-            out.flush();
         }
         out.close();
     }

@@ -21,6 +21,7 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
     public static final String DEX_SCALAR = "dexScalar";
     public static final String INT_SCALAR = "intScalar";
     public static final String WIS_SCALAR = "wisScalar";
+    public static final String CRIT_PERCENT = "critPercent";
 
     public static final String HIT_BONUS = "hitBonus";
     public static final String DAMAGE_TYPE = "damageType";
@@ -42,6 +43,7 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(DEX_SCALAR, "DECIMAL");
         TABLE_DEFINITION.put(INT_SCALAR, "DECIMAL");
         TABLE_DEFINITION.put(WIS_SCALAR, "DECIMAL");
+        TABLE_DEFINITION.put(CRIT_PERCENT, "INT");
 
         TABLE_DEFINITION.put(HIT_BONUS, "INT");
         TABLE_DEFINITION.put(DAMAGE_TYPE, "VARCHAR(16)");

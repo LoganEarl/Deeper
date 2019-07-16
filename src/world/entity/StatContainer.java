@@ -11,17 +11,21 @@ public class StatContainer implements Entity.SqlExtender {
     private int dexterity;
     private int intelligence;
     private int wisdom;
+    private int toughness;
+    private int fitness;
 
     private static final Random RND = new Random(System.currentTimeMillis());
 
     public static final String SIGNIFIER = "stats";
-    private static final String[] HEADERS = new String[]{STR,DEX,INT,WIS};
+    private static final String[] HEADERS = new String[]{STR,DEX,INT,WIS,TOUGH,FIT};
 
-    public StatContainer(int strength, int dexterity, int intelligence, int wisdom) {
+    public StatContainer(int strength, int dexterity, int intelligence, int wisdom, int toughness, int fitness) {
         this.strength = strength;
         this.dexterity = dexterity;
         this.intelligence = intelligence;
         this.wisdom = wisdom;
+        this.toughness = toughness;
+        this.fitness = fitness;
     }
 
     public StatContainer(ResultSet readEntry) throws SQLException {
@@ -29,6 +33,8 @@ public class StatContainer implements Entity.SqlExtender {
         dexterity = readEntry.getInt(DEX);
         intelligence = readEntry.getInt(INT);
         wisdom = readEntry.getInt(WIS);
+        toughness = readEntry.getInt(TOUGH);
+        fitness = readEntry.getInt(FIT);
     }
 
     /**
@@ -54,6 +60,10 @@ public class StatContainer implements Entity.SqlExtender {
                return intelligence;
             case WIS:
                 return wisdom;
+            case TOUGH:
+                return toughness;
+            case FIT:
+                return fitness;
             default:
                 throw new IllegalArgumentException("Column name " + columnName + " is not an entity stat");
         }
@@ -76,7 +86,7 @@ public class StatContainer implements Entity.SqlExtender {
 
     @Override
     public Object[] getInsertSqlValues() {
-        return new Object[]{strength,dexterity,intelligence,wisdom};
+        return new Object[]{strength,dexterity,intelligence,wisdom, toughness, fitness};
     }
 
     @Override
@@ -114,5 +124,21 @@ public class StatContainer implements Entity.SqlExtender {
 
     public void setWisdom(int wisdom) {
         this.wisdom = wisdom;
+    }
+
+    public int getToughness() {
+        return toughness;
+    }
+
+    public void setToughness(int toughness) {
+        this.toughness = toughness;
+    }
+
+    public int getFitness() {
+        return fitness;
+    }
+
+    public void setFitness(int fitness) {
+        this.fitness = fitness;
     }
 }

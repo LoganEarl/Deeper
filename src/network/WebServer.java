@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 
 /**
@@ -33,7 +34,8 @@ public class WebServer {
                 serverRunning = true;
                 ServerSocket serverSocket = new ServerSocket(port);
                 while (true) {
-                    ClientConnection clientConnection = new ClientConnection(serverSocket.accept());
+                    Socket newSocket = serverSocket.accept();
+                    ClientConnection clientConnection = new ClientConnection(newSocket);
                     connectedClients.add(clientConnection);
                     clientConnection.start();
                 }
@@ -76,7 +78,7 @@ public class WebServer {
         private BufferedOutputStream out;
         private BufferedInputStream in;
 
-        private Queue<ServerMessage> messageQueue = new LinkedList<>();
+        private Vector<ServerMessage> messageQueue = new Vector<>();
 
         private boolean alive = true;
 
@@ -92,15 +94,16 @@ public class WebServer {
         }
 
         private void sendMessage(ServerMessage toSend) {
-            messageQueue.add(toSend);
+            if(toSend != null)
+                messageQueue.add(toSend);
         }
 
         @Override
         public void run(){
             while(alive){
                 try {
-                    if (!messageQueue.isEmpty()) {
-                        ServerMessage message = messageQueue.remove();
+                    while (!messageQueue.isEmpty()) {
+                        ServerMessage message = messageQueue.remove(0);
                         out.write(message.getHeader().getBytes());
                         out.write("\n".getBytes());
                         out.write(message.getBytes());
@@ -117,6 +120,8 @@ public class WebServer {
                                 if(message != null && !message.isEmpty())
                                     clientListener.onClientMessage(identifier,message);
                     }
+                }catch (SocketException e) {
+                    alive = false;
                 }catch (Exception e){
                     e.printStackTrace();
                 }

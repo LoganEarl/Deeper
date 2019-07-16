@@ -57,7 +57,13 @@ public class LookCommand extends EntityCommand {
 
     @Override
     protected boolean requiresBalance() {
-        return lookInto;
+        return true;
+    }
+
+    @Override
+    protected void setBalance() {
+        if(lookInto)
+            super.setBalance();
     }
 
     private String lookInContainer(String target){

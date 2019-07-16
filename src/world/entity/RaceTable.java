@@ -18,14 +18,18 @@ public class RaceTable implements DatabaseManager.DatabaseTable {
     public static final String DISPLAY_NAME = "displayName";
     /**The description for the race*/
     public static final String DESCRIPTION = "description";
-    /**Base intelligence value for the race. 0-100 scale with an average human citizen being 25*/
+    /**Base intelligence value for the race. 0-100 scale with an average human citizen being 10*/
     public static final String BASE_INT = "baseInt";
-    /**Base wisdom value for the race. 0-100 scale with an average human citizen being 25*/
+    /**Base wisdom value for the race. 0-100 scale with an average human citizen being 10*/
     public static final String BASE_WIS = "baseWis";
-    /**Base strength value for the race. 0-100 scale with an average human citizen being 25*/
+    /**Base strength value for the race. 0-100 scale with an average human citizen being 10*/
     public static final String BASE_STR = "baseStr";
-    /**Base dexterity value for the race. 0-100 scale with an average human citizen being 25*/
+    /**Base dexterity value for the race. 0-100 scale with an average human citizen being 10*/
     public static final String BASE_DEX = "baseDex";
+    /**Base toughness value for the race. 0-100 scale with an average human citizen being 10*/
+    public static final String BASE_TOUGH = "baseTough";
+    /**Base fitness value for the race. 0-100 scale with an average human citizen being 10*/
+    public static final String BASE_FIT = "baseFit";
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
     public static final Map<String,String> COLUMN_DEFINITIONS = new LinkedHashMap<>();
@@ -38,6 +42,8 @@ public class RaceTable implements DatabaseManager.DatabaseTable {
         COLUMN_DEFINITIONS.put(BASE_WIS, "INT");
         COLUMN_DEFINITIONS.put(BASE_STR, "INT");
         COLUMN_DEFINITIONS.put(BASE_DEX, "INT");
+        COLUMN_DEFINITIONS.put(BASE_TOUGH, "INT");
+        COLUMN_DEFINITIONS.put(BASE_FIT, "INT");
     }
 
     @Override

@@ -81,6 +81,7 @@ public class SimulationManager {
         messagePipeline.loadMessage(ClientGrabMessage.class);
         messagePipeline.loadMessage(ClientPutMessage.class);
         messagePipeline.loadMessage(ClientInventoryMessage.class);
+        messagePipeline.loadMessage(ClientAttackMessage.class);
 
         ItemFactory factory = ItemFactory.getInstance();
         factory.addParser(Weapon.factory());

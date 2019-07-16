@@ -52,6 +52,27 @@ public class Weapon extends Item {
         return rawDmg;
     }
 
+    public int rollHit(int str, int dex, int intel, int wis){
+        int rawRoll = rnd.nextInt(99) + 1;
+        rawRoll = modWithPrimaryStat(rawRoll,str,dex,intel,wis);
+        rawRoll += getHitBonus();
+        return rawRoll;
+    }
+
+    private int modWithPrimaryStat(int rawRoll, int str, int dex, int intel, int wis){
+        int[] stats = {str, dex, intel, wis};
+        float[] scalars = {getStrScalar(), getDexScalar(), getIntScalar(), getWisScalar()};
+        int bestIndex = 0;
+        float bestScalar = -1.0f;
+        for(int i = 0; i < scalars.length; i++){
+            if(scalars[i] > bestScalar || (scalars[i] == bestScalar && stats[i] > stats[bestIndex])){
+                bestIndex = i;
+                bestScalar = scalars[i];
+            }
+        }
+        return stats[bestIndex] - rawRoll;
+    }
+
     public int getMinBaseDamage(){
         initStats();
         return getCastInt(MIN_BASE_DAMAGE);

@@ -41,6 +41,15 @@ public class PoolContainer implements Entity.SqlExtender{
         maxBurnout = readEntry.getInt(MAX_BURNOUT);
     }
 
+    public void damage(int damage){
+        this.hp -= damage;
+        if(hp <= 0){
+            //TODO enter dying state
+        }else if(hp< maxHP/-4){
+            //TODO enter dead stats
+        }
+    }
+
     @Override
     public String getSignifier() {
         return SIGNIFIER;
@@ -58,8 +67,8 @@ public class PoolContainer implements Entity.SqlExtender{
 
     /**Recalculates the maximum hp/mp/stamina/burnout values based on the entity's stats*/
     public void calculatePoolMaxes(StatContainer stats){
-        maxHP = stats.getStrength() * 2 + stats.getDexterity();
-        maxStamina = stats.getDexterity() * 2 + stats.getStrength();
+        maxHP = stats.getStrength() / 2 + stats.getDexterity() / 2 + (int)(stats.getToughness() * 1.5);
+        maxStamina = stats.getDexterity() / 2 + stats.getStrength() / 2 + (int)(stats.getFitness() * 1.5);
         maxMP = stats.getIntelligence() * 2 + stats.getWisdom();
         maxBurnout = stats.getWisdom() * 2 + stats.getIntelligence();
     }

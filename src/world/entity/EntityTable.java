@@ -44,6 +44,10 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
     public static final String INT = "intelligence";
     /**The wisdom attribute of the entity. 10 is average*/
     public static final String WIS = "wisdom";
+    /**The fitness attribute of the entity. 10 is average*/
+    public static final String FIT = "fitness";
+    /**The toughness attribute of the entity. 10 is average*/
+    public static final String TOUGH = "toughness";
 
     public static final String SLOT_HEAD = "slotHead";
 
@@ -98,6 +102,8 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(DEX,"INT");
         TABLE_DEFINITION.put(INT,"INT");
         TABLE_DEFINITION.put(WIS,"INT");
+        TABLE_DEFINITION.put(FIT, "INT");
+        TABLE_DEFINITION.put(TOUGH, "INT");
         TABLE_DEFINITION.put(RACE_ID, "VARCHAR(16)");
         TABLE_DEFINITION.put(CONTROLLER_TYPE,"VARCHAR(16)");
         TABLE_DEFINITION.put(ROOM_NAME, "VARCHAR(32) COLLATE NOCASE");
@@ -120,7 +126,7 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 RACE_ID, RaceTable.TABLE_NAME, RaceTable.RACE_ID));
 
-        //no constraints placed on equipment slots. These need to be checked programmatically as they can be items or containers
+        //no constraints placed on equipment slots. The default value 0 means no item which fucks up foreign keys
     }
 
     @Override

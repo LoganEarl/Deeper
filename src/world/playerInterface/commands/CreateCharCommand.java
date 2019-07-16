@@ -114,6 +114,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 Entity preexisting = WorldUtils.getEntityOfClient(sourceClient);
                 if(preexisting != null) {
                     if (World.deleteEntity(preexisting)) {
+                        preexisting.removeFromDatabase(preexisting.getDatabaseName());
                         registry.sendMessage("Your old character has been deleted", sourceClient);
                         newMessageArgs = null;
                         stage = STAGE_START;
@@ -200,7 +201,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 stage = STAGE_VERIFY;
                 newMessageArgs = null;
             }else{
-                registry.sendMessage("I do not understand. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis]. Use [done] when complete.",sourceClient);
+                registry.sendMessage("I do not understand. Allocate points with: {add/subtract} [number of points] {from/to} {str/dex/int/wis}. Use 'done' when complete.",sourceClient);
             }
         }
     }

@@ -1,9 +1,7 @@
 package world.entity;
 
 import client.Client;
-import client.commands.PromptCommand;
 import database.DatabaseManager;
-import network.CommandExecutor;
 import world.meta.World;
 import world.room.Room;
 
@@ -16,6 +14,7 @@ import java.util.stream.Stream;
 import static world.entity.EntityTable.*;
 
 public class Entity implements DatabaseManager.DatabaseEntry {
+    private static Map<String,Entity> entityCache = new HashMap<>();
 
     private String entityID;
     private String displayName;
@@ -62,6 +61,8 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         controllerType = readEntry.getString(CONTROLLER_TYPE);
         roomName = readEntry.getString(ROOM_NAME);
 
+        getPools().calculatePoolMaxes(getStats());
+
         this.databaseName = databaseName;
     }
 
@@ -99,8 +100,16 @@ public class Entity implements DatabaseManager.DatabaseEntry {
 
     public static Entity getPlayableEntityByID(String entityID){
         World w = World.getWorldOfEntityID(entityID);
-        if(w != null)
-            return Entity.getEntityByEntityID(entityID,w.getDatabaseName());
+        if(w != null) {
+            String tag = getEntityTag(entityID, w.getDatabaseName());
+            if(entityCache.containsKey(tag))
+                return entityCache.get(tag);
+
+            Entity entity = Entity.getEntityByEntityID(entityID, w.getDatabaseName());
+            if(entity != null)
+                entityCache.put(tag, entity);
+            return entity;
+        }
         return null;
     }
 
@@ -114,7 +123,7 @@ public class Entity implements DatabaseManager.DatabaseEntry {
             try {
                 getSQL = c.prepareStatement(GET_NAME_ROOM_SQL);
                 getSQL.setString(1,displayName);
-                getSQL.setString(1,roomName);
+                getSQL.setString(2,roomName);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next())
                     toReturn = new Entity(accountSet,databaseName);
@@ -126,10 +135,23 @@ public class Entity implements DatabaseManager.DatabaseEntry {
                 toReturn = null;
             }
         }
+
+        if(toReturn != null){
+            String tag = getEntityTag(toReturn.getID(),toReturn.getDatabaseName());
+            if(entityCache.containsKey(tag))
+                return entityCache.get(tag);
+            else
+                entityCache.put(tag,toReturn);
+        }
+
         return toReturn;
     }
 
     public static Entity getEntityByEntityID(String entityID, String databaseName){
+        String tag = getEntityTag(entityID,databaseName);
+        if(entityCache.containsKey(tag))
+            return entityCache.get(tag);
+
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL = null;
         Entity toReturn;
@@ -150,6 +172,11 @@ public class Entity implements DatabaseManager.DatabaseEntry {
                 toReturn = null;
             }
         }
+
+        if(toReturn != null){
+            entityCache.put(tag,toReturn);
+        }
+
         return toReturn;
     }
 
@@ -187,6 +214,15 @@ public class Entity implements DatabaseManager.DatabaseEntry {
                 foundItems = Collections.emptyList();
             }
         }
+
+        for(int i = 0; i <foundItems.size(); i++){
+            String tag = getEntityTag(foundItems.get(i).getID(), foundItems.get(i).getDatabaseName());
+            if(entityCache.containsKey(tag))
+                foundItems.set(i,entityCache.get(tag));
+            else
+                entityCache.put(tag,foundItems.get(i));
+        }
+
         return foundItems;
     }
 
@@ -338,6 +374,10 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         }
     }
 
+    private static String getEntityTag(String entityID, String databaseName){
+        return "<!ID!>"+entityID+"<!LOCATION!>" + databaseName;
+    }
+
     public static class EntityBuilder{
         private String entityID = "";
         private String displayName = "";
@@ -354,6 +394,8 @@ public class Entity implements DatabaseManager.DatabaseEntry {
         private int dexterity = 10;
         private int intelligence = 10;
         private int wisdom = 10;
+        private int toughness = 10;
+        private int fitness = 10;
 
         private String controllerType = CONTROLLER_TYPE_STATIC;
         private String roomName = "";
@@ -365,7 +407,8 @@ public class Entity implements DatabaseManager.DatabaseEntry {
             Entity e = new Entity();
             LinkedHashMap<String,SqlExtender> extenders = new LinkedHashMap<>();
             extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(hp,maxHP,mp,maxMP,stamina,maxStamina,burnout,maxBurnout));
-            extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom));
+            extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom, toughness, fitness
+            ));
             extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer());
 
             e.extenders = extenders;

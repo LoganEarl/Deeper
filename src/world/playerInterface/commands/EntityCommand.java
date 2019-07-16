@@ -44,7 +44,7 @@ public abstract class EntityCommand implements CommandExecutor.Command {
     }
 
     /**
-     * An overridable method that determines how unbalanced the entity is after the command completes. By default, cooldown ranges from 500 to 1000 ms depending on the dex of the entity. Only called if requiresBalance() returns true
+     * An overridable method that determines how unbalanced the entity is after the command completes. By default, cooldown ranges from 500 to 1000 ms depending on the dex of the entity. Only called if requiresBalance() returns true. If you want a command to require balance but not create a cooldown then simple override this and don't call the setBalanceTime() of the source entity
      */
     protected void setBalance(){
         int dex = getSourceEntity().getStats().getDexterity();
