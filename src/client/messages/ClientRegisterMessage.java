@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.notification.NotificationService;
 
 public class ClientRegisterMessage extends ClientMessage {
     public static final String HEADER = "register";
@@ -13,8 +14,8 @@ public class ClientRegisterMessage extends ClientMessage {
     private String hPass;
     private String email = "";
 
-    public ClientRegisterMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
-        super(HEADER,sourceClient, executor, registry, pipeline);
+    public ClientRegisterMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
+        super(HEADER,sourceClient, executor, registry, pipeline, notificationService);
     }
 
     @Override

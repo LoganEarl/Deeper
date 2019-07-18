@@ -9,6 +9,7 @@ import world.entity.Entity;
 import world.entity.EntityTable;
 import world.entity.Race;
 import world.meta.World;
+import world.notification.NotificationService;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -30,6 +31,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     private Client sourceClient;
     private MessagePipeline pipeline;
     private CommandExecutor executor;
+    private NotificationService service;
 
     private Entity.EntityBuilder builder = new Entity.EntityBuilder();
     private String[] newMessageArgs = null;
@@ -61,11 +63,12 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
      *                 MessageContext
      * @see network.messaging.MessagePipeline.MessageContext
      */
-    public CreateCharCommand(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
+    public CreateCharCommand(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService service){
         this.registry = registry;
         this.sourceClient = sourceClient;
         this.pipeline = pipeline;
         this.executor = executor;
+        this.service = service;
 
         if(sourceClient.getStatus() == Client.ClientStatus.ACTIVE)
             userName = sourceClient.getUserName();
@@ -214,6 +217,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 registry.sendMessage("Very well, your character creation is now complete. Welcome " + selectedName + " to the Simulacrum!", sourceClient);
                 Entity newPlayer = builder.build();
                 newPlayer.transferToWorld(World.getHubWorld());
+                service.subscribe(newPlayer);
                 executor.scheduleCommand(new LookCommand("",false, sourceClient));
                 stage = STAGE_COMPLETE;
             }

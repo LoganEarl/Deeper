@@ -11,6 +11,7 @@ import world.item.container.Container;
 import world.item.misc.MiscItem;
 import world.item.weapon.Weapon;
 import world.meta.World;
+import world.notification.NotificationService;
 import world.playerInterface.messages.*;
 
 import java.util.LinkedList;
@@ -29,6 +30,7 @@ public class SimulationManager {
     private MessagePipeline messagePipeline;
     private CommandExecutor commandExecutor;
     private ClientRegistry clientRegistry;
+    private NotificationService notificationService;
 
     private static final String DB_NAME = "account.db";
 
@@ -42,7 +44,8 @@ public class SimulationManager {
 
         server = new WebServer(port);
         clientRegistry = new ClientRegistry(executor, server,DB_NAME);
-        messagePipeline = new MessagePipeline(clientRegistry,executor);
+        notificationService = new NotificationService(clientRegistry);
+        messagePipeline = new MessagePipeline(clientRegistry,executor, notificationService);
 
         server.setMessageRecievedListener(messagePipeline);
     }

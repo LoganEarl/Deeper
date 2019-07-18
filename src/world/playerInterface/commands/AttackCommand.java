@@ -9,20 +9,26 @@ import world.item.Item;
 import world.item.ItemType;
 import world.item.armor.ArmorSlot;
 import world.item.weapon.Weapon;
+import world.notification.Notification;
+import world.notification.NotificationService;
+import world.notification.NotificationSubscriber;
+import world.room.RoomNotificationScope;
 
 import java.util.List;
 
 public class AttackCommand extends EntityCommand {
     private String targetID;
     private ClientRegistry registry;
+    private NotificationService service;
 
     private int cooldownMs = 0;
 
     private boolean complete = false;
 
-    public AttackCommand(String target, Client sourceClient, ClientRegistry registry) {
+    public AttackCommand(String target, Client sourceClient, ClientRegistry registry, NotificationService service) {
         super(sourceClient);
         this.registry = registry;
+        this.service = service;
         targetID = target;
     }
 
@@ -105,30 +111,80 @@ public class AttackCommand extends EntityCommand {
                 stats.getWisdom());
         roll = roll - target.getEquipment().getEquipmentAC();
         roll = roll + bonus;
-        notifyRoom(String.format("%s the %s is fighting %s the %s",
-                getSourceEntity().getDisplayName(), getSourceEntity().getRace().getDisplayName(),
-                target.getDisplayName(), target.getRace().getDisplayName()),
-                getSourceEntity().getID(), target.getID());
+
+        int damage = 0;
         if(roll >= 0) {
-            int damage = selectWeapon.rollDamage( stats.getStrength(), stats.getDexterity(), stats.getIntelligence(), stats.getWisdom());
+            damage = selectWeapon.rollDamage( stats.getStrength(), stats.getDexterity(), stats.getIntelligence(), stats.getWisdom());
             target.getPools().damage(damage);
-            getSourceClient().sendMessage(String.format("You score a hit on %s with your %s(+%d) for %d damage",
-                    target.getDisplayName(),selectWeapon.getDisplayableName(), roll, damage));
-            notifyTarget(String.format("%s the %s attacks you with a %s for %d damage",
-                    getSourceEntity().getDisplayName(), getSourceEntity().getRace().getDisplayName(), selectWeapon.getDisplayableName(), damage),
-                    target);
-        }else{
-            getSourceClient().sendMessage(String.format("You miss %s with your %s(%d)",
-                    target.getDisplayName(),selectWeapon.getDisplayableName(), roll));
-            notifyTarget(String.format("%s the %s misses you with his %s",
-                    getSourceEntity().getDisplayName(), getSourceEntity().getRace().getDisplayName(), selectWeapon.getDisplayableName()),
-                    target);
         }
+        AttackNotification notification = new AttackNotification(getSourceEntity(),target,selectWeapon,roll, damage,registry);
+        service.notify(notification,new RoomNotificationScope(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName()));
     }
 
     @Override
     protected void setBalance() {
         if(cooldownMs > 0)
             getSourceEntity().setBalanceTime(cooldownMs,getSourceClient());
+    }
+
+    public class AttackNotification extends Notification {
+        private Entity attackEntity;
+        private Entity defenceEntity;
+        private Weapon attackWeapon;
+        private int netRoll;
+        private int damage;
+
+        public AttackNotification(Entity attackEntity,Entity defenceEntity,Weapon attackWeapon,int netRoll,int damage,ClientRegistry registry) {
+            super(registry);
+            this.attackEntity = attackEntity;
+            this.defenceEntity = defenceEntity;
+            this.attackWeapon = attackWeapon;
+            this.netRoll = netRoll;
+            this.damage = damage;
+        }
+
+        @Override
+        public String getAsMessage(NotificationSubscriber viewer) {
+            if(viewer.getID().equals(attackEntity.getID()) && viewer.getDatabaseName().equals(attackEntity.getDatabaseName())){
+                if(netRoll >= 0)
+                    return String.format("You score a hit on %s with your %s(+%d) for %d damage",
+                        defenceEntity.getDisplayName(),attackWeapon.getDisplayableName(), netRoll, damage);
+                else
+                    return String.format("You miss %s with your %s(%d)",
+                            defenceEntity.getDisplayName(),attackWeapon.getDisplayableName(), netRoll);
+            }else if(viewer.getID().equals(defenceEntity.getID()) && viewer.getDatabaseName().equals(attackEntity.getDatabaseName())){
+                if(netRoll >= 0)
+                    return String.format("%s the %s attacks you with a %s for %d damage",
+                        attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName(), damage);
+                else
+                    return String.format("%s the %s misses you with his %s",
+                            attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName());
+            }else{
+                return String.format("%s the %s is fighting %s the %s",
+                        attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(),
+                        defenceEntity.getDisplayName(), defenceEntity.getRace().getDisplayName());
+            }
+
+        }
+
+        public Entity getAttackEntity() {
+            return attackEntity;
+        }
+
+        public Entity getDefenceEntity() {
+            return defenceEntity;
+        }
+
+        public Weapon getAttackWeapon() {
+            return attackWeapon;
+        }
+
+        public int getNetRoll() {
+            return netRoll;
+        }
+
+        public int getDamage() {
+            return damage;
+        }
     }
 }

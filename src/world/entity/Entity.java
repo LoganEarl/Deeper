@@ -3,6 +3,9 @@ package world.entity;
 import client.Client;
 import database.DatabaseManager;
 import world.meta.World;
+import world.notification.Notification;
+import world.notification.NotificationService;
+import world.notification.NotificationSubscriber;
 import world.room.Room;
 
 import java.sql.Connection;
@@ -13,11 +16,12 @@ import java.util.stream.Stream;
 
 import static world.entity.EntityTable.*;
 
-public class Entity implements DatabaseManager.DatabaseEntry {
+public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscriber {
     private static Map<String,Entity> entityCache = new HashMap<>();
 
     private String entityID;
     private String displayName;
+    private int notificationSubscriptionID = 0;
 
     private LinkedHashMap<String, SqlExtender> extenders = new LinkedHashMap<>();
 
@@ -518,6 +522,14 @@ public class Entity implements DatabaseManager.DatabaseEntry {
             else
                 throw new IllegalArgumentException("Cannot assign a controller type that is not one of the EntityTable.CONTROLLER_TYPE_* constants");
             return this;
+        }
+    }
+
+    @Override
+    public void notify(Notification notification) {
+        if(EntityTable.CONTROLLER_TYPE_PLAYER.equals(getControllerType())) {
+            Client toNotify = notification.getClientRegistry().getClientWithUsername(entityID);
+            toNotify.sendMessage(notification.getAsMessage(this));
         }
     }
 

@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.notification.NotificationService;
 import world.playerInterface.commands.GrabDropCommand;
 
 public class ClientGrabMessage extends ClientMessage {
@@ -13,8 +14,8 @@ public class ClientGrabMessage extends ClientMessage {
     private String itemID = "";
     private String fromContainer = "";
 
-    public ClientGrabMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline);
+    public ClientGrabMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
+        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
     }
 
     @Override

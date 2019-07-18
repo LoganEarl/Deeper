@@ -5,6 +5,8 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.entity.Entity;
+import world.notification.NotificationService;
 
 /**
  * Instantiated form of a client's attempt to login. Still needs to be verified but contains all the info to do so.<br>
@@ -24,8 +26,8 @@ public class ClientLoginMessage extends ClientMessage {
 
     public static final String HEADER = "login";
 
-    public ClientLoginMessage(Client client, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
-        super(HEADER,client,executor, registry, pipeline);
+    public ClientLoginMessage(Client client, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
+        super(HEADER,client,executor, registry, pipeline, notificationService);
     }
 
     @Override
@@ -42,6 +44,11 @@ public class ClientLoginMessage extends ClientMessage {
     @Override
     public void doActions() {
         getClient().tryLogIn(getClient(), userName, hashedPassword);
+        if(getClient().getStatus() == Client.ClientStatus.ACTIVE){
+            Entity loggedEntity = Entity.getPlayableEntityByID(getClient().getUserName());
+            if(loggedEntity != null)
+                getNotificationService().subscribe(loggedEntity);
+        }
     }
 
     @Override

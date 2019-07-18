@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.notification.NotificationService;
 
 /**
  * Instantiated form of a client's attempt to update account information. Still needs to be verified but contains all the info to do so.<br>
@@ -37,8 +38,8 @@ public class ClientAccountUpdateMessage extends ClientMessage {
 
     public static final String HEADER = "update";
 
-    public ClientAccountUpdateMessage(Client client, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
-        super(HEADER,client,executor, registry, pipeline);
+    public ClientAccountUpdateMessage(Client client, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
+        super(HEADER,client,executor, registry, pipeline, notificationService);
     }
 
     @Override

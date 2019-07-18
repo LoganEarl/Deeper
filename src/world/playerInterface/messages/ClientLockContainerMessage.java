@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.notification.NotificationService;
 import world.playerInterface.commands.LockContainerCommand;
 
 public class ClientLockContainerMessage extends ClientMessage {
@@ -15,8 +16,8 @@ public class ClientLockContainerMessage extends ClientMessage {
     private String toLock;
     private String key;
 
-    public ClientLockContainerMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline);
+    public ClientLockContainerMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
+        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
         this.executor = executor;
     }
 

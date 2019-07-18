@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.notification.NotificationService;
 import world.playerInterface.commands.TransferEntityCommand;
 
 public class ClientTransferEntityMessage extends ClientMessage {
@@ -13,8 +14,8 @@ public class ClientTransferEntityMessage extends ClientMessage {
     private String entityID;
     private String worldID;
 
-    public ClientTransferEntityMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline);
+    public ClientTransferEntityMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
+        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
     }
 
     @Override

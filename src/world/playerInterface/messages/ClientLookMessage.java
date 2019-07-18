@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.notification.NotificationService;
 import world.playerInterface.commands.LookCommand;
 
 /**
@@ -21,8 +22,8 @@ public class ClientLookMessage extends ClientMessage {
 
     public static final String HEADER = "look";
 
-    public ClientLookMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
-        super(HEADER,sourceClient, executor, registry, pipeline);
+    public ClientLookMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
+        super(HEADER,sourceClient, executor, registry, pipeline, notificationService);
     }
 
     @Override

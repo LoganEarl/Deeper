@@ -7,6 +7,7 @@ import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
 import world.meta.World;
+import world.notification.NotificationService;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -20,8 +21,8 @@ public class ClientViewWorldMessage extends ClientMessage {
 
     private String viewArg = "";
 
-    public ClientViewWorldMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline);
+    public ClientViewWorldMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
+        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
     }
 
     @Override

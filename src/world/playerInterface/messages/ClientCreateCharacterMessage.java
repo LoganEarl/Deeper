@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.notification.NotificationService;
 import world.playerInterface.commands.CreateCharCommand;
 
 /**
@@ -14,8 +15,8 @@ import world.playerInterface.commands.CreateCharCommand;
 public class ClientCreateCharacterMessage extends ClientMessage {
     public static final String HEADER = "create";
 
-    public ClientCreateCharacterMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
-        super(HEADER, sourceClient,executor,registry,pipeline);
+    public ClientCreateCharacterMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
+        super(HEADER, sourceClient,executor,registry,pipeline, notificationService);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class ClientCreateCharacterMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        getExecutor().scheduleCommand(new CreateCharCommand(getClient(),getExecutor(),getClientRegistry(),getMessagePipeline()));
+        getExecutor().scheduleCommand(new CreateCharCommand(getClient(),getExecutor(),getClientRegistry(),getMessagePipeline(), getNotificationService()));
     }
 
     @Override

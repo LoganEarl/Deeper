@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.notification.NotificationService;
 import world.playerInterface.commands.SayCommand;
 
 public class ClientSayMessage extends ClientMessage {
@@ -12,8 +13,8 @@ public class ClientSayMessage extends ClientMessage {
 
     private String message = "";
 
-    public ClientSayMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline){
-        super(HEADER,sourceClient, executor, registry, pipeline);
+    public ClientSayMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
+        super(HEADER,sourceClient, executor, registry, pipeline, notificationService);
     }
 
     @Override
