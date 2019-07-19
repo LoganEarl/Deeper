@@ -1,24 +1,24 @@
 package network;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class CommandExecutor {
-    private Queue<Command> commandQueue = new LinkedList<>();
+    private List<Command> commandQueue = Collections.synchronizedList(new LinkedList<>());
     /**
      * preforms a single simulation step by executing all scheduled commands and re-enqueueing all commands that are not yet complete
      */
     public void step() {
-        Queue<Command> toExecute = commandQueue;
-        Queue<Command> continuingCommands = new LinkedList<>();
-        commandQueue = new LinkedList<>();
+        List<Command> continuingCommands = new LinkedList<>();
 
-        for (Command c : toExecute) {
+        while(commandQueue.size() > 0){
+            Command c = commandQueue.remove(0);
+
             if(c.getStartTimestamp() <= System.currentTimeMillis())
                 c.execute();
             if (!c.isComplete())
                 continuingCommands.add(c);
         }
+
         commandQueue.addAll(continuingCommands);
     }
 

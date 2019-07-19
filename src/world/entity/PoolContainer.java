@@ -73,6 +73,14 @@ public class PoolContainer implements Entity.SqlExtender{
         maxBurnout = stats.getWisdom() * 2 + stats.getIntelligence();
     }
 
+    public boolean isDying(){
+        return hp <= 0 && hp > getMaxHP()/-4;
+    }
+
+    public boolean isDead(){
+        return hp <= getMaxHP()/-4;
+    }
+
     public int getHp() {
         return hp;
     }

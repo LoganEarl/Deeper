@@ -117,6 +117,15 @@ public class ClientRegistry {
         sendMessage(message, sendTimestamp, addresses);
     }
 
+    public void disconnect(Client... toDisconnect){
+        String[] addresses = new String[toDisconnect.length];
+        for (int i = 0; i < toDisconnect.length; i++)
+            addresses[i] = toDisconnect[i].getAddress();
+        localServer.disconnectClients(addresses);
+        for(Client c: toDisconnect)
+            clients.remove(c.getAddress());
+    }
+
     /**
      * get the name of the database file containing account info
      *

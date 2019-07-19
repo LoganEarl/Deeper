@@ -35,6 +35,11 @@ public class SayCommand extends EntityCommand {
     }
 
     @Override
+    protected boolean canDoWhenDying() {
+        return true;
+    }
+
+    @Override
     protected boolean requiresBalance() {
         return false;
     }

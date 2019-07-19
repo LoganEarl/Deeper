@@ -5,7 +5,6 @@ import client.ClientRegistry;
 import client.messages.*;
 import database.DatabaseManager;
 import network.messaging.MessagePipeline;
-import world.item.Item;
 import world.item.ItemFactory;
 import world.item.container.Container;
 import world.item.misc.MiscItem;
@@ -44,10 +43,10 @@ public class SimulationManager {
 
         server = new WebServer(port);
         clientRegistry = new ClientRegistry(executor, server,DB_NAME);
-        notificationService = new NotificationService(clientRegistry);
+        notificationService = new NotificationService(clientRegistry, executor);
         messagePipeline = new MessagePipeline(clientRegistry,executor, notificationService);
 
-        server.setMessageRecievedListener(messagePipeline);
+        server.setMessageReceivedListener(messagePipeline);
     }
 
     /**Starts the server and ensures the directory system and world system is all in place*/
@@ -90,6 +89,8 @@ public class SimulationManager {
         factory.addParser(Weapon.factory());
         factory.addParser(MiscItem.factory());
         factory.addParser(Container.factory());
+
+        notificationService.attachToExecutor(commandExecutor);
 
         server.startServer();
     }

@@ -24,11 +24,21 @@ public abstract class EntityCommand implements CommandExecutor.Command {
         } else if(requiresBalance() && !sourceEntity.isBalanced()) {
             sourceClient.sendMessage("You must regain your balance first!");
             done = true;
-        }else{
+        } else if(sourceEntity.getPools().isDying() && !canDoWhenDying()){
+            sourceClient.sendMessage("You are dying. You cannot do that right now. Seek help quickly before you pass on");
+            done = true;
+        }else if(sourceEntity.getPools().isDead()){
+            sourceClient.sendMessage("You are dead");
+            done = true;
+        } else{
             executeEntityCommand();
             if(requiresBalance())
                 setBalance();
         }
+    }
+
+    protected boolean canDoWhenDying(){
+        return false;
     }
 
     protected final Entity getSourceEntity(){

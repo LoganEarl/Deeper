@@ -48,7 +48,7 @@ public class WebServer {
         });
     }
 
-    public void setMessageRecievedListener(OnMessageReceivedListener clientListener){
+    public void setMessageReceivedListener(OnMessageReceivedListener clientListener){
         this.clientListener = clientListener;
     }
 
@@ -61,7 +61,7 @@ public class WebServer {
     }
 
     /**
-     * sends the given message to the given clients.
+     * sends the given message to the given clients. If no client is given, all are notified
      * @param message the message to send to the given clients
      * @param toNotify the identifiers of all clients to notify
      */
@@ -69,6 +69,22 @@ public class WebServer {
         for (ClientConnection conn : connectedClients)
             if (toNotify.length == 0 || Arrays.asList(toNotify).contains(conn.identifier))
                 conn.sendMessage(message);
+    }
+
+    /**
+     * disconnects the given client connections. If none are specified, disconnects all connections
+     * @param toDisconnect the identifiers of all clients to disconnect
+     */
+    public void disconnectClients(String... toDisconnect){
+        List<ClientConnection> toRemove = new ArrayList<>(1);
+        for (ClientConnection conn : connectedClients)
+            if (toDisconnect.length == 0 || Arrays.asList(toDisconnect).contains(conn.identifier)) {
+                conn.kill();
+                toRemove.add(conn);
+            }
+
+        for(ClientConnection conn: toRemove)
+            connectedClients.remove(conn);
     }
 
     private class ClientConnection extends Thread{
