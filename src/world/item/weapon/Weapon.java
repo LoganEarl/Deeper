@@ -4,6 +4,7 @@ import world.item.DamageType;
 import world.item.Item;
 import world.item.ItemFactory;
 import world.item.ItemType;
+import world.meta.World;
 
 import java.sql.ResultSet;
 import java.util.Map;
@@ -26,6 +27,18 @@ public class Weapon extends Item {
     @Override
     protected Map<String, String> getDerivedStats() {
         return WeaponStatTable.getStatsForWeapon(getItemName(),getDatabaseName());
+    }
+
+    @Override
+    protected boolean compositeStatsExistInWorld(World targetWorld) {
+        initStats();
+        return WeaponStatTable.existsInWorld(getItemName(), targetWorld);
+    }
+
+    @Override
+    protected boolean writeCompositeStatsToWorld(World targetWorld) {
+        initStats();
+        return WeaponStatTable.writeStatsToWorld(getDerivedStats(),targetWorld);
     }
 
     public double getStaminaUsage(int str, int dex){

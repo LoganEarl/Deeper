@@ -2,12 +2,15 @@ package world.item.container;
 
 import database.DatabaseManager;
 import world.item.ItemStatTable;
+import world.meta.World;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+
+import static world.item.Item.NULL_ITEM_NAME;
 
 /**
  * Holds the stats of different containers. Distinct from an instance of a container in that it has no location,
@@ -38,6 +41,9 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     private static final Set<String> CONSTRAINTS = new HashSet<>(1);
 
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);
+    private static final String INSERT_SQL = String.format(Locale.US, "INSERT INTO %s(%s, %s, %s, %s) VALUES (?, ?, ?, ?)",
+            TABLE_NAME, ITEM_NAME, MAX_KGS, MAX_LITERS, MAX_NUMBER);
+
 
     public ContainerStatTable(){
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL COLLATE NOCASE");
@@ -66,5 +72,31 @@ public class ContainerStatTable implements DatabaseManager.DatabaseTable {
     @Override
     public Set<String> getConstraints() {
         return CONSTRAINTS;
+    }
+
+    public static boolean existsInWorld(String itemName, World targetWorld){
+        return null != getStatsForContainer(itemName,targetWorld.getDatabaseName());
+    }
+
+    public static boolean writeStatsToWorld(Map<String,String> stats, World targetWorld){
+        if(existsInWorld(stats.getOrDefault(ITEM_NAME,NULL_ITEM_NAME),targetWorld))
+            return false;
+
+        String name = stats.get(ITEM_NAME);
+        String rawMaxKg = stats.get(MAX_KGS);
+        String rawMaxLiters = stats.get(MAX_LITERS);
+        String rawMaxNumber = stats.get(MAX_NUMBER);
+
+        Double maxKg, maxLiters, maxNumber;
+        try {
+            maxKg = Double.parseDouble(rawMaxKg);
+            maxLiters = Double.parseDouble(rawMaxLiters);
+            maxNumber = Double.parseDouble(rawMaxNumber);
+        }catch (NumberFormatException ignored){
+            return false;
+        }
+
+        return DatabaseManager.executeStatement(INSERT_SQL, targetWorld.getDatabaseName(),
+                name, maxKg, maxLiters, maxNumber) > 0;
     }
 }

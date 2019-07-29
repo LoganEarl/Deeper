@@ -4,19 +4,33 @@ import world.item.Item;
 import world.item.ItemFactory;
 import world.item.ItemType;
 import world.item.weapon.Weapon;
+import world.meta.World;
 
 import java.sql.ResultSet;
 import java.util.Collections;
 import java.util.Map;
 
 public class MiscItem extends Item {
-    protected MiscItem(ResultSet entry, String databaseName) throws Exception {
+
+    public MiscItem(ResultSet entry, String databaseName) throws Exception {
         super(entry, databaseName);
     }
 
     @Override
+    protected boolean compositeStatsExistInWorld(World targetWorld) {
+        initStats();
+        return MiscItemStatTable.existsInWorld(getItemName(),targetWorld);
+    }
+
+    @Override
+    protected boolean writeCompositeStatsToWorld(World targetWorld) {
+        initStats();
+        return MiscItemStatTable.writeStatsToWorld(getDerivedStats(), targetWorld);
+    }
+
+    @Override
     protected Map<String, String> getDerivedStats() {
-        return Collections.emptyMap();
+        return MiscItemStatTable.getStatsForMisc(getItemName(),getDatabaseName());
     }
 
     @Override

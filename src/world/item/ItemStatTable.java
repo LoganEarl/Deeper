@@ -1,12 +1,15 @@
 package world.item;
 
 import database.DatabaseManager;
+import world.meta.World;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+
+import static world.item.Item.NULL_ITEM_NAME;
 
 /**
  * Contains the definition for a SQL table that holds the stats for different types of items. Does not hold the
@@ -45,6 +48,8 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     }
 
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);
+    private static final String INSERT_SQL = String.format(Locale.US, "INSERT INTO %s(%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
+        TABLE_NAME, ITEM_NAME, ITEM_DESCRIPTION, WEIGHT, VOLUME, ITEM_TYPE);
 
     public static Map<String,String> getStatsForItem(String itemName, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
@@ -116,5 +121,31 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
             }
         }
         return containerState;
+    }
+
+    public static boolean existsInWorld(String itemName, World targetWorld){
+        return null != getStatsForRawItem(itemName,targetWorld.getDatabaseName(),
+                GET_SQL, new ItemStatTable().getColumnDefinitions().keySet());
+    }
+
+    public static boolean writeStatsToWorld(Map<String,String> stats, World targetWorld){
+        if(existsInWorld(stats.getOrDefault(ITEM_NAME,NULL_ITEM_NAME),targetWorld))
+            return false;
+
+        String name = stats.get(ITEM_NAME);
+        String desc = stats.get(ITEM_DESCRIPTION);
+        String type = stats.get(ITEM_TYPE);
+        String rawWeight = stats.get(WEIGHT);
+        String rawVolume = stats.get(VOLUME);
+        Double weight, volume;
+        try {
+            weight = Double.parseDouble(rawWeight);
+            volume = Double.parseDouble(rawVolume);
+        }catch (NumberFormatException ignored){
+            return false;
+        }
+
+        return DatabaseManager.executeStatement(INSERT_SQL, targetWorld.getDatabaseName(),
+                name, desc, weight, volume, type) > 0;
     }
 }

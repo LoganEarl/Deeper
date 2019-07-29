@@ -2,6 +2,7 @@ package world.item;
 
 import database.DatabaseManager;
 import world.entity.Entity;
+import world.meta.World;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,13 +43,18 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     private int lockNumber;
     private Map<String,String> itemStats;
 
+    public static final String NULL_ITEM_NAME = "!nullItemName!";
+
     protected Item(ResultSet entry, String databaseName) throws Exception{
         itemID = entry.getInt(ITEM_ID);
         roomName = entry.getString(ROOM_NAME);
         if(roomName == null)
             roomName = "";
         itemName = entry.getString(ITEM_NAME);
-        if(itemName == null || itemName.isEmpty() || ItemStatTable.getStatsForItem(itemName,databaseName) == null)
+        if(itemName == null ||
+                itemName.isEmpty() ||
+                itemName.toLowerCase().equals(NULL_ITEM_NAME.toLowerCase()) ||
+                ItemStatTable.getStatsForItem(itemName,databaseName) == null)
             throw new IllegalArgumentException("Passed in an entry without a container name");
         containerID = entry.getInt(CONTAINER_ID);
         displayName = entry.getString(DISPLAY_NAME);
@@ -276,6 +282,8 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         return itemName;
     }
 
+
+
     protected final void initStats(){
         if(itemStats == null)
             itemStats = ItemStatTable.getStatsForItem(itemName,databaseName);
@@ -395,6 +403,20 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     public final String getDatabaseName(){
         return databaseName;
     }
+
+    public final boolean statsExistInWorld(World targetWorld){
+        return ItemStatTable.existsInWorld(itemName,targetWorld) &&
+                compositeStatsExistInWorld(targetWorld);
+    }
+
+    public final boolean writeStatsToWorld(World targetWorld){
+        initStats();
+        return ItemStatTable.writeStatsToWorld(itemStats,targetWorld) &&
+                writeCompositeStatsToWorld(targetWorld);
+    }
+
+    protected abstract boolean compositeStatsExistInWorld(World targetWorld);
+    protected abstract boolean writeCompositeStatsToWorld(World targetWorld);
 
     @Override
     public String toString(){

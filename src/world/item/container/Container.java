@@ -1,6 +1,7 @@
 package world.item.container;
 
 import world.item.*;
+import world.meta.World;
 
 import java.sql.ResultSet;
 import java.util.List;
@@ -38,6 +39,16 @@ public class Container extends Item {
     @Override
     protected Map<String, String> getDerivedStats() {
         return ContainerStatTable.getStatsForContainer(getItemName(), getDatabaseName());
+    }
+
+    @Override
+    protected boolean compositeStatsExistInWorld(World targetWorld) {
+        return ContainerStatTable.existsInWorld(getItemName(),targetWorld);
+    }
+
+    @Override
+    protected boolean writeCompositeStatsToWorld(World targetWorld) {
+        return ContainerStatTable.writeStatsToWorld(getDerivedStats(),targetWorld);
     }
 
     /**

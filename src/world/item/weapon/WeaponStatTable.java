@@ -2,12 +2,15 @@ package world.item.weapon;
 
 import database.DatabaseManager;
 import world.item.ItemStatTable;
+import world.meta.World;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+
+import static world.item.Item.NULL_ITEM_NAME;
 
 public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
     public static final String TABLE_NAME = "weaponStat";
@@ -27,6 +30,8 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
     public static final String DAMAGE_TYPE = "damageType";
 
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);
+    private static final String INSERT_SQL = String.format(Locale.US, "INSERT INTO %s(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            TABLE_NAME, ITEM_NAME, MIN_BASE_DAMAGE, MAX_BASE_DAMAGE, BALANCE, ATTACK_SPEED, STR_SCALAR, DEX_SCALAR, INT_SCALAR, WIS_SCALAR, CRIT_PERCENT, HIT_BONUS, DAMAGE_TYPE);
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
     private static final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
@@ -54,6 +59,49 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
 
     public static Map<String,String> getStatsForWeapon(String itemName, String databaseName){
         return ItemStatTable.getStatsForRawItem(itemName,databaseName,GET_SQL,TABLE_DEFINITION.keySet());
+    }
+
+    public static boolean existsInWorld(String itemName, World targetWorld){
+        return null != getStatsForWeapon(itemName,targetWorld.getDatabaseName());
+    }
+
+    public static boolean writeStatsToWorld(Map<String,String> stats, World targetWorld){
+        if(existsInWorld(stats.getOrDefault(ITEM_NAME,NULL_ITEM_NAME),targetWorld))
+            return false;
+
+        String name = stats.get(ITEM_NAME);
+        String rawMin = stats.get(MIN_BASE_DAMAGE);
+        String rawMax = stats.get(MAX_BASE_DAMAGE);
+        String rawBalance = stats.get(BALANCE);
+        String rawSpeed = stats.get(ATTACK_SPEED);
+        String rawDex = stats.get(DEX_SCALAR);
+        String rawStr = stats.get(STR_SCALAR);
+        String rawInt = stats.get(INT_SCALAR);
+        String rawWis = stats.get(WIS_SCALAR);
+        String rawCrit = stats.get(CRIT_PERCENT);
+        String rawBonus = stats.get(HIT_BONUS);
+        String damageType = stats.get(DAMAGE_TYPE);
+
+        Double balance, speed, str, dex, intel, wis;
+        Integer min, max, bonus, crit;
+        try {
+            min = Integer.parseInt(rawMin);
+            max = Integer.parseInt(rawMax);
+            bonus = Integer.parseInt(rawBonus);
+            crit = Integer.parseInt(rawCrit);
+
+            balance = Double.parseDouble(rawBalance);
+            speed = Double.parseDouble(rawSpeed);
+            str = Double.parseDouble(rawStr);
+            dex = Double.parseDouble(rawDex);
+            intel = Double.parseDouble(rawInt);
+            wis = Double.parseDouble(rawWis);
+        }catch (NumberFormatException ignored){
+            return false;
+        }
+
+        return DatabaseManager.executeStatement(INSERT_SQL, targetWorld.getDatabaseName(),
+                name, min, max, balance, speed, str, dex, intel, wis, crit, bonus, damageType) > 0;
     }
 
     @Override

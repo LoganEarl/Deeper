@@ -3,6 +3,7 @@ package world.item.armor;
 import world.item.DamageType;
 import world.item.Item;
 import world.item.ItemType;
+import world.meta.World;
 
 import java.sql.ResultSet;
 import java.util.HashMap;
@@ -44,6 +45,18 @@ public class Armor extends Item {
     public int getArmorClass(){
         initStats();
         return getCastInt(ARMOR_CLASS);
+    }
+
+    @Override
+    protected boolean compositeStatsExistInWorld(World targetWorld) {
+        initStats();
+        return ArmorStatTable.existsInWorld(getItemName(),targetWorld);
+    }
+
+    @Override
+    protected boolean writeCompositeStatsToWorld(World targetWorld) {
+        initStats();
+        return ArmorStatTable.writeStatsToWorld(getDerivedStats(), targetWorld);
     }
 
     /**
