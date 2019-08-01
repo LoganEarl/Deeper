@@ -18,7 +18,7 @@ import static world.item.ItemInstanceTable.*;
  * @author Logan Earl
  */
 public abstract class Item implements DatabaseManager.DatabaseEntry {
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)",
+    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
             TABLE_NAME, ITEM_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, STATE);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
@@ -282,8 +282,6 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         return itemName;
     }
 
-
-
     protected final void initStats(){
         if(itemStats == null)
             itemStats = ItemStatTable.getStatsForItem(itemName,databaseName);
@@ -413,6 +411,23 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         initStats();
         return ItemStatTable.writeStatsToWorld(itemStats,targetWorld) &&
                 writeCompositeStatsToWorld(targetWorld);
+    }
+
+    public final void transferToWorld(World newWorld){
+        if(!newWorld.getDatabaseName().equals(databaseName)) {
+            boolean canWrite = false;
+            if (!statsExistInWorld(newWorld))
+                canWrite = writeStatsToWorld(newWorld);
+            else
+                canWrite = true;
+            if(canWrite) {
+                removeFromDatabase(databaseName);
+                databaseName = newWorld.getDatabaseName();
+                if (roomName != null && !roomName.isEmpty())
+                    roomName = newWorld.getEntryRoomName();
+                saveToDatabase(databaseName);
+            }
+        }
     }
 
     protected abstract boolean compositeStatsExistInWorld(World targetWorld);

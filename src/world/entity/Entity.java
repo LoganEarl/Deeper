@@ -2,6 +2,7 @@ package world.entity;
 
 import client.Client;
 import database.DatabaseManager;
+import world.item.Item;
 import world.meta.World;
 import world.notification.Notification;
 import world.notification.NotificationService;
@@ -94,10 +95,16 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         if(!saveToDatabase(newWorld.getDatabaseName()))
             return CODE_TRANSFER_FAILED;
 
+        getEquipment().transferEquipmentToWorld(newWorld);
+
         if(!World.setWorldOfEntity(this,newWorld))
             return CODE_TRANSFER_FAILED;
+        String tag = getEntityTag(entityID,databaseName);
+        entityCache.remove(tag);
         this.databaseName = newWorld.getDatabaseName();
         this.roomName = newWorld.getEntryRoomName();
+        tag = getEntityTag(entityID, databaseName);
+        entityCache.put(tag,this);
         updateInDatabase(databaseName);
         return CODE_TRANSFER_COMPLETE;
     }
@@ -234,9 +241,12 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     public boolean saveToDatabase(String databaseName) {
         Entity entity = getEntityByEntityID(entityID,databaseName);
         if(entity == null){
-            return DatabaseManager.executeStatement(makeInsertSQL(extenders,
+            boolean success =  DatabaseManager.executeStatement(makeInsertSQL(extenders,
                     ENTITY_ID,DISPLAY_NAME,CONTROLLER_TYPE,ROOM_NAME,RACE_ID), databaseName, appendData(extenders,
                     entityID,displayName,controllerType,roomName,raceID)) > 0;
+            if(success)
+                entityCache.put(getEntityTag(entityID,databaseName),this);
+            return success;
         }else{
             return updateInDatabase(databaseName);
         }
@@ -244,14 +254,20 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
     @Override
     public boolean removeFromDatabase(String databaseName) {
-        return DatabaseManager.executeStatement(DELETE_SQL,databaseName, entityID) > 0;
+        boolean success = DatabaseManager.executeStatement(DELETE_SQL,databaseName, entityID) > 0;
+        if(success)
+            entityCache.remove(getEntityTag(entityID,databaseName));
+        return success;
     }
 
     @Override
     public boolean updateInDatabase(String databaseName) {
-        return DatabaseManager.executeStatement(makeInsertSQL(extenders,
+        boolean success = DatabaseManager.executeStatement(makeInsertSQL(extenders,
                 ENTITY_ID,DISPLAY_NAME,CONTROLLER_TYPE,ROOM_NAME,RACE_ID), databaseName, appendData(extenders,
                 entityID,displayName,controllerType,roomName,raceID)) > 0;
+        if(success)
+            entityCache.put(getEntityTag(entityID,databaseName),this);
+        return success;
     }
 
     @Override
@@ -413,7 +429,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(hp,maxHP,mp,maxMP,stamina,maxStamina,burnout,maxBurnout));
             extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom, toughness, fitness
             ));
-            extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer());
+            extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(e));
 
             e.extenders = extenders;
             e.entityID = entityID;

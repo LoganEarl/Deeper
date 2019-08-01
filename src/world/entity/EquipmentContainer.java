@@ -4,6 +4,8 @@ import world.item.Item;
 import world.item.ItemType;
 import world.item.armor.Armor;
 import world.item.armor.ArmorSlot;
+import world.item.container.Container;
+import world.meta.World;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,7 +33,8 @@ public class EquipmentContainer implements Entity.SqlExtender {
     public static final int CODE_WRONG_TYPE = -5;
     public static final int CODE_ERROR = -100;
 
-    EquipmentContainer() {
+    EquipmentContainer(Entity entity) {
+        this.entity = entity;
     }
 
     EquipmentContainer(ResultSet readFrom, Entity entity) throws SQLException {
@@ -268,6 +271,26 @@ public class EquipmentContainer implements Entity.SqlExtender {
         if (empty(slots.get(leftHand)))
             return leftHand;
         return null;
+    }
+
+    public void transferEquipmentToWorld(World newWorld){
+        if(newWorld == null)
+            return;
+
+        for(Integer itemID: slots.values()) {
+            if (!empty(itemID)) {
+                Item toTransfer = Item.getItemByID(itemID, entity.getDatabaseName());
+                if(toTransfer != null)
+                    transferItem(toTransfer, newWorld);
+            }
+        }
+    }
+
+    private void transferItem(Item item, World newWorld){
+        if(item.getItemType() == ItemType.container)
+            for(Item i: ((Container)item).getStoredItems())
+                transferItem(i,newWorld);
+        item.transferToWorld(newWorld);
     }
 
     @Override
