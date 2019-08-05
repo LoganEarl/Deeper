@@ -1,6 +1,7 @@
 package world.entity;
 
 import database.DatabaseManager;
+import world.entity.race.RaceTable;
 import world.room.RoomTable;
 
 import java.util.*;

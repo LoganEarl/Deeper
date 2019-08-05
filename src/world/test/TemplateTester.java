@@ -2,7 +2,7 @@ package world.test;
 
 import database.DatabaseManager;
 import world.entity.EntityTable;
-import world.entity.RaceTable;
+import world.entity.race.RaceTable;
 import world.item.ItemInstanceTable;
 import world.item.ItemStatTable;
 import world.item.container.ContainerStatTable;

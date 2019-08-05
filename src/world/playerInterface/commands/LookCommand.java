@@ -3,7 +3,7 @@ package world.playerInterface.commands;
 import client.Client;
 import world.WorldUtils;
 import world.entity.Entity;
-import world.entity.Race;
+import world.entity.race.Race;
 import world.item.Item;
 import world.item.ItemType;
 import world.item.container.Container;

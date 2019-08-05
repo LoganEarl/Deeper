@@ -1,4 +1,4 @@
-package world.entity;
+package world.entity.race;
 
 import database.DatabaseManager;
 
@@ -66,6 +66,7 @@ public class Race {
         baseWis = entry.getInt(RaceTable.BASE_WIS);
         baseTough = entry.getInt(RaceTable.BASE_TOUGH);
         baseFit = entry.getInt(RaceTable.BASE_FIT);
+        this.databaseName = databaseName;
     }
 
     public static List<Race> defaultRaces(){
@@ -113,6 +114,10 @@ public class Race {
                 newRace = null;
             }
         }
+
+        if(newRace != null && !unplayableRaceCache.containsKey(tag))
+            unplayableRaceCache.put(tag,newRace);
+
         return newRace;
     }
 

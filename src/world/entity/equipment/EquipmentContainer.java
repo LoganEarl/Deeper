@@ -1,5 +1,7 @@
-package world.entity;
+package world.entity.equipment;
 
+import world.entity.BaseStance;
+import world.entity.Entity;
 import world.item.Item;
 import world.item.ItemType;
 import world.item.armor.Armor;
@@ -15,9 +17,11 @@ import static world.entity.EntityTable.*;
 import static world.item.armor.ArmorSlot.*;
 
 public class EquipmentContainer implements Entity.SqlExtender {
-    static final String SIGNIFIER = "items";
+    public static final String SIGNIFIER = "items";
 
     private Map<ArmorSlot, Integer> slots = new HashMap<>();
+
+    private BaseStance stance;
 
     private Entity entity;
 
@@ -33,11 +37,11 @@ public class EquipmentContainer implements Entity.SqlExtender {
     public static final int CODE_WRONG_TYPE = -5;
     public static final int CODE_ERROR = -100;
 
-    EquipmentContainer(Entity entity) {
+    public EquipmentContainer(Entity entity) {
         this.entity = entity;
     }
 
-    EquipmentContainer(ResultSet readFrom, Entity entity) throws SQLException {
+    public EquipmentContainer(ResultSet readFrom, Entity entity) throws SQLException {
         for (int i = 0; i < HEADERS.size(); i++) {
             slots.put(SLOTS.get(i), readFrom.getInt(HEADERS.get(i)));
         }
@@ -309,5 +313,10 @@ public class EquipmentContainer implements Entity.SqlExtender {
     @Override
     public String[] getSqlColumnHeaders() {
         return HEADERS.toArray(new String[0]);
+    }
+
+    @Override
+    public void registerStance(BaseStance toRegister) {
+        this.stance = toRegister;
     }
 }

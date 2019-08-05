@@ -2,10 +2,11 @@ package world.entity;
 
 import client.Client;
 import database.DatabaseManager;
-import world.item.Item;
+import world.entity.equipment.EquipmentContainer;
+import world.entity.pool.PoolContainer;
+import world.entity.race.Race;
 import world.meta.World;
 import world.notification.Notification;
-import world.notification.NotificationService;
 import world.notification.NotificationSubscriber;
 import world.room.Room;
 
@@ -22,7 +23,6 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
     private String entityID;
     private String displayName;
-    private int notificationSubscriptionID = 0;
 
     private LinkedHashMap<String, SqlExtender> extenders = new LinkedHashMap<>();
 
@@ -31,6 +31,8 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     private String controllerType;
     private String roomName;
     private String raceID;
+
+    private BaseStance currentStance;
 
     private String databaseName;
 
@@ -49,6 +51,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
     private Entity() {
         //for use by the builder
+
     }
 
     private Entity(ResultSet readEntry, String databaseName) throws Exception {
@@ -69,9 +72,9 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         getPools().calculatePoolMaxes(getStats());
 
         this.databaseName = databaseName;
+
+        setStance(new BaseStance());
     }
-
-
 
     /**
      * will transfer this entity to the given world, updating the meta file and everything.
@@ -107,6 +110,10 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         entityCache.put(tag,this);
         updateInDatabase(databaseName);
         return CODE_TRANSFER_COMPLETE;
+    }
+
+    public static Collection<Entity> getAllLoadedEnties(){
+        return entityCache.values();
     }
 
     public static Entity getPlayableEntityByID(String entityID){
@@ -324,6 +331,16 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
                 return this.entityID;
             else
                 return myRace.getDisplayName() + ":" + this.entityID;
+        }
+    }
+
+    public void setStance(BaseStance stance){
+        //TODO check if they have the required skill to enter the stance
+        if(!stance.equals(currentStance)) {
+            this.currentStance = stance;
+            for (SqlExtender extender : extenders.values()) {
+                extender.registerStance(currentStance);
+            }
         }
     }
 
@@ -549,9 +566,10 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         }
     }
 
-    interface SqlExtender{
+    public interface SqlExtender{
         String getSignifier();
         Object[] getInsertSqlValues();
         String[] getSqlColumnHeaders();
+        void registerStance(BaseStance toRegister);
     }
 }

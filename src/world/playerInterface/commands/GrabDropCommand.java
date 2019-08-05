@@ -1,13 +1,13 @@
 package world.playerInterface.commands;
 
 import client.Client;
-import world.entity.EquipmentContainer;
+import world.entity.equipment.EquipmentContainer;
 import world.item.Item;
 import world.item.ItemType;
 import world.item.armor.ArmorSlot;
 import world.item.container.Container;
 
-import static world.entity.EquipmentContainer.*;
+import static world.entity.equipment.EquipmentContainer.*;
 
 public class GrabDropCommand extends EntityCommand {
     private String itemIdentifier;

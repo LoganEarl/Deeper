@@ -1,4 +1,4 @@
-package world.entity;
+package world.entity.race;
 
 import database.DatabaseManager;
 

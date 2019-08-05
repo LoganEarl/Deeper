@@ -7,7 +7,7 @@ import network.messaging.MessagePipeline;
 import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.EntityTable;
-import world.entity.Race;
+import world.entity.race.Race;
 import world.meta.World;
 import world.notification.NotificationService;
 

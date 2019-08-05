@@ -3,7 +3,7 @@ package world.playerInterface.commands;
 import client.Client;
 import client.ClientRegistry;
 import world.entity.Entity;
-import world.entity.EquipmentContainer;
+import world.entity.equipment.EquipmentContainer;
 import world.entity.StatContainer;
 import world.item.Item;
 import world.item.ItemType;

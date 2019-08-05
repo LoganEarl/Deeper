@@ -14,6 +14,8 @@ public class StatContainer implements Entity.SqlExtender {
     private int toughness;
     private int fitness;
 
+    private BaseStance currnetStance;
+
     private static final Random RND = new Random(System.currentTimeMillis());
 
     public static final String SIGNIFIER = "stats";
@@ -79,6 +81,22 @@ public class StatContainer implements Entity.SqlExtender {
         return strength/100.0 * 360 + 40;
     }
 
+    public int calculateMaxHP(){
+        return getToughness() * 2 + (getStrength() + getDexterity())/2;
+    }
+
+    public int calculateMaxStamina(){
+        return getFitness() * 2 + (getStrength() + getDexterity())/2;
+    }
+
+    public int calculateMaxMP(){
+        return getIntelligence() * 2 + getWisdom();
+    }
+
+    public int calculateMaxBurnout(){
+        return getWisdom() * 2 + getIntelligence();
+    }
+
     @Override
     public String getSignifier() {
         return SIGNIFIER;
@@ -92,6 +110,11 @@ public class StatContainer implements Entity.SqlExtender {
     @Override
     public String[] getSqlColumnHeaders() {
         return HEADERS;
+    }
+
+    @Override
+    public void registerStance(BaseStance toRegister) {
+        currnetStance = toRegister;
     }
 
     public int getStrength() {

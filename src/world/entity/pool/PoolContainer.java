@@ -1,11 +1,15 @@
-package world.entity;
+package world.entity.pool;
+
+import world.entity.BaseStance;
+import world.entity.Entity;
+import world.entity.StatContainer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static world.entity.EntityTable.*;
 
-public class PoolContainer implements Entity.SqlExtender{
+public class PoolContainer implements Entity.SqlExtender {
     private int hp;
     private int maxHP;
     private int mp;
@@ -14,6 +18,8 @@ public class PoolContainer implements Entity.SqlExtender{
     private int maxStamina;
     private int burnout;
     private int maxBurnout;
+
+    private BaseStance currentStance;
 
     public static final String SIGNIFIER = "pools";
 
@@ -42,6 +48,9 @@ public class PoolContainer implements Entity.SqlExtender{
     }
 
     public void damage(int damage){
+        if(currentStance != null)
+            damage = currentStance.getDamageDealt(damage);
+
         this.hp -= damage;
         if(hp <= 0){
             //TODO enter dying state
@@ -63,6 +72,30 @@ public class PoolContainer implements Entity.SqlExtender{
     @Override
     public String[] getSqlColumnHeaders() {
         return HEADERS;
+    }
+
+    @Override
+    public void registerStance(BaseStance toRegister) {
+        this.currentStance = toRegister;
+    }
+
+    public void regenPools(long curTime, StatContainer stats){
+        calculatePoolMaxes(stats);
+        if(!isDying() && !isDead()) {
+            BaseStance.RegenPacket regenPacket = currentStance.receiveNextRegenPacket(stats, curTime);
+            hp += regenPacket.getHp();
+            mp += regenPacket.getMp();
+            stamina += regenPacket.getStamina();
+            burnout += regenPacket.getBurnout();
+            rectifyPools();
+        }
+    }
+
+    private void rectifyPools(){
+        if(hp > maxHP)hp = maxHP;
+        if(mp > maxMP) mp = maxMP;
+        if(stamina > maxStamina) stamina = maxStamina;
+        if(burnout > maxBurnout) burnout = maxBurnout;
     }
 
     /**Recalculates the maximum hp/mp/stamina/burnout values based on the entity's stats*/

@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import client.messages.*;
 import database.DatabaseManager;
 import network.messaging.MessagePipeline;
+import world.entity.pool.EntityRegenCommand;
 import world.item.ItemFactory;
 import world.item.container.Container;
 import world.item.misc.MiscItem;
@@ -45,6 +46,8 @@ public class SimulationManager {
         clientRegistry = new ClientRegistry(executor, server,DB_NAME);
         notificationService = new NotificationService(clientRegistry, executor);
         messagePipeline = new MessagePipeline(clientRegistry,executor, notificationService);
+
+        executor.scheduleCommand(new EntityRegenCommand());
 
         server.setMessageReceivedListener(messagePipeline);
     }
