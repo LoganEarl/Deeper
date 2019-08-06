@@ -1,5 +1,6 @@
-package world.entity;
+package world.entity.stance;
 
+import world.entity.StatContainer;
 import world.entity.skill.Skill;
 
 public class BaseStance {

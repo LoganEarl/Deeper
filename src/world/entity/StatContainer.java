@@ -1,5 +1,7 @@
 package world.entity;
 
+import world.entity.stance.BaseStance;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;

@@ -1,6 +1,6 @@
 package world.entity.pool;
 
-import world.entity.BaseStance;
+import world.entity.stance.BaseStance;
 import world.entity.Entity;
 import world.entity.StatContainer;
 

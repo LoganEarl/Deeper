@@ -5,6 +5,9 @@ import database.DatabaseManager;
 import world.entity.equipment.EquipmentContainer;
 import world.entity.pool.PoolContainer;
 import world.entity.race.Race;
+import world.entity.skill.Skill;
+import world.entity.skill.SkillTable;
+import world.entity.stance.BaseStance;
 import world.meta.World;
 import world.notification.Notification;
 import world.notification.NotificationSubscriber;
@@ -335,11 +338,13 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     }
 
     public void setStance(BaseStance stance){
-        //TODO check if they have the required skill to enter the stance
-        if(!stance.equals(currentStance)) {
-            this.currentStance = stance;
-            for (SqlExtender extender : extenders.values()) {
-                extender.registerStance(currentStance);
+        Skill requiredSkill = stance.getRequiredSkill();
+        if(requiredSkill != null && SkillTable.entityHasSkill(this, requiredSkill)) {
+            if (!stance.equals(currentStance)) {
+                this.currentStance = stance;
+                for (SqlExtender extender : extenders.values()) {
+                    extender.registerStance(currentStance);
+                }
             }
         }
     }

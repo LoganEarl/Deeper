@@ -1,6 +1,6 @@
 package world.entity.equipment;
 
-import world.entity.BaseStance;
+import world.entity.stance.BaseStance;
 import world.entity.Entity;
 import world.item.Item;
 import world.item.ItemType;
