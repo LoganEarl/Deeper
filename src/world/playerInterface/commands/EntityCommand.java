@@ -4,6 +4,8 @@ import client.Client;
 import network.CommandExecutor;
 import world.WorldUtils;
 import world.entity.Entity;
+import world.entity.skill.Skill;
+import world.entity.skill.SkillTable;
 
 public abstract class EntityCommand implements CommandExecutor.Command {
     private Client sourceClient;
@@ -15,29 +17,53 @@ public abstract class EntityCommand implements CommandExecutor.Command {
     }
 
     public final void execute(){
+        Skill requiredSkill;
         if(sourceClient.getStatus() != Client.ClientStatus.ACTIVE) {
             sourceClient.sendMessage("You must be logged in to do that");
             done = true;
         }else if((sourceEntity = WorldUtils.getEntityOfClient(sourceClient)) == null) {
             sourceClient.sendMessage("You must have a character to do that");
             done = true;
-        } else if(requiresBalance() && !sourceEntity.isBalanced()) {
-            sourceClient.sendMessage("You must regain your balance first!");
-            done = true;
         } else if(sourceEntity.getPools().isDying() && !canDoWhenDying()){
             sourceClient.sendMessage("You are dying. You cannot do that right now. Seek help quickly before you pass on");
             done = true;
-        }else if(sourceEntity.getPools().isDead()){
+        }else if(sourceEntity.getPools().isDead() && !canDoWhenDead()){
             sourceClient.sendMessage("You are dead");
             done = true;
-        } else{
+        } else if(requiresBalance() && !sourceEntity.isBalanced()) {
+            sourceClient.sendMessage("You must regain your balance first!");
+            done = true;
+        } else if((requiredSkill = getRequiredSkill()) != null && !SkillTable.entityHasSkill(sourceEntity,requiredSkill)) {
+            sourceClient.sendMessage("You must learn " + requiredSkill.getDisplayName() + " before you can do that");
+            done = true;
+        }else{
             executeEntityCommand();
             if(requiresBalance())
                 setBalance();
         }
     }
 
+    /**
+     * override to gate the command behind a skill. Default behavior is for there to be no requirement
+     * @return the required skill for the command or null if no requirement is needed
+     */
+    protected Skill getRequiredSkill(){
+        return null;
+    }
+
+    /**
+     * override to set if entities can do this action while dying. Default state is for the action to be impossible while dying
+     * @return true if the action can be done while dying.
+     */
     protected boolean canDoWhenDying(){
+        return false;
+    }
+
+    /**
+     * override to set if entities can do this action while dead. Default state is for the action to be impossible while dead
+     * @return true if the action can be done while dead.
+     */
+    protected boolean canDoWhenDead() {
         return false;
     }
 
