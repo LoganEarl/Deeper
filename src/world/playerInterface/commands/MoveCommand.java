@@ -7,10 +7,17 @@ import world.room.Room;
 public class MoveCommand extends EntityCommand {
     private String direction;
     private boolean complete = false;
+    private int staminaNeeded;
+    private int staminaUsed = 0;
 
     public MoveCommand(String direction, Client sourceClient) {
         super(sourceClient);
         this.direction = direction;
+
+        if(!getSourceEntity().getEquipment().isEncumbered())
+            staminaNeeded = 0;
+        else
+            staminaNeeded = 1;
     }
 
     @Override
@@ -21,6 +28,7 @@ public class MoveCommand extends EntityCommand {
             if(curRoom != null) {
                 Room travelRoom = Room.getRoomByRoomName(curRoom.getConnectedRoomID(direction), curRoom.getDatabaseName());
                 if(travelRoom != null && travelRoom.getVisibilityCode() == 0){
+                    staminaUsed = staminaNeeded;
                     sourceEntity.setRoom(travelRoom);
                     sourceEntity.updateInDatabase(sourceEntity.getDatabaseName());
                     new LookCommand("",false,getSourceClient()).execute();
@@ -32,6 +40,16 @@ public class MoveCommand extends EntityCommand {
             getSourceClient().sendMessage("I do not understand the direction " + direction + ". Please try again.");
         complete = true;
 
+    }
+
+    @Override
+    protected int getRequiredStamina() {
+        return staminaNeeded;
+    }
+
+    @Override
+    protected int getStaminaUsed() {
+        return staminaUsed;
     }
 
     @Override

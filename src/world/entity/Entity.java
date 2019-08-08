@@ -115,7 +115,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         return CODE_TRANSFER_COMPLETE;
     }
 
-    public static Collection<Entity> getAllLoadedEnties(){
+    public static Collection<Entity> getAllLoadedEntities(){
         return entityCache.values();
     }
 

@@ -1,5 +1,6 @@
 package world.entity.stance;
 
+import world.entity.Entity;
 import world.entity.StatContainer;
 import world.entity.skill.Skill;
 
@@ -14,7 +15,7 @@ public class BaseStance {
     private long lastUpdateTime = 0;
     private double carryoverHP = 0, carryOverMP = 0, carryOverStam = 0, carryOverBurn = 0;
 
-    public int getDamageDealt(int baseDamage){
+    public int getDamageDealt(int baseDamage, Entity agressor, int hitRoll){
         return baseDamage;
     }
 

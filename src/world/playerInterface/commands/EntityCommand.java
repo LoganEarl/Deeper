@@ -36,10 +36,18 @@ public abstract class EntityCommand implements CommandExecutor.Command {
         } else if((requiredSkill = getRequiredSkill()) != null && !SkillTable.entityHasSkill(sourceEntity,requiredSkill)) {
             sourceClient.sendMessage("You must learn " + requiredSkill.getDisplayName() + " before you can do that");
             done = true;
+        } else if(getRequiredStamina() > sourceEntity.getPools().getStamina()){
+            sourceClient.sendMessage("You are exhausted");
+            done = true;
         }else{
             executeEntityCommand();
             if(requiresBalance())
                 setBalance();
+            if(getSourceEntity().getEquipment().isEncumbered()) {
+                getSourceEntity().getPools().expendStamina(getStaminaUsed() * 2);
+            }else{
+                getSourceEntity().getPools().expendStamina(getStaminaUsed());
+            }
         }
     }
 
@@ -49,6 +57,14 @@ public abstract class EntityCommand implements CommandExecutor.Command {
      */
     protected Skill getRequiredSkill(){
         return null;
+    }
+
+    protected int getRequiredStamina(){
+        return 0;
+    }
+
+    protected int getStaminaUsed(){
+        return 0;
     }
 
     /**

@@ -47,9 +47,18 @@ public class PoolContainer implements Entity.SqlExtender {
         maxBurnout = readEntry.getInt(MAX_BURNOUT);
     }
 
+    public void expendStamina(int stamina){
+        this.stamina -= stamina;
+        if(this.stamina < 0) this.stamina = 0;
+    }
+
     public void damage(int damage){
+        damage(damage, null, 0);
+    }
+
+    public void damage(int damage, Entity aggressor, int hitRoll){
         if(currentStance != null)
-            damage = currentStance.getDamageDealt(damage);
+            damage = currentStance.getDamageDealt(damage, aggressor, hitRoll);
 
         this.hp -= damage;
         if(hp <= 0){

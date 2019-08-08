@@ -24,6 +24,7 @@ public class AttackCommand extends EntityCommand {
     private int cooldownMs = 0;
 
     private boolean complete = false;
+    private int staminaUsed = 0;
 
     public AttackCommand(String target, Client sourceClient, ClientRegistry registry, NotificationService service) {
         super(sourceClient);
@@ -64,17 +65,17 @@ public class AttackCommand extends EntityCommand {
                 getSourceClient().sendMessage("You have no weapon to attack with");
             }else if(rightHandCanAttack && !leftHandCanAttack){
                 Weapon rightHandWeapon = (Weapon) rightHand;
-                singleAttack(rightHandWeapon,target,stats,0);
+                singleAttack(rightHandWeapon,target,stats,0, 1);
                 cooldownMs = (int)Math.ceil(rightHandWeapon.getAttackSpeed() * 1000);
             }else if(leftHandCanAttack && !rightHandCanAttack){
                 Weapon leftHandWeapon = (Weapon) leftHand;
-                singleAttack(leftHandWeapon,target,stats,0);
+                singleAttack(leftHandWeapon,target,stats,0,1);
                 cooldownMs = (int)Math.ceil(leftHandWeapon.getAttackSpeed() * 1000);
             }else if(rightHandCanAttack && leftHandCanAttack){
                 Weapon rightHandWeapon = (Weapon) rightHand;
                 Weapon leftHandWeapon = (Weapon) leftHand;
-                singleAttack(rightHandWeapon,target,stats,-10);
-                singleAttack(leftHandWeapon,target,stats,-20);
+                singleAttack(rightHandWeapon,target,stats,-10,1.1);
+                singleAttack(leftHandWeapon,target,stats,-20, 1.1);
                 float maxWeaponSpeed = rightHandWeapon.getAttackSpeed() > leftHandWeapon.getAttackSpeed()?
                         rightHandWeapon.getAttackSpeed(): leftHandWeapon.getAttackSpeed();
                 cooldownMs = (int)Math.ceil(maxWeaponSpeed * 1500);
@@ -84,6 +85,11 @@ public class AttackCommand extends EntityCommand {
         }
 
         complete = true;
+    }
+
+    @Override
+    protected int getStaminaUsed() {
+        return staminaUsed;
     }
 
     private void notifyTarget(String message, Entity target){
@@ -103,22 +109,29 @@ public class AttackCommand extends EntityCommand {
         }
     }
 
-    private void singleAttack(Weapon selectWeapon, Entity target, StatContainer stats, int bonus){
-        int roll = selectWeapon.rollHit(
-                stats.getStrength(),
-                stats.getDexterity(),
-                stats.getIntelligence(),
-                stats.getWisdom());
-        roll = roll - target.getEquipment().getEquipmentAC();
-        roll = roll + bonus;
+    private void singleAttack(Weapon selectWeapon, Entity target, StatContainer stats, int bonus, double staminaMultiplier){
+        double rawStamina = selectWeapon.getStaminaUsage(stats.getStrength(), stats.getDexterity()) * staminaMultiplier;
+        int staminaNeeded = (int)Math.ceil(rawStamina);
+        if(staminaNeeded > getSourceEntity().getPools().getStamina())
+            getSourceClient().sendMessage("You are exhausted and cannot wield the " + selectWeapon.getDisplayableName());
+        else {
+            int roll = selectWeapon.rollHit(
+                    stats.getStrength(),
+                    stats.getDexterity(),
+                    stats.getIntelligence(),
+                    stats.getWisdom());
+            roll = roll - target.getEquipment().getEquipmentAC();
+            roll = roll + bonus;
 
-        int damage = 0;
-        if(roll >= 0) {
-            damage = selectWeapon.rollDamage( stats.getStrength(), stats.getDexterity(), stats.getIntelligence(), stats.getWisdom());
-            target.getPools().damage(damage);
+            int damage = 0;
+            if (roll >= 0) {
+                damage = selectWeapon.rollDamage(stats.getStrength(), stats.getDexterity(), stats.getIntelligence(), stats.getWisdom());
+                target.getPools().damage(damage, getSourceEntity(), roll);
+            }
+            AttackNotification notification = new AttackNotification(getSourceEntity(), target, selectWeapon, roll, damage, registry);
+            service.notify(notification, new RoomNotificationScope(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName()));
+            staminaUsed += staminaNeeded;
         }
-        AttackNotification notification = new AttackNotification(getSourceEntity(),target,selectWeapon,roll, damage,registry);
-        service.notify(notification,new RoomNotificationScope(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName()));
     }
 
     @Override
