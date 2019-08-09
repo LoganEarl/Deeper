@@ -50,9 +50,9 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     private String selectedName;
     private Race selectedRace;
 
-    private int[] allocations = {0,0,0,0};
-    private String[] allocationNames = {"str","dex","int","wis"};
-    private int pointsAvailable = 40;
+    private int[] allocations = {0,0,0,0,0,0};
+    private String[] allocationNames = {"str","dex","int","wis", "fit", "tough"};
+    private int pointsAvailable = 20;
 
     /**
      * cole constructor
@@ -183,7 +183,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
 
             if(newMessageArgs == null){
                 registry.sendMessage("You have " + pointsAvailable +
-                        " stat points available to allocate. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis]. Use [done] when complete.", sourceClient);
+                        " stat points available to allocate. Allocate points with: [add/subtract] [number of points] [from/to] [str/dex/int/wis/fit/tough]. Use [done] when complete.", sourceClient);
             }else if(newMessageArgs.length == 4 &&
                     (newMessageArgs[0].equals("add") || newMessageArgs[0].equals("subtract")) &&
                     isInteger(newMessageArgs[1]) &&
@@ -201,10 +201,15 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                     registry.sendMessage("You cannot allocate less points to an attribute than your race's base stats",sourceClient);
             }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("done")){
                 builder.setStrength(allocations[0] + selectedRace.getBaseStr());
+                builder.setDexterity(allocations[1] + selectedRace.getBaseDex());
+                builder.setIntelligence(allocations[2] + selectedRace.getBaseInt());
+                builder.setWisdom(allocations[3] + selectedRace.getBaseWis());
+                builder.setFitness(allocations[4] + selectedRace.getBaseFit());
+                builder.setToughness(allocations[5] + selectedRace.getBaseTough());
                 stage = STAGE_VERIFY;
                 newMessageArgs = null;
             }else{
-                registry.sendMessage("I do not understand. Allocate points with: {add/subtract} [number of points] {from/to} {str/dex/int/wis}. Use 'done' when complete.",sourceClient);
+                registry.sendMessage("I do not understand. Allocate points with: {add/subtract} [number of points] {from/to} {str/dex/int/wis/fit/tough}. Use 'done' when complete.",sourceClient);
             }
         }
     }
@@ -225,11 +230,13 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     }
 
     private String getCurrentStats(){
-        return String.format(Locale.US, "[STR %d] [DEX %d] [INT %d] [WIS %d]",
+        return String.format(Locale.US, "[STR %d] [DEX %d] [INT %d] [WIS %d] [FIT %d] [TOUGH %d]",
                 selectedRace.getBaseStr() + allocations[0],
                 selectedRace.getBaseDex() + allocations[1],
                 selectedRace.getBaseInt() + allocations[2],
-                selectedRace.getBaseWis() + allocations[3]);
+                selectedRace.getBaseWis() + allocations[3],
+                selectedRace.getBaseFit() + allocations[4],
+                selectedRace.getBaseTough() + allocations[5]);
     }
 
     private static boolean isInteger(String s) {

@@ -1,0 +1,127 @@
+package world.playerInterface.commands;
+
+import client.Client;
+import world.entity.pool.PoolContainer;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class PoolsCommand extends EntityCommand {
+    private static final int BAR_LENGTH = 15;
+    private static Map<Client, PoolsCommand> registeredContinuingPools = new HashMap<>();
+
+    private int lastHP = 0;
+    private int lastMP = 0;
+    private int lastBurn = 0;
+    private int lastStam = 0;
+
+    private boolean complete = false;
+    private long nextUpdateTimestamp = -1;
+    private boolean useBars;
+    private double updateIntervalSeconds = -1;
+
+    private boolean firstRun = true;
+
+    public PoolsCommand(boolean useBars, Client sourceClient) {
+        this(useBars,-1,sourceClient);
+    }
+
+    public PoolsCommand(boolean useBars, double updateIntervalSeconds, Client sourceClient) {
+        super(sourceClient);
+        this.updateIntervalSeconds = updateIntervalSeconds;
+        nextUpdateTimestamp = System.currentTimeMillis();
+        this.useBars = useBars;
+
+        if(updateIntervalSeconds != -1){
+            PoolsCommand.killUpdaterOfClient(sourceClient);
+            registeredContinuingPools.put(sourceClient,this);
+        }
+    }
+
+    @Override
+    protected boolean requiresBalance() {
+        return false;
+    }
+
+    @Override
+    protected boolean entityCommandIsComplete() {
+        return complete;
+    }
+
+    @Override
+    protected void executeEntityCommand() {
+        PoolContainer pools = getSourceEntity().getPools();
+        if (lastHP != pools.getHp() || lastBurn != pools.getBurnout() ||
+                lastMP != pools.getMp() || lastStam != pools.getStamina()) {
+            lastHP = pools.getHp();
+            lastBurn = pools.getBurnout();
+            lastMP = pools.getMp();
+            lastStam = pools.getStamina();
+
+            getSourceClient().sendMessage(getDisplayText());
+        }
+        if (updateIntervalSeconds != -1) {
+            if(firstRun){
+                firstRun = false;
+                getSourceClient().sendMessage("Now updating pools");
+            }
+            nextUpdateTimestamp = System.currentTimeMillis() + (long) (updateIntervalSeconds * 1000) - 100;
+        }else
+            complete = true;
+
+    }
+
+    private String getDisplayText() {
+        PoolContainer pools = getSourceEntity().getPools();
+        String hpBar = "", stamBar = "", mpBar = "", burnBar = "";
+        if (useBars) {
+            hpBar = getBarForRatio(pools.getHp() / (double) pools.getMaxHP(), BAR_LENGTH);
+            stamBar = getBarForRatio(pools.getStamina() / (double) pools.getMaxStamina(), BAR_LENGTH);
+            mpBar = getBarForRatio(pools.getMp() / (double) pools.getMaxMP(), BAR_LENGTH);
+            burnBar = getBarForRatio(pools.getBurnout() / (double) pools.getMaxBurnout(), BAR_LENGTH);
+        }
+
+        return String.format(Locale.US,
+                "HP:    %d/%d\t %s\nSTAM:  %d/%d\t %s\nMP:    %d/%d\t %s\nBURN:  %d/%d\t %s\n",
+                pools.getHp(), pools.getMaxHP(), hpBar,
+                pools.getStamina(), pools.getMaxStamina(), stamBar,
+                pools.getMp(), pools.getMaxMP(), mpBar,
+                pools.getBurnout(), pools.getMaxBurnout(), burnBar);
+
+    }
+
+    private String getBarForRatio(double ratio, int length) {
+        int completion = (int) (ratio * length);
+        StringBuilder text = new StringBuilder("[");
+        for (int i = 0; i < length; i++) {
+            if (i < completion)
+                text.append("I");
+            else
+                text.append("_");
+        }
+        text.append("]");
+        return text.toString();
+    }
+
+    @Override
+    public long getStartTimestamp() {
+        return nextUpdateTimestamp;
+    }
+
+    @Override
+    protected boolean canDoWhenDying() {
+        return true;
+    }
+
+    public void stopUpdates() {
+        complete = true;
+    }
+
+    public static void killUpdaterOfClient(Client client){
+        if(registeredContinuingPools.containsKey(client)){
+            registeredContinuingPools.get(client).stopUpdates();
+            registeredContinuingPools.remove(client);
+        }
+    }
+}

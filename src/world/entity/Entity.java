@@ -448,8 +448,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             Entity e = new Entity();
             LinkedHashMap<String,SqlExtender> extenders = new LinkedHashMap<>();
             extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(hp,maxHP,mp,maxMP,stamina,maxStamina,burnout,maxBurnout));
-            extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom, toughness, fitness
-            ));
+            extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom, toughness, fitness));
             extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(e));
 
             e.extenders = extenders;
@@ -459,6 +458,11 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             e.roomName = roomName;
             e.raceID = raceID;
             e.databaseName = databaseName;
+
+            e.getPools().calculatePoolMaxes(e.getStats());
+
+            e.setStance(new BaseStance());
+
             return e;
         }
 
@@ -498,6 +502,14 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         public EntityBuilder setWisdom(int wisdom){
             this.wisdom = wisdom;
             return this;
+        }
+
+        public void setToughness(int toughness) {
+            this.toughness = toughness;
+        }
+
+        public void setFitness(int fitness) {
+            this.fitness = fitness;
         }
 
         public EntityBuilder setID(String id){
@@ -544,6 +556,8 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             this.dexterity = r.getBaseDex();
             this.intelligence = r.getBaseInt();
             this.wisdom = r.getBaseWis();
+            this.fitness = r.getBaseFit();
+            this.toughness = r.getBaseTough();
             return this;
         }
 
