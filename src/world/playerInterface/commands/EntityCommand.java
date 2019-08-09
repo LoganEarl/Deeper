@@ -14,6 +14,7 @@ public abstract class EntityCommand implements CommandExecutor.Command {
 
     public EntityCommand(Client sourceClient){
         this.sourceClient = sourceClient;
+        sourceEntity = WorldUtils.getEntityOfClient(sourceClient);
     }
 
     public final void execute(){
@@ -21,7 +22,7 @@ public abstract class EntityCommand implements CommandExecutor.Command {
         if(sourceClient.getStatus() != Client.ClientStatus.ACTIVE) {
             sourceClient.sendMessage("You must be logged in to do that");
             done = true;
-        }else if((sourceEntity = WorldUtils.getEntityOfClient(sourceClient)) == null) {
+        }else if(sourceEntity == null) {
             sourceClient.sendMessage("You must have a character to do that");
             done = true;
         } else if(sourceEntity.getPools().isDying() && !canDoWhenDying()){

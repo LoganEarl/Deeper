@@ -54,7 +54,6 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
     private Entity() {
         //for use by the builder
-
     }
 
     private Entity(ResultSet readEntry, String databaseName) throws Exception {
@@ -339,7 +338,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
     public void setStance(BaseStance stance){
         Skill requiredSkill = stance.getRequiredSkill();
-        if(requiredSkill != null && SkillTable.entityHasSkill(this, requiredSkill)) {
+        if(requiredSkill == null || SkillTable.entityHasSkill(this, requiredSkill)) {
             if (!stance.equals(currentStance)) {
                 this.currentStance = stance;
                 for (SqlExtender extender : extenders.values()) {

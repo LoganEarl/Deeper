@@ -19,27 +19,27 @@ public class BaseStance {
         return baseDamage;
     }
 
-    protected double getBaseHpPerToughPerSec(){
+    public double getBaseHpPerToughPerSec(){
         return BASE_HP_PER_TOUGH_PER_SEC;
     }
 
-    protected double getBaseStamPerFitPerSec(){
+    public double getBaseStamPerFitPerSec(){
         return BASE_STAM_PER_FIT_PER_SEC;
     }
 
-    protected double getMpPerIntPerSec() {
+    public double getMpPerIntPerSec() {
         return MP_PER_INT_PER_SEC;
     }
 
-    protected double getMpPerWisPerSec() {
+    public double getMpPerWisPerSec() {
         return MP_PER_WIS_PER_SEC;
     }
 
-    protected double getBurnPerWisPerSec() {
+    public double getBurnPerWisPerSec() {
         return BURN_PER_WIS_PER_SEC;
     }
 
-    protected double getBurnPerIntPerSec() {
+    public double getBurnPerIntPerSec() {
         return BURN_PER_INT_PER_SEC;
     }
 

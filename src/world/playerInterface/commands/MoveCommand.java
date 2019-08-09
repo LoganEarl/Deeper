@@ -14,7 +14,8 @@ public class MoveCommand extends EntityCommand {
         super(sourceClient);
         this.direction = direction;
 
-        if(!getSourceEntity().getEquipment().isEncumbered())
+        //check the entity status first, we don't know if we have one or not until executeEntityCommand() is called
+        if(getSourceEntity() != null && !getSourceEntity().getEquipment().isEncumbered())
             staminaNeeded = 0;
         else
             staminaNeeded = 1;
