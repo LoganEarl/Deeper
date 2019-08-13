@@ -5,6 +5,7 @@ import database.DatabaseManager;
 import world.WorldModel;
 import world.entity.equipment.EquipmentContainer;
 import world.entity.pool.PoolContainer;
+import world.entity.progression.ProgressionContainer;
 import world.entity.race.Race;
 import world.entity.skill.Skill;
 import world.entity.skill.SkillTable;
@@ -62,6 +63,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(readEntry));
         extenders.put(StatContainer.SIGNIFIER, new StatContainer(readEntry));
         extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(readEntry, model.getItemCollection(), this));
+        extenders.put(ProgressionContainer.SIGNIFIER, new ProgressionContainer(readEntry));
 
         entityID = readEntry.getString(ENTITY_ID);
         displayName = readEntry.getString(DISPLAY_NAME);
@@ -391,6 +393,10 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         return (StatContainer) extenders.get(StatContainer.SIGNIFIER);
     }
 
+    public ProgressionContainer getProgression(){
+        return (ProgressionContainer) extenders.get(ProgressionContainer.SIGNIFIER);
+    }
+
     /**
      * gets if the entity is off cool-down and ready to act again
      * @return true if ready to act
@@ -458,6 +464,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(hp,maxHP,mp,maxMP,stamina,maxStamina,burnout,maxBurnout));
             extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom, toughness, fitness));
             extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(model.getItemCollection(), e));
+            extenders.put(ProgressionContainer.SIGNIFIER, new ProgressionContainer());
 
             e.extenders = extenders;
             e.entityID = entityID;

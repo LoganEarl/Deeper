@@ -1,13 +1,5 @@
 TODO
 
-- add world related commands.
-    - ability to instantiate a world
-    - ability to view available worlds
-    - ability to remove a world
-    - ability to travel to a world
-- add a stat system and a way to view it
-    - add the burnout stat that works like stamina for magic
-    - make HP, MP, STAM, BURN, be derived by base stats
 - add some basic skills
     - skills will be their own database table
     - we need a dodge and a deflect skill first

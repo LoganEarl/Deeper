@@ -19,6 +19,10 @@ public class BaseStance {
         return baseDamage;
     }
 
+    public int getXPGained(int baseXP){
+        return baseXP;
+    }
+
     public double getBaseHpPerToughPerSec(){
         return BASE_HP_PER_TOUGH_PER_SEC;
     }
