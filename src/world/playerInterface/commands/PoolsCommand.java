@@ -1,8 +1,10 @@
 package world.playerInterface.commands;
 
 import client.Client;
+import world.WorldUtils;
 import world.entity.pool.PoolContainer;
 
+import static world.playerInterface.ColorTheme.*;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -83,11 +85,11 @@ public class PoolsCommand extends EntityCommand {
         }
 
         return String.format(Locale.US,
-                "HP:    %d/%d\t %s\nSTAM:  %d/%d\t %s\nMP:    %d/%d\t %s\nBURN:  %d/%d\t %s\n",
-                pools.getHp(), pools.getMaxHP(), hpBar,
-                pools.getStamina(), pools.getMaxStamina(), stamBar,
-                pools.getMp(), pools.getMaxMP(), mpBar,
-                pools.getBurnout(), pools.getMaxBurnout(), burnBar);
+                "HP:    %4d/%-4d\t %s\nSTAM:  %4d/%-4d\t %s\nMP:    %4d/%-4d\t %s\nBURN:  %4d/%-4d\t %s\n",
+                pools.getHp(), pools.getMaxHP(), getMessageInColor(hpBar, HP_COLOR),
+                pools.getStamina(), pools.getMaxStamina(), getMessageInColor(stamBar,STAMINA_COLOR),
+                pools.getMp(), pools.getMaxMP(), getMessageInColor(mpBar, MP_COLOR),
+                pools.getBurnout(), pools.getMaxBurnout(), getMessageInColor(burnBar,BURNOUT_COLOR));
 
     }
 

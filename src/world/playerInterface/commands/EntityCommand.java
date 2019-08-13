@@ -6,6 +6,7 @@ import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.skill.Skill;
 import world.entity.skill.SkillTable;
+import static world.playerInterface.ColorTheme.*;
 
 public abstract class EntityCommand implements CommandExecutor.Command {
     private Client sourceClient;
@@ -20,25 +21,25 @@ public abstract class EntityCommand implements CommandExecutor.Command {
     public final void execute(){
         Skill requiredSkill;
         if(sourceClient.getStatus() != Client.ClientStatus.ACTIVE) {
-            sourceClient.sendMessage("You must be logged in to do that");
+            sourceClient.sendMessage("You must be " + getMessageInColor("logged in to do that",FAILURE));
             done = true;
         }else if(sourceEntity == null) {
-            sourceClient.sendMessage("You must have a character to do that");
+            sourceClient.sendMessage("You must "+ getMessageInColor("have a character",FAILURE) + " to do that");
             done = true;
         } else if(sourceEntity.getPools().isDying() && !canDoWhenDying()){
-            sourceClient.sendMessage("You are dying. You cannot do that right now. Seek help quickly before you pass on");
+            sourceClient.sendMessage(getMessageInColor("You are dying.",FAILURE) + " You cannot do that right now. Seek help quickly before you pass on");
             done = true;
         }else if(sourceEntity.getPools().isDead() && !canDoWhenDead()){
-            sourceClient.sendMessage("You are dead");
+            sourceClient.sendMessage(getMessageInColor("You are dead",FAILURE));
             done = true;
         } else if(requiresBalance() && !sourceEntity.isBalanced()) {
             sourceClient.sendMessage("You must regain your balance first!");
             done = true;
         } else if((requiredSkill = getRequiredSkill()) != null && !SkillTable.entityHasSkill(sourceEntity,requiredSkill)) {
-            sourceClient.sendMessage("You must learn " + requiredSkill.getDisplayName() + " before you can do that");
+            sourceClient.sendMessage("You must " + getMessageInColor("learn " + requiredSkill.getDisplayName(),FAILURE) + " before you can do that");
             done = true;
         } else if(getRequiredStamina() > sourceEntity.getPools().getStamina()){
-            sourceClient.sendMessage("You are exhausted");
+            sourceClient.sendMessage("You are " + getMessageInColor("exhausted", STAMINA_COLOR));
             done = true;
         }else{
             executeEntityCommand();

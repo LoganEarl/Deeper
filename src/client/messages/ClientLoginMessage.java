@@ -43,11 +43,19 @@ public class ClientLoginMessage extends ClientMessage {
 
     @Override
     public void doActions() {
+        if(getClient().getStatus() == Client.ClientStatus.ACTIVE){
+            Entity loggedEntity = Entity.getPlayableEntityByID(getClient().getUserName());
+            if(loggedEntity != null) {
+                getNotificationService().unsubscribe(loggedEntity);
+            }
+        }
+
         getClient().tryLogIn(getClient(), userName, hashedPassword);
         if(getClient().getStatus() == Client.ClientStatus.ACTIVE){
             Entity loggedEntity = Entity.getPlayableEntityByID(getClient().getUserName());
-            if(loggedEntity != null)
+            if(loggedEntity != null) {
                 getNotificationService().subscribe(loggedEntity);
+            }
         }
     }
 

@@ -14,6 +14,8 @@ import world.notification.NotificationService;
 import world.notification.NotificationSubscriber;
 import world.room.RoomNotificationScope;
 
+import static world.playerInterface.ColorTheme.*;
+
 import java.util.List;
 
 public class AttackCommand extends EntityCommand {
@@ -50,7 +52,7 @@ public class AttackCommand extends EntityCommand {
         if(target == null)
             target = Entity.getEntityByEntityID(targetID,getSourceEntity().getDatabaseName());
         if(target == null)
-            getSourceClient().sendMessage("There is nothing named " + targetID + " nearby");
+            getSourceClient().sendMessage("There is " + getMessageInColor("nothing named " + targetID + " nearby",FAILURE));
         else{
             EquipmentContainer equipment = getSourceEntity().getEquipment();
             StatContainer stats = getSourceEntity().getStats();
@@ -62,7 +64,7 @@ public class AttackCommand extends EntityCommand {
             boolean hasFists = rightHand == null && leftHand == null;
 
             if(hasFists){
-                getSourceClient().sendMessage("You have no weapon to attack with");
+                getSourceClient().sendMessage("You have " + getMessageInColor("no weapon",FAILURE) + " to attack with");
             }else if(rightHandCanAttack && !leftHandCanAttack){
                 Weapon rightHandWeapon = (Weapon) rightHand;
                 singleAttack(rightHandWeapon,target,stats,0, 1);
@@ -80,7 +82,7 @@ public class AttackCommand extends EntityCommand {
                         rightHandWeapon.getAttackSpeed(): leftHandWeapon.getAttackSpeed();
                 cooldownMs = (int)Math.ceil(maxWeaponSpeed * 1500);
             }else if(!rightHandCanAttack && !leftHandCanAttack){
-                getSourceClient().sendMessage("You have no weapon to attack with");
+                getSourceClient().sendMessage("You have " + getMessageInColor("no weapon",FAILURE) + " to attack with");
             }
         }
 
@@ -113,7 +115,7 @@ public class AttackCommand extends EntityCommand {
         double rawStamina = selectWeapon.getStaminaUsage(stats.getStrength(), stats.getDexterity()) * staminaMultiplier;
         int staminaNeeded = (int)Math.ceil(rawStamina);
         if(staminaNeeded > getSourceEntity().getPools().getStamina())
-            getSourceClient().sendMessage("You are exhausted and cannot wield the " + selectWeapon.getDisplayableName());
+            getSourceClient().sendMessage("You are " + getMessageInColor("exhausted",STAMINA_COLOR) + " and cannot wield the " + selectWeapon.getDisplayableName());
         else {
             int roll = selectWeapon.rollHit(
                     stats.getStrength(),
@@ -160,17 +162,17 @@ public class AttackCommand extends EntityCommand {
         public String getAsMessage(NotificationSubscriber viewer) {
             if(viewer.getID().equals(attackEntity.getID()) && viewer.getDatabaseName().equals(attackEntity.getDatabaseName())){
                 if(netRoll >= 0)
-                    return String.format("You score a hit on %s with your %s(+%d) for %d damage",
-                        defenceEntity.getDisplayName(),attackWeapon.getDisplayableName(), netRoll, damage);
+                    return String.format("You score a hit on %s with your %s(+%d) for " + getMessageInColor("%d damage", OUTGOING_DAMAGE),
+                            defenceEntity.getDisplayName(), attackWeapon.getDisplayableName(), netRoll, damage);
                 else
                     return String.format("You miss %s with your %s(%d)",
                             defenceEntity.getDisplayName(),attackWeapon.getDisplayableName(), netRoll);
             }else if(viewer.getID().equals(defenceEntity.getID()) && viewer.getDatabaseName().equals(attackEntity.getDatabaseName())){
                 if(netRoll >= 0)
-                    return String.format("%s the %s attacks you with a %s for %d damage",
-                        attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName(), damage);
+                    return String.format("%s the %s attacks you with a %s for " + getMessageInColor("%d damage", INCOMING_DAMAGE),
+                            attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName(), damage);
                 else
-                    return String.format("%s the %s misses you with his %s",
+                    return String.format(getMessageInColor("%s the %s misses", WARNING) + " you with his %s",
                             attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName());
             }else{
                 return String.format("%s the %s is fighting %s the %s",
