@@ -2,6 +2,7 @@ package world.playerInterface.commands;
 
 import client.Client;
 import client.ClientRegistry;
+import world.WorldModel;
 import world.entity.Entity;
 import world.entity.equipment.EquipmentContainer;
 import world.entity.StatContainer;
@@ -28,10 +29,10 @@ public class AttackCommand extends EntityCommand {
     private boolean complete = false;
     private int staminaUsed = 0;
 
-    public AttackCommand(String target, Client sourceClient, ClientRegistry registry, NotificationService service) {
-        super(sourceClient);
-        this.registry = registry;
-        this.service = service;
+    public AttackCommand(String target, Client sourceClient, WorldModel worldModel) {
+        super(sourceClient, worldModel);
+        this.registry = worldModel.getRegistry();
+        this.service = worldModel.getNotificationService();
         targetID = target;
     }
 
@@ -47,10 +48,10 @@ public class AttackCommand extends EntityCommand {
 
     @Override
     protected void executeEntityCommand() {
-        Entity target = Entity.getEntityByDisplayName(targetID, getSourceEntity().getRoomName(),getSourceEntity().getDatabaseName());
+        Entity target = getWorldModel().getEntityCollection().getEntityByDisplayName(targetID, getSourceEntity().getRoomName(),getSourceEntity().getDatabaseName());
 
         if(target == null)
-            target = Entity.getEntityByEntityID(targetID,getSourceEntity().getDatabaseName());
+            target = getWorldModel().getEntityCollection().getEntityByEntityID(targetID,getSourceEntity().getDatabaseName());
         if(target == null)
             getSourceClient().sendMessage("There is " + getMessageInColor("nothing named " + targetID + " nearby",FAILURE));
         else{
@@ -102,7 +103,7 @@ public class AttackCommand extends EntityCommand {
     }
 
     private void notifyRoom(String message, String... excludedEntityIDs){
-        List<Entity> inRoom = Entity.getEntitiesInRoom(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName(), excludedEntityIDs);
+        List<Entity> inRoom = getWorldModel().getEntityCollection().getEntitiesInRoom(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName(), excludedEntityIDs);
         for(Entity ent: inRoom){
             Client attachedClient = registry.getClientWithUsername(ent.getID());
             if(attachedClient != null){

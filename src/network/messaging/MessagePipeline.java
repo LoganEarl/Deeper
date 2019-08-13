@@ -4,6 +4,7 @@ import client.Client;
 import client.ClientRegistry;
 import network.CommandExecutor;
 import network.WebServer;
+import world.WorldModel;
 import world.notification.NotificationService;
 
 import java.lang.reflect.Constructor;
@@ -21,12 +22,12 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
     private Map<Client, List<MessageContext>> specificContexts = new HashMap<>();
     private ClientRegistry registry;
     private CommandExecutor executor;
-    private NotificationService notificationService;
+    private WorldModel model;
 
-    public MessagePipeline(ClientRegistry registry, CommandExecutor executor, NotificationService notificationService) {
+    public MessagePipeline(ClientRegistry registry, CommandExecutor executor, WorldModel model) {
         this.registry = registry;
         this.executor = executor;
-        this.notificationService = notificationService;
+        this.model = model;
     }
 
     @Override
@@ -48,7 +49,7 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
 
         if (!header.isEmpty() && loadedMessageBuilders.containsKey(header)) {
             try {
-                ClientMessage message = loadedMessageBuilders.get(header).newInstance(client, executor, registry, this, notificationService);
+                ClientMessage message = loadedMessageBuilders.get(header).newInstance(client, this, model);
 
                 if (message.constructFromString(getMessageBody(rawMessage)))
                     message.resolve();
@@ -70,7 +71,7 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
                     System.out.println("Unable to load class " + messageClass.getName() + " as it's header " + header + " is already bound to a different message");
                 Constructor<? extends ClientMessage> messageConstructor = ClientMessage.getConstructor(messageClass);
                 if (messageConstructor != null) {
-                    ClientMessage tempInstance = messageConstructor.newInstance(null,null,null,null,null);
+                    ClientMessage tempInstance = messageConstructor.newInstance(null,null,null);
                     usageMessages.put(header,tempInstance.getUsage());
                     helpMessages.put(header,tempInstance.getHelpText());
                     loadedMessageBuilders.put(header, messageConstructor);

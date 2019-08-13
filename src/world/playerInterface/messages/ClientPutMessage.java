@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.notification.NotificationService;
 import world.playerInterface.commands.GrabDropCommand;
 
@@ -14,8 +15,8 @@ public class ClientPutMessage extends ClientMessage {
     private String toStore;
     private String toStoreIn;
 
-    public ClientPutMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
+    public ClientPutMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -42,7 +43,6 @@ public class ClientPutMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        getExecutor().scheduleCommand(new GrabDropCommand(toStore,toStoreIn,false,getClient()));
-
+        getWorldModel().getExecutor().scheduleCommand(new GrabDropCommand(toStore,toStoreIn,false,getClient(), getWorldModel()));
     }
 }

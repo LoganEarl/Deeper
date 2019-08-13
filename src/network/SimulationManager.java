@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import client.messages.*;
 import database.DatabaseManager;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.entity.pool.EntityRegenCommand;
 import world.item.ItemFactory;
 import world.item.container.Container;
@@ -30,7 +31,7 @@ public class SimulationManager {
     private MessagePipeline messagePipeline;
     private CommandExecutor commandExecutor;
     private ClientRegistry clientRegistry;
-    private NotificationService notificationService;
+    private WorldModel worldModel;
 
     private static final String DB_NAME = "account.db";
 
@@ -44,10 +45,8 @@ public class SimulationManager {
 
         server = new WebServer(port);
         clientRegistry = new ClientRegistry(executor, server,DB_NAME);
-        notificationService = new NotificationService(clientRegistry, executor);
-        messagePipeline = new MessagePipeline(clientRegistry,executor, notificationService);
-
-        executor.scheduleCommand(new EntityRegenCommand());
+        worldModel = new WorldModel(executor,clientRegistry);
+        messagePipeline = new MessagePipeline(clientRegistry,executor, worldModel);
 
         server.setMessageReceivedListener(messagePipeline);
     }
@@ -72,29 +71,8 @@ public class SimulationManager {
         messagePipeline.loadMessage(ClientLogoutMessage.class);
         messagePipeline.loadMessage(ClientRegisterMessage.class);
 
-        messagePipeline.loadMessage(ClientCreateCharacterMessage.class);
-        messagePipeline.loadMessage(ClientLookMessage.class);
-        messagePipeline.loadMessage(ClientMoveMessage.class);
-        messagePipeline.loadMessage(ClientSayMessage.class);
-        messagePipeline.loadMessage(ClientCreateWorldMessage.class);
-        messagePipeline.loadMessage(ClientViewWorldMessage.class);
-        messagePipeline.loadMessage(ClientTransferEntityMessage.class);
-        messagePipeline.loadMessage(ClientLockContainerMessage.class);
-        messagePipeline.loadMessage(ClientUnlockContainerMessage.class);
-
-        messagePipeline.loadMessage(ClientDropMessage.class);
-        messagePipeline.loadMessage(ClientGrabMessage.class);
-        messagePipeline.loadMessage(ClientPutMessage.class);
-        messagePipeline.loadMessage(ClientInventoryMessage.class);
-        messagePipeline.loadMessage(ClientAttackMessage.class);
-        messagePipeline.loadMessage(ClientPoolsMessage.class);
-
-        ItemFactory factory = ItemFactory.getInstance();
-        factory.addParser(Weapon.factory());
-        factory.addParser(MiscItem.factory());
-        factory.addParser(Container.factory());
-
-        notificationService.attachToExecutor(commandExecutor);
+        worldModel.loadDefaultCommands(messagePipeline);
+        worldModel.startDefaultTasks();
 
         server.startServer();
     }

@@ -2,6 +2,7 @@ package world.playerInterface.commands;
 
 import client.Client;
 import network.CommandExecutor;
+import world.WorldModel;
 import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.skill.Skill;
@@ -12,10 +13,12 @@ public abstract class EntityCommand implements CommandExecutor.Command {
     private Client sourceClient;
     private Entity sourceEntity;
     private boolean done = false;
+    private WorldModel worldModel;
 
-    public EntityCommand(Client sourceClient){
+    public EntityCommand(Client sourceClient, WorldModel model){
         this.sourceClient = sourceClient;
-        sourceEntity = WorldUtils.getEntityOfClient(sourceClient);
+        this.worldModel = model;
+        sourceEntity = WorldUtils.getEntityOfClient(sourceClient, model);
     }
 
     public final void execute(){
@@ -116,4 +119,8 @@ public abstract class EntityCommand implements CommandExecutor.Command {
     protected abstract boolean entityCommandIsComplete();
 
     protected abstract void executeEntityCommand();
+
+    protected final WorldModel getWorldModel() {
+        return worldModel;
+    }
 }

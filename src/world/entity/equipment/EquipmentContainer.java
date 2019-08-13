@@ -3,6 +3,7 @@ package world.entity.equipment;
 import world.entity.stance.BaseStance;
 import world.entity.Entity;
 import world.item.Item;
+import world.item.ItemCollection;
 import world.item.ItemType;
 import world.item.armor.Armor;
 import world.item.armor.ArmorSlot;
@@ -24,6 +25,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
     private BaseStance stance;
 
     private Entity entity;
+    private ItemCollection itemCollection;
 
     private static final List<String> HEADERS = Arrays.asList(SLOT_HEAD, SLOT_CHEST, SLOT_LEGS, SLOT_FEET, SLOT_HANDS, SLOT_HAND_LEFT, SLOT_SHEATH_LEFT,  SLOT_HAND_RIGHT, SLOT_SHEATH_RIGHT, SLOT_BACK, SLOT_BELT_POUCH, SLOT_BELT_UTIL);
 
@@ -37,15 +39,16 @@ public class EquipmentContainer implements Entity.SqlExtender {
     public static final int CODE_WRONG_TYPE = -5;
     public static final int CODE_ERROR = -100;
 
-    public EquipmentContainer(Entity entity) {
+    public EquipmentContainer(ItemCollection items, Entity entity) {
         this.entity = entity;
+        this.itemCollection = items;
     }
 
-    public EquipmentContainer(ResultSet readFrom, Entity entity) throws SQLException {
+    public EquipmentContainer(ResultSet readFrom, ItemCollection items, Entity entity) throws SQLException {
         for (int i = 0; i < HEADERS.size(); i++) {
             slots.put(SLOTS.get(i), readFrom.getInt(HEADERS.get(i)));
         }
-
+        this.itemCollection = items;
         this.entity = entity;
     }
 
@@ -53,7 +56,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
         int total = 0;
         for (Integer i : slots.values()) {
             Item item;
-            if (!empty(i) && (item = Item.getItemByID(i, entity.getDatabaseName())) != null) {
+            if (!empty(i) && (item = itemCollection.getItemByID(i, entity.getDatabaseName())) != null) {
                 if (item.getItemType() == ItemType.armor) {
                     total += ((Armor) item).getArmorClass();
                 }
@@ -70,7 +73,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
         double total = 0;
         for (Integer i: slots.values()){
             Item item;
-            if (!empty(i) && (item = Item.getItemByID(i, entity.getDatabaseName())) != null) {
+            if (!empty(i) && (item = itemCollection.getItemByID(i, entity.getDatabaseName())) != null) {
                 total += item.getWeight();
             }
         }
@@ -80,13 +83,13 @@ public class EquipmentContainer implements Entity.SqlExtender {
     public Item getEquippedItem(ArmorSlot selectedSlot){
         Integer itemID = slots.get(selectedSlot);
         if(empty(itemID)) return null;
-        return Item.getItemByID(itemID, entity.getDatabaseName());
+        return itemCollection.getItemByID(itemID, entity.getDatabaseName());
     }
 
     public Item getEquippedItem(int itemID){
         for(Integer slotItemID : slots.values()){
             if(!empty(slotItemID) && slotItemID.equals(itemID)){
-                Item equipped = Item.getItemByID(slotItemID, entity.getDatabaseName());
+                Item equipped = itemCollection.getItemByID(slotItemID, entity.getDatabaseName());
                 if(equipped != null)
                     return equipped;
             }
@@ -98,7 +101,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
         itemName = itemName.toLowerCase();
         for(Integer itemID : slots.values()){
             if(!empty(itemID)){
-                Item equipped = Item.getItemByID(itemID, entity.getDatabaseName());
+                Item equipped = itemCollection.getItemByID(itemID, entity.getDatabaseName());
                 if(equipped != null && (equipped.getItemName().toLowerCase().equals(itemName) ||
                         equipped.getDisplayableName().toLowerCase().equals(itemName)))
                     return equipped;
@@ -129,7 +132,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
 
         if (sourceSlot == leftHand || sourceSlot == rightHand) {
             if (!empty(curEquipID)) {
-                Item curEquip = Item.getItemByID(curEquipID, entity.getDatabaseName());
+                Item curEquip = itemCollection.getItemByID(curEquipID, entity.getDatabaseName());
                 if (curEquip != null)
                     slots.put(sourceSlot, curEquipID);
             }
@@ -191,7 +194,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
         if(empty(slots.get(leftSheath)))
             return CODE_CONTAINER_FULL;
 
-        Item leftWeapon = Item.getItemByID(handID,entity.getDatabaseName());
+        Item leftWeapon = itemCollection.getItemByID(handID,entity.getDatabaseName());
         if(leftWeapon == null)
             return CODE_NO_ITEM;
         if(leftWeapon.getItemType() != ItemType.weapon)
@@ -247,7 +250,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
         if(existingItem != null && existingItem != 0){
             ArmorSlot freeHand = getFreeHand();
             if(freeHand == null){
-                Item heldItem = Item.getItemByID(existingItem,entity.getDatabaseName());
+                Item heldItem = itemCollection.getItemByID(existingItem,entity.getDatabaseName());
                 if(heldItem != null) {
                     heldItem.setRoomName(entity.getRoomName());
                     heldItem.saveToDatabase(heldItem.getDatabaseName());
@@ -283,7 +286,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
 
         for(Integer itemID: slots.values()) {
             if (!empty(itemID)) {
-                Item toTransfer = Item.getItemByID(itemID, entity.getDatabaseName());
+                Item toTransfer = itemCollection.getItemByID(itemID, entity.getDatabaseName());
                 if(toTransfer != null)
                     transferItem(toTransfer, newWorld);
             }

@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.notification.NotificationService;
 import world.playerInterface.commands.TransferEntityCommand;
 
@@ -14,8 +15,8 @@ public class ClientTransferEntityMessage extends ClientMessage {
     private String entityID;
     private String worldID;
 
-    public ClientTransferEntityMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
+    public ClientTransferEntityMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -32,7 +33,7 @@ public class ClientTransferEntityMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        getExecutor().scheduleCommand(new TransferEntityCommand(entityID,worldID,getExecutor(),getClient()));
+        getWorldModel().getExecutor().scheduleCommand(new TransferEntityCommand(entityID,worldID,getClient(), getWorldModel()));
     }
 
     @Override

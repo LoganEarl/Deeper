@@ -1,8 +1,10 @@
 package world.playerInterface.commands;
 
 import client.Client;
+import world.WorldModel;
 import world.WorldUtils;
 import world.entity.pool.PoolContainer;
+import world.meta.World;
 
 import static world.playerInterface.ColorTheme.*;
 import java.util.HashMap;
@@ -25,12 +27,12 @@ public class PoolsCommand extends EntityCommand {
 
     private boolean firstRun = true;
 
-    public PoolsCommand(boolean useBars, Client sourceClient) {
-        this(useBars,-1,sourceClient);
+    public PoolsCommand(boolean useBars, Client sourceClient, WorldModel model) {
+        this(useBars,-1,sourceClient, model);
     }
 
-    public PoolsCommand(boolean useBars, double updateIntervalSeconds, Client sourceClient) {
-        super(sourceClient);
+    public PoolsCommand(boolean useBars, double updateIntervalSeconds, Client sourceClient, WorldModel model) {
+        super(sourceClient, model);
         this.updateIntervalSeconds = updateIntervalSeconds;
         nextUpdateTimestamp = System.currentTimeMillis();
         this.useBars = useBars;

@@ -5,25 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ItemFactory {
-    private static ItemFactory soleInstance;
-
-    public static synchronized ItemFactory getInstance(){
-        if(soleInstance == null)
-            soleInstance = new ItemFactory();
-        return soleInstance;
-    }
-
     private Map<ItemType, ItemParser> parsers = new HashMap<>();
-
-    private ItemFactory(){
-    }
 
     public Item parseFromResultSet(ResultSet resultSet, String databaseName){
         if(resultSet != null) {
             ItemType type = ItemType.extractFromResultSet(resultSet);
             if (parsers.containsKey(type)) {
                 try {
-                    Item i = parsers.get(type).parseFromResultSet(resultSet, databaseName);
+                    Item i = parsers.get(type).parseFromResultSet(resultSet, this, databaseName);
                     i.initStats();
                     return i;
                 } catch (Exception e) {
@@ -42,6 +31,6 @@ public class ItemFactory {
 
     public interface ItemParser{
         ItemType getAssociatedType();
-        Item parseFromResultSet(ResultSet fromEntry, String databaseName) throws Exception;
+        Item parseFromResultSet(ResultSet fromEntry, ItemFactory sourceFactory, String databaseName) throws Exception;
     }
 }

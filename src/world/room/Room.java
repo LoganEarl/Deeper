@@ -1,6 +1,7 @@
 package world.room;
 
 import database.DatabaseManager;
+import world.WorldModel;
 import world.item.Item;
 
 import java.sql.Connection;
@@ -115,9 +116,9 @@ public class Room implements DatabaseManager.DatabaseEntry {
         return getRoomByRoomName(roomName,databaseName) != null;
     }
 
-    public String displayRoom(String databaseName){
+    public String displayRoom(WorldModel worldModel, String databaseName){
         String itemSlot = "";
-        List<Item> items = Item.getItemsInRoom(roomName, databaseName);
+        List<Item> items = worldModel.getItemCollection().getItemsInRoom(roomName, databaseName);
 
         return String.format(Locale.US,
                 "%s\n%s\n\n",roomName, roomDescription);

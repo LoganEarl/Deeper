@@ -5,14 +5,15 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.notification.NotificationService;
 import world.playerInterface.commands.InventoryCommand;
 
 public class ClientInventoryMessage extends ClientMessage {
     public static final String HEADER = "inventory";
 
-    public ClientInventoryMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
+    public ClientInventoryMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -32,6 +33,6 @@ public class ClientInventoryMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        getExecutor().scheduleCommand(new InventoryCommand(getClient()));
+        getWorldModel().getExecutor().scheduleCommand(new InventoryCommand(getClient(), getWorldModel()));
     }
 }

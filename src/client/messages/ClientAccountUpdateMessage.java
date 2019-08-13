@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.notification.NotificationService;
 
 /**
@@ -38,8 +39,8 @@ public class ClientAccountUpdateMessage extends ClientMessage {
 
     public static final String HEADER = "update";
 
-    public ClientAccountUpdateMessage(Client client, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
-        super(HEADER,client,executor, registry, pipeline, notificationService);
+    public ClientAccountUpdateMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override

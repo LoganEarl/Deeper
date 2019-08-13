@@ -5,20 +5,18 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.notification.NotificationService;
 import world.playerInterface.commands.LockContainerCommand;
 
 public class ClientLockContainerMessage extends ClientMessage {
     public static final String HEADER = "lock";
 
-    private CommandExecutor executor;
-
     private String toLock;
     private String key;
 
-    public ClientLockContainerMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
-        this.executor = executor;
+    public ClientLockContainerMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -44,6 +42,6 @@ public class ClientLockContainerMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        executor.scheduleCommand(new LockContainerCommand(toLock, key, true,getClient()));
+        getWorldModel().getExecutor().scheduleCommand(new LockContainerCommand(toLock, key, true,getClient(), getWorldModel()));
     }
 }

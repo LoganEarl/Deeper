@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.notification.NotificationService;
 import world.playerInterface.commands.HelpCommand;
 
@@ -13,8 +14,8 @@ public class ClientHelpMessage extends ClientMessage {
 
     private String arg = "";
 
-    public ClientHelpMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
+    public ClientHelpMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -52,6 +53,6 @@ public class ClientHelpMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        getExecutor().scheduleCommand(new HelpCommand(arg,getClient(),getMessagePipeline()));
+        getWorldModel().getExecutor().scheduleCommand(new HelpCommand(arg,getClient(),getMessagePipeline()));
     }
 }

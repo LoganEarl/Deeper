@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.notification.NotificationService;
 
 /**
@@ -24,8 +25,8 @@ public class ClientLogoutMessage extends ClientMessage {
 
     public static final String HEADER = "logout";
 
-    public ClientLogoutMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
-        super(HEADER,sourceClient,executor, registry, pipeline, notificationService);
+    public ClientLogoutMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override

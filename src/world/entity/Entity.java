@@ -2,6 +2,7 @@ package world.entity;
 
 import client.Client;
 import database.DatabaseManager;
+import world.WorldModel;
 import world.entity.equipment.EquipmentContainer;
 import world.entity.pool.PoolContainer;
 import world.entity.race.Race;
@@ -38,6 +39,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     private BaseStance currentStance;
 
     private String databaseName;
+    private WorldModel model;
 
     private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,ENTITY_ID);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,ENTITY_ID);
@@ -56,10 +58,10 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         //for use by the builder
     }
 
-    private Entity(ResultSet readEntry, String databaseName) throws Exception {
+    private Entity(ResultSet readEntry, WorldModel model, String databaseName) throws Exception {
         extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(readEntry));
         extenders.put(StatContainer.SIGNIFIER, new StatContainer(readEntry));
-        extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(readEntry, this));
+        extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(readEntry, model.getItemCollection(), this));
 
         entityID = readEntry.getString(ENTITY_ID);
         displayName = readEntry.getString(DISPLAY_NAME);
@@ -74,6 +76,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         getPools().calculatePoolMaxes(getStats());
 
         this.databaseName = databaseName;
+        this.model = model;
 
         setStance(new BaseStance());
     }
@@ -118,14 +121,14 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         return entityCache.values();
     }
 
-    public static Entity getPlayableEntityByID(String entityID){
+    public static Entity getPlayableEntityByID(String entityID, WorldModel model){
         World w = World.getWorldOfEntityID(entityID);
         if(w != null) {
             String tag = getEntityTag(entityID, w.getDatabaseName());
             if(entityCache.containsKey(tag))
                 return entityCache.get(tag);
 
-            Entity entity = Entity.getEntityByEntityID(entityID, w.getDatabaseName());
+            Entity entity = Entity.getEntityByEntityID(entityID, model, w.getDatabaseName());
             if(entity != null)
                 entityCache.put(tag, entity);
             return entity;
@@ -133,7 +136,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         return null;
     }
 
-    public static Entity getEntityByDisplayName(String displayName, String roomName, String databaseName){
+    public static Entity getEntityByDisplayName(String displayName, String roomName, WorldModel model, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL = null;
         Entity toReturn;
@@ -146,7 +149,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
                 getSQL.setString(2,roomName);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next())
-                    toReturn = new Entity(accountSet,databaseName);
+                    toReturn = new Entity(accountSet, model, databaseName);
                 else
                     toReturn = null;
                 getSQL.close();
@@ -167,7 +170,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         return toReturn;
     }
 
-    public static Entity getEntityByEntityID(String entityID, String databaseName){
+    public static Entity getEntityByEntityID(String entityID, WorldModel model, String databaseName){
         String tag = getEntityTag(entityID,databaseName);
         if(entityCache.containsKey(tag))
             return entityCache.get(tag);
@@ -183,7 +186,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
                 getSQL.setString(1,entityID);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next())
-                    toReturn = new Entity(accountSet,databaseName);
+                    toReturn = new Entity(accountSet, model, databaseName);
                 else
                     toReturn = null;
                 getSQL.close();
@@ -206,7 +209,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
      * @param databaseName the database containing the items
      * @return a list of all items in the room
      */
-    public static List<Entity> getEntitiesInRoom(String roomName, String databaseName, String... excludedEntityIDs){
+    public static List<Entity> getEntitiesInRoom(String roomName, String databaseName, WorldModel model, String... excludedEntityIDs){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
         List<Entity> foundItems = new LinkedList<>();
@@ -224,7 +227,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
                 getSQL.setString(1,roomName);
                 ResultSet accountSet = getSQL.executeQuery();
                 while(accountSet.next()) {
-                    Entity e = new Entity(accountSet,databaseName);
+                    Entity e = new Entity(accountSet, model, databaseName);
                     if(!excluded.contains(e.getID()))
                         foundItems.add(e);
                 }
@@ -248,7 +251,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
     @Override
     public boolean saveToDatabase(String databaseName) {
-        Entity entity = getEntityByEntityID(entityID,databaseName);
+        Entity entity = getEntityByEntityID(entityID, model, databaseName);
         if(entity == null){
             boolean success =  DatabaseManager.executeStatement(makeInsertSQL(extenders,
                     ENTITY_ID,DISPLAY_NAME,CONTROLLER_TYPE,ROOM_NAME,RACE_ID), databaseName, appendData(extenders,
@@ -281,7 +284,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
     @Override
     public boolean existsInDatabase(String databaseName) {
-        return getEntityByEntityID(entityID,databaseName) != null;
+        return getEntityByEntityID(entityID,model,databaseName) != null;
     }
 
     private static String makeInsertSQL(LinkedHashMap<String, SqlExtender> extenders, String... baseColumns){
@@ -443,13 +446,18 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         private String raceID = Race.HUMAN.getRaceID();
 
         private String databaseName = "";
+        private WorldModel model;
+
+        public EntityBuilder(WorldModel model){
+            this.model = model;
+        }
 
         public Entity build(){
             Entity e = new Entity();
             LinkedHashMap<String,SqlExtender> extenders = new LinkedHashMap<>();
             extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(hp,maxHP,mp,maxMP,stamina,maxStamina,burnout,maxBurnout));
             extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom, toughness, fitness));
-            extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(e));
+            extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(model.getItemCollection(), e));
 
             e.extenders = extenders;
             e.entityID = entityID;

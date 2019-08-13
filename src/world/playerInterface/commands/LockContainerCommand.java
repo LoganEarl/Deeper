@@ -1,6 +1,7 @@
 package world.playerInterface.commands;
 
 import client.Client;
+import world.WorldModel;
 import world.item.Item;
 import world.item.ItemType;
 import world.item.container.Container;
@@ -11,8 +12,8 @@ public class LockContainerCommand extends EntityCommand {
     private String containerIDName, itemIDName;
     private boolean desiredLockState;
 
-    public LockContainerCommand(String containerIDName, String itemIDName, boolean desiredLockState, Client sourceClient) {
-        super(sourceClient);
+    public LockContainerCommand(String containerIDName, String itemIDName, boolean desiredLockState, Client sourceClient, WorldModel model) {
+        super(sourceClient, model);
 
         this.desiredLockState = desiredLockState;
         this.containerIDName = containerIDName;
@@ -52,7 +53,7 @@ public class LockContainerCommand extends EntityCommand {
     }
 
     private Container parseContainer(String identifier) {
-        Item rawContainer = Item.getFromEntityContext(identifier, getSourceEntity());
+        Item rawContainer = Item.getFromEntityContext(identifier, getSourceEntity(),getWorldModel().getItemFactory());
 
         if (rawContainer != null) {
             if (rawContainer.getItemType().equals(ItemType.container) && rawContainer instanceof Container && rawContainer.getLockNumber() > 0)
@@ -68,7 +69,7 @@ public class LockContainerCommand extends EntityCommand {
     }
 
     private Item parseKey(String identifier){
-        Item rawItem = Item.getFromEntityContext(identifier, getSourceEntity());
+        Item rawItem = Item.getFromEntityContext(identifier, getSourceEntity(), getWorldModel().getItemFactory());
 
         if(rawItem != null){
             if(rawItem.getLockNumber() > 0)

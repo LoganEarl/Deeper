@@ -2,6 +2,7 @@ package world.playerInterface.commands;
 
 import client.Client;
 import client.ClientRegistry;
+import world.WorldModel;
 import world.entity.Entity;
 
 import java.util.List;
@@ -11,15 +12,15 @@ public class SayCommand extends EntityCommand {
     private ClientRegistry registry;
     private String message;
 
-    public SayCommand(String message, Client sourceClient, ClientRegistry registry){
-        super(sourceClient);
-        this.registry = registry;
+    public SayCommand(String message, Client sourceClient, WorldModel model){
+        super(sourceClient, model);
+        this.registry = model.getRegistry();
         this.message = message;
     }
 
     @Override
     protected void executeEntityCommand() {
-        List<Entity> nearby = Entity.getEntitiesInRoom(
+        List<Entity> nearby = getWorldModel().getEntityCollection().getEntitiesInRoom(
                 getSourceEntity().getRoomName(),
                 getSourceEntity().getDatabaseName(),
                 getSourceEntity().getID());

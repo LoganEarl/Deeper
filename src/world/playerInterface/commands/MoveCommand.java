@@ -1,6 +1,7 @@
 package world.playerInterface.commands;
 
 import client.Client;
+import world.WorldModel;
 import world.entity.Entity;
 import world.room.Room;
 
@@ -10,8 +11,8 @@ public class MoveCommand extends EntityCommand {
     private int staminaNeeded;
     private int staminaUsed = 0;
 
-    public MoveCommand(String direction, Client sourceClient) {
-        super(sourceClient);
+    public MoveCommand(String direction, Client sourceClient, WorldModel model) {
+        super(sourceClient, model);
         this.direction = direction;
 
         //check the entity status first, we don't know if we have one or not until executeEntityCommand() is called
@@ -32,7 +33,7 @@ public class MoveCommand extends EntityCommand {
                     staminaUsed = staminaNeeded;
                     sourceEntity.setRoom(travelRoom);
                     sourceEntity.updateInDatabase(sourceEntity.getDatabaseName());
-                    new LookCommand("",false,getSourceClient()).execute();
+                    new LookCommand("",false,getSourceClient(),getWorldModel()).execute();
                 }else
                     getSourceClient().sendMessage("You cannot travel " + direction);
             }else

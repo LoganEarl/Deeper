@@ -21,8 +21,8 @@ public class Container extends Item {
         locked, unlocked
     }
 
-    public Container(ResultSet entry, String databaseName) throws Exception {
-        super(entry, databaseName);
+    public Container(ResultSet entry, ItemFactory factory, String databaseName) throws Exception {
+        super(entry, factory, databaseName);
 
         try {
             setState(ContainerState.valueOf(entry.getString(ItemInstanceTable.STATE)));
@@ -58,7 +58,7 @@ public class Container extends Item {
      * @see Item
      */
     public List<Item> getStoredItems() {
-        return Item.getItemsOfContainerID(getItemID(), getDatabaseName());
+        return Item.getItemsOfContainerID(getItemID(),getItemFactory(), getDatabaseName());
     }
 
     public boolean containsItem(Item item) {
@@ -179,8 +179,8 @@ public class Container extends Item {
         }
 
         @Override
-        public Item parseFromResultSet(ResultSet fromEntry, String databaseName) throws Exception {
-            return new Container(fromEntry, databaseName);
+        public Item parseFromResultSet(ResultSet fromEntry, ItemFactory sourceFactory, String databaseName) throws Exception {
+            return new Container(fromEntry, sourceFactory, databaseName);
         }
     };
 

@@ -6,6 +6,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.notification.NotificationService;
 
 /**
@@ -27,8 +28,8 @@ public class ClientElevateUserMessage extends ClientMessage {
 
     public static final String HEADER = "elevate";
 
-    public ClientElevateUserMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService){
-        super(HEADER,sourceClient,executor, registry, messagePipeline, notificationService);
+    public ClientElevateUserMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override

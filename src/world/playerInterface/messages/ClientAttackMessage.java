@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.notification.NotificationService;
 import world.playerInterface.commands.AttackCommand;
 
@@ -13,8 +14,8 @@ public class ClientAttackMessage extends ClientMessage {
 
     private String target;
 
-    public ClientAttackMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
+    public ClientAttackMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -44,6 +45,6 @@ public class ClientAttackMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        getExecutor().scheduleCommand(new AttackCommand(target,getClient(), getClientRegistry(), getNotificationService()));
+        getWorldModel().getExecutor().scheduleCommand(new AttackCommand(target,getClient(), getWorldModel()));
     }
 }

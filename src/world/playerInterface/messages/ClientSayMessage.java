@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.notification.NotificationService;
 import world.playerInterface.commands.SayCommand;
 
@@ -13,8 +14,8 @@ public class ClientSayMessage extends ClientMessage {
 
     private String message = "";
 
-    public ClientSayMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
-        super(HEADER,sourceClient, executor, registry, pipeline, notificationService);
+    public ClientSayMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -30,7 +31,7 @@ public class ClientSayMessage extends ClientMessage {
         if(message.isEmpty())
             getClient().sendMessage("What do you want to say?");
         else
-            getExecutor().scheduleCommand(new SayCommand(message, getClient(),getClientRegistry()));
+            getWorldModel().getExecutor().scheduleCommand(new SayCommand(message, getClient(),getWorldModel()));
     }
 
     @Override

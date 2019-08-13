@@ -5,6 +5,7 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.entity.Entity;
 import world.notification.NotificationService;
 
@@ -26,8 +27,8 @@ public class ClientLoginMessage extends ClientMessage {
 
     public static final String HEADER = "login";
 
-    public ClientLoginMessage(Client client, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
-        super(HEADER,client,executor, registry, pipeline, notificationService);
+    public ClientLoginMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -44,17 +45,17 @@ public class ClientLoginMessage extends ClientMessage {
     @Override
     public void doActions() {
         if(getClient().getStatus() == Client.ClientStatus.ACTIVE){
-            Entity loggedEntity = Entity.getPlayableEntityByID(getClient().getUserName());
+            Entity loggedEntity = getWorldModel().getEntityCollection().getPlayableEntityByID(getClient().getUserName());
             if(loggedEntity != null) {
-                getNotificationService().unsubscribe(loggedEntity);
+                getWorldModel().getNotificationService().unsubscribe(loggedEntity);
             }
         }
 
         getClient().tryLogIn(getClient(), userName, hashedPassword);
         if(getClient().getStatus() == Client.ClientStatus.ACTIVE){
-            Entity loggedEntity = Entity.getPlayableEntityByID(getClient().getUserName());
+            Entity loggedEntity = getWorldModel().getEntityCollection().getPlayableEntityByID(getClient().getUserName());
             if(loggedEntity != null) {
-                getNotificationService().subscribe(loggedEntity);
+                getWorldModel().getNotificationService().subscribe(loggedEntity);
             }
         }
     }

@@ -15,8 +15,8 @@ import static world.item.weapon.WeaponStatTable.*;
 public class Weapon extends Item {
     private static final Random  rnd = new Random();
 
-    public Weapon(ResultSet fromEntry, String databaseName) throws Exception{
-        super(fromEntry, databaseName);
+    public Weapon(ResultSet fromEntry, ItemFactory factory, String databaseName) throws Exception{
+        super(fromEntry,factory, databaseName);
     }
 
     @Override
@@ -146,8 +146,8 @@ public class Weapon extends Item {
         }
 
         @Override
-        public Item parseFromResultSet(ResultSet fromEntry, String databaseName) throws Exception {
-            return new Weapon(fromEntry,databaseName);
+        public Item parseFromResultSet(ResultSet fromEntry, ItemFactory sourceFactory, String databaseName) throws Exception {
+            return new Weapon(fromEntry,sourceFactory,databaseName);
         }
     };
 
