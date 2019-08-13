@@ -2,14 +2,13 @@ package world.playerInterface.commands;
 
 import client.Client;
 import world.WorldModel;
-import world.WorldUtils;
 import world.entity.pool.PoolContainer;
-import world.meta.World;
 
-import static world.playerInterface.ColorTheme.*;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import static world.playerInterface.ColorTheme.*;
 
 public class PoolsCommand extends EntityCommand {
     private static final int BAR_LENGTH = 15;

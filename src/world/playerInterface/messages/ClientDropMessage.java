@@ -1,12 +1,9 @@
 package world.playerInterface.messages;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
 import world.WorldModel;
-import world.notification.NotificationService;
 import world.playerInterface.commands.GrabDropCommand;
 
 public class ClientDropMessage extends ClientMessage {

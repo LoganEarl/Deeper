@@ -3,12 +3,9 @@ package world.item.misc;
 import world.item.Item;
 import world.item.ItemFactory;
 import world.item.ItemType;
-import world.item.armor.Armor;
-import world.item.weapon.Weapon;
 import world.meta.World;
 
 import java.sql.ResultSet;
-import java.util.Collections;
 import java.util.Map;
 
 public class MiscItem extends Item {

@@ -1,8 +1,8 @@
 package world.entity.pool;
 
-import world.entity.stance.BaseStance;
 import world.entity.Entity;
 import world.entity.StatContainer;
+import world.entity.stance.BaseStance;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

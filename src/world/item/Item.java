@@ -1,7 +1,6 @@
 package world.item;
 
 import database.DatabaseManager;
-import world.WorldModel;
 import world.entity.Entity;
 import world.meta.World;
 

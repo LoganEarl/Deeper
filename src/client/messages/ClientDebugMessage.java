@@ -1,12 +1,9 @@
 package client.messages;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
 import world.WorldModel;
-import world.notification.NotificationService;
 
 /**
  * A debugging tool the client can use to cause printouts on the server's System.out. Just initiate with debug [any text]

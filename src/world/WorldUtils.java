@@ -5,10 +5,8 @@ import client.Client;
 import world.entity.Entity;
 import world.meta.World;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 public class WorldUtils {
     public static Entity getEntityOfClient(Client c, WorldModel model) {

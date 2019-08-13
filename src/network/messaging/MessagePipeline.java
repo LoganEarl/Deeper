@@ -5,7 +5,6 @@ import client.ClientRegistry;
 import network.CommandExecutor;
 import network.WebServer;
 import world.WorldModel;
-import world.notification.NotificationService;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

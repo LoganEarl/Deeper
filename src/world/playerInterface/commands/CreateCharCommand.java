@@ -10,7 +10,6 @@ import world.entity.Entity;
 import world.entity.EntityTable;
 import world.entity.race.Race;
 import world.meta.World;
-import world.notification.NotificationService;
 
 import java.util.Arrays;
 import java.util.Locale;

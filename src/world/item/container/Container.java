@@ -1,6 +1,9 @@
 package world.item.container;
 
-import world.item.*;
+import world.item.Item;
+import world.item.ItemFactory;
+import world.item.ItemInstanceTable;
+import world.item.ItemType;
 import world.meta.World;
 
 import java.sql.ResultSet;

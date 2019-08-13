@@ -4,8 +4,8 @@ import client.Client;
 import client.ClientRegistry;
 import world.WorldModel;
 import world.entity.Entity;
-import world.entity.equipment.EquipmentContainer;
 import world.entity.StatContainer;
+import world.entity.equipment.EquipmentContainer;
 import world.item.Item;
 import world.item.ItemType;
 import world.item.armor.ArmorSlot;
@@ -15,9 +15,9 @@ import world.notification.NotificationService;
 import world.notification.NotificationSubscriber;
 import world.room.RoomNotificationScope;
 
-import static world.playerInterface.ColorTheme.*;
-
 import java.util.List;
+
+import static world.playerInterface.ColorTheme.*;
 
 public class AttackCommand extends EntityCommand {
     private String targetID;

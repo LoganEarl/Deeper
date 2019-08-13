@@ -1,12 +1,9 @@
 package client.messages;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
 import world.WorldModel;
-import world.notification.NotificationService;
 import world.playerInterface.commands.HelpCommand;
 
 public class ClientHelpMessage extends ClientMessage {

@@ -1,7 +1,7 @@
 package world.entity.equipment;
 
-import world.entity.stance.BaseStance;
 import world.entity.Entity;
+import world.entity.stance.BaseStance;
 import world.item.Item;
 import world.item.ItemCollection;
 import world.item.ItemType;

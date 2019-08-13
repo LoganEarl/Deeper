@@ -7,6 +7,7 @@ import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.skill.Skill;
 import world.entity.skill.SkillTable;
+
 import static world.playerInterface.ColorTheme.*;
 
 public abstract class EntityCommand implements CommandExecutor.Command {

@@ -1,11 +1,9 @@
 package network.messaging;
 
 import client.Client;
-import client.ClientRegistry;
 import com.sun.istack.internal.Nullable;
 import network.CommandExecutor;
 import world.WorldModel;
-import world.notification.NotificationService;
 
 import java.lang.reflect.Constructor;
 

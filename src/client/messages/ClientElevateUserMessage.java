@@ -2,12 +2,9 @@ package client.messages;
 
 import client.Account;
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
 import world.WorldModel;
-import world.notification.NotificationService;
 
 /**
  * Instantiated form of a client's attempt to update another account's permission level. Client must already be logged in and have a permission

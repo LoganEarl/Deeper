@@ -1,12 +1,9 @@
 package client.messages;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
 import world.WorldModel;
-import world.notification.NotificationService;
 
 /**
  * Instantiated form of a clients logout attempt. Can also be used to log out other players<br>

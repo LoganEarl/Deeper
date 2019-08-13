@@ -2,7 +2,10 @@ package world.entity.race;
 
 import database.DatabaseManager;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Instantiated form of the table of available races. Contains the definition for the table.

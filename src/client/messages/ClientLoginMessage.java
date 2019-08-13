@@ -1,13 +1,10 @@
 package client.messages;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
 import world.WorldModel;
 import world.entity.Entity;
-import world.notification.NotificationService;
 
 /**
  * Instantiated form of a client's attempt to login. Still needs to be verified but contains all the info to do so.<br>

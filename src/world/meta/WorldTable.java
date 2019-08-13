@@ -2,7 +2,9 @@ package world.meta;
 
 import database.DatabaseManager;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class WorldTable implements DatabaseManager.DatabaseTable {
     public static final String TABLE_NAME = "world";
