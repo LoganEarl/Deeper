@@ -1,11 +1,9 @@
 package client.messages;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
-import world.notification.NotificationService;
+import world.WorldModel;
 
 /**
  * A debugging tool the client can use to cause printouts on the server's System.out. Just initiate with debug [any text]
@@ -16,8 +14,8 @@ public class ClientDebugMessage extends ClientMessage {
 
     public static final String HEADER = "debug";
 
-    public ClientDebugMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
-        super(HEADER,sourceClient,executor, registry, pipeline, notificationService);
+    public ClientDebugMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.net.Socket;
+import java.util.LinkedList;
 
 public class ClientForm {
     private JPanel clientView;
@@ -17,7 +18,9 @@ public class ClientForm {
     private BufferedOutputStream out;
 
     private String sessionLog = "";
+    private int selectIndex = -1;
 
+    private java.util.List<String> prevEntries = new LinkedList<>();
 
     public static void main(String... args){
         JFrame frame = new JFrame("Simulacrum");
@@ -35,7 +38,7 @@ public class ClientForm {
         SwingUtilities.invokeLater(() -> {
             String convertedText =  text.replace("\n","<br>");
             convertedText = convertedText.replace("\t","&emsp;");
-            convertedText = convertedText.replace(" ","&nbsp;<wr>");
+            convertedText = convertedText.replace("  ","&nbsp;<wr>&nbsp;<wr>");
             sessionLog +=convertedText + "<br>";
 
             outputText.setText(sessionLog);
@@ -57,6 +60,9 @@ public class ClientForm {
 
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
                     String entry = inputText.getText();
+                    if(prevEntries.size() == 0 || (!prevEntries.get(prevEntries.size()-1).equals(entry)))
+                        prevEntries.add(prevEntries.size(),entry);
+                    selectIndex = prevEntries.size();
                     inputText.setText("");
                     String[] words = entry.split(" ");
                     StringBuilder messageToSend = new StringBuilder();
@@ -78,6 +84,18 @@ public class ClientForm {
                     }catch (Exception ignored){
 
                     }
+                }else if(e.getKeyCode() == KeyEvent.VK_UP && prevEntries.size() > 0){
+                    selectIndex--;
+                    if(selectIndex < 0)
+                        selectIndex = 0;
+                    inputText.setText(prevEntries.get(selectIndex));
+                }else if(e.getKeyCode() == KeyEvent.VK_DOWN && prevEntries.size() > 0){
+                    selectIndex++;
+                    if(selectIndex >= prevEntries.size()) {
+                        selectIndex = prevEntries.size();
+                        inputText.setText("");
+                    }else
+                        inputText.setText(prevEntries.get(selectIndex));
                 }
             }
         });

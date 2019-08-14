@@ -1,11 +1,9 @@
 package world.playerInterface.messages;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
-import world.notification.NotificationService;
+import world.WorldModel;
 import world.playerInterface.commands.LookCommand;
 
 /**
@@ -22,8 +20,8 @@ public class ClientLookMessage extends ClientMessage {
 
     public static final String HEADER = "look";
 
-    public ClientLookMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
-        super(HEADER,sourceClient, executor, registry, pipeline, notificationService);
+    public ClientLookMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -46,7 +44,7 @@ public class ClientLookMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        getExecutor().scheduleCommand(new LookCommand(examineTarget,isLookingInto,getClient()));
+        getWorldModel().getExecutor().scheduleCommand(new LookCommand(examineTarget,isLookingInto,getClient(), getWorldModel()));
     }
 
     @Override

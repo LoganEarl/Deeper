@@ -2,6 +2,7 @@ package world.item.armor;
 
 import world.item.DamageType;
 import world.item.Item;
+import world.item.ItemFactory;
 import world.item.ItemType;
 import world.meta.World;
 
@@ -28,8 +29,8 @@ public class Armor extends Item {
     }
     private static Map<DamageType, String> defenceColumnBindings = mapDamageTypes();
 
-    protected Armor(ResultSet entry, String databaseName) throws Exception {
-        super(entry, databaseName);
+    protected Armor(ResultSet entry, ItemFactory factory, String databaseName) throws Exception {
+        super(entry, factory, databaseName);
     }
 
     @Override

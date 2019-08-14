@@ -1,33 +1,30 @@
 package network.messaging;
 
 import client.Client;
-import client.ClientRegistry;
 import com.sun.istack.internal.Nullable;
 import network.CommandExecutor;
-import world.notification.NotificationService;
+import world.WorldModel;
 
 import java.lang.reflect.Constructor;
 
 public abstract class ClientMessage {
     private String signifier;
-    private CommandExecutor executor;
     private Client sourceClient;
-    private ClientRegistry hostRegistry;
     private MessagePipeline messagePipeline;
-    private NotificationService notificationService;
+    private WorldModel worldModel;
 
     public ClientMessage(@Nullable String messageSignifier,
                             @Nullable Client sourceClient,
-                            @Nullable CommandExecutor executor,
-                            @Nullable ClientRegistry registry,
                             @Nullable MessagePipeline messagePipeline,
-                            @Nullable NotificationService notificationService){
+                            @Nullable WorldModel worldModel){
         this.signifier = messageSignifier;
-        this.executor = executor;
         this.sourceClient = sourceClient;
-        this.hostRegistry = registry;
         this.messagePipeline = messagePipeline;
-        this.notificationService = notificationService;
+        this.worldModel = worldModel;
+    }
+
+    public WorldModel getWorldModel() {
+        return worldModel;
     }
 
     /**the first word of this message*/
@@ -39,20 +36,8 @@ public abstract class ClientMessage {
         return sourceClient;
     }
 
-    public final CommandExecutor getExecutor(){
-        return executor;
-    }
-
-    public final ClientRegistry getClientRegistry(){
-        return hostRegistry;
-    }
-
     public final MessagePipeline getMessagePipeline(){
         return messagePipeline;
-    }
-
-    public final NotificationService getNotificationService(){
-        return notificationService;
     }
 
     public abstract boolean constructFromString(String rawMessage);
@@ -62,8 +47,8 @@ public abstract class ClientMessage {
     public abstract String getHelpText();
 
     public final void resolve(){
-        if(executor != null) {
-            executor.scheduleCommand(new CommandExecutor.Command() {
+        if(worldModel.getExecutor() != null) {
+            worldModel.getExecutor().scheduleCommand(new CommandExecutor.Command() {
                 private boolean complete = false;
 
                 @Override
@@ -85,7 +70,7 @@ public abstract class ClientMessage {
 
     public static Constructor<? extends ClientMessage> getConstructor(Class<? extends  ClientMessage> messageClass){
         try {
-            return messageClass.getConstructor(Client.class,CommandExecutor.class, ClientRegistry.class, MessagePipeline.class, NotificationService.class);
+            return messageClass.getConstructor(Client.class, MessagePipeline.class, WorldModel.class);
         }catch (Exception e){
             return null;
         }

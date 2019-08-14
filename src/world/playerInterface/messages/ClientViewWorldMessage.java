@@ -2,12 +2,10 @@ package world.playerInterface.messages;
 
 import client.Account;
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.meta.World;
-import world.notification.NotificationService;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -21,8 +19,8 @@ public class ClientViewWorldMessage extends ClientMessage {
 
     private String viewArg = "";
 
-    public ClientViewWorldMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
+    public ClientViewWorldMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override

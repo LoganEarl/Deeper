@@ -1,12 +1,10 @@
 package client.messages;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.entity.Entity;
-import world.notification.NotificationService;
 
 /**
  * Instantiated form of a client's attempt to login. Still needs to be verified but contains all the info to do so.<br>
@@ -26,8 +24,8 @@ public class ClientLoginMessage extends ClientMessage {
 
     public static final String HEADER = "login";
 
-    public ClientLoginMessage(Client client, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService notificationService){
-        super(HEADER,client,executor, registry, pipeline, notificationService);
+    public ClientLoginMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -43,11 +41,19 @@ public class ClientLoginMessage extends ClientMessage {
 
     @Override
     public void doActions() {
+        if(getClient().getStatus() == Client.ClientStatus.ACTIVE){
+            Entity loggedEntity = getWorldModel().getEntityCollection().getPlayableEntityByID(getClient().getUserName());
+            if(loggedEntity != null) {
+                getWorldModel().getNotificationService().unsubscribe(loggedEntity);
+            }
+        }
+
         getClient().tryLogIn(getClient(), userName, hashedPassword);
         if(getClient().getStatus() == Client.ClientStatus.ACTIVE){
-            Entity loggedEntity = Entity.getPlayableEntityByID(getClient().getUserName());
-            if(loggedEntity != null)
-                getNotificationService().subscribe(loggedEntity);
+            Entity loggedEntity = getWorldModel().getEntityCollection().getPlayableEntityByID(getClient().getUserName());
+            if(loggedEntity != null) {
+                getWorldModel().getNotificationService().subscribe(loggedEntity);
+            }
         }
     }
 

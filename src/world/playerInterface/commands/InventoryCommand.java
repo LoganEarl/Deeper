@@ -1,6 +1,7 @@
 package world.playerInterface.commands;
 
 import client.Client;
+import world.WorldModel;
 import world.entity.Entity;
 import world.item.Item;
 import world.item.armor.ArmorSlot;
@@ -12,8 +13,8 @@ import static world.item.armor.ArmorSlot.*;
 public class InventoryCommand extends EntityCommand {
     private boolean complete = false;
 
-    public InventoryCommand(Client sourceClient) {
-        super(sourceClient);
+    public InventoryCommand(Client sourceClient, WorldModel model) {
+        super(sourceClient, model);
     }
 
     @Override

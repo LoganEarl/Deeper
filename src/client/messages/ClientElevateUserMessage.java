@@ -2,11 +2,9 @@ package client.messages;
 
 import client.Account;
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
-import world.notification.NotificationService;
+import world.WorldModel;
 
 /**
  * Instantiated form of a client's attempt to update another account's permission level. Client must already be logged in and have a permission
@@ -27,8 +25,8 @@ public class ClientElevateUserMessage extends ClientMessage {
 
     public static final String HEADER = "elevate";
 
-    public ClientElevateUserMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService){
-        super(HEADER,sourceClient,executor, registry, messagePipeline, notificationService);
+    public ClientElevateUserMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override

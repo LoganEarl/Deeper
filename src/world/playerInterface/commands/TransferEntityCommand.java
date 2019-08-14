@@ -3,6 +3,7 @@ package world.playerInterface.commands;
 import client.Account;
 import client.Client;
 import network.CommandExecutor;
+import world.WorldModel;
 import world.WorldUtils;
 import world.entity.Entity;
 import world.meta.World;
@@ -13,12 +14,12 @@ public class TransferEntityCommand extends EntityCommand {
     private boolean complete = false;
     private CommandExecutor executor;
 
-    public TransferEntityCommand(String entityID, String worldID, CommandExecutor executor, Client sourceClient) {
-        super(sourceClient);
+    public TransferEntityCommand(String entityID, String worldID, Client sourceClient, WorldModel model) {
+        super(sourceClient, model);
 
         this.entityID = entityID;
         this.worldID = worldID;
-        this.executor = executor;
+        this.executor = model.getExecutor();
     }
 
     @Override
@@ -31,9 +32,9 @@ public class TransferEntityCommand extends EntityCommand {
         if(!WorldUtils.isAuthorized(getSourceClient(),Account.AccountType.ADMIN)) {
             getSourceClient().sendMessage(WorldUtils.getRefusedFlavorText());
         }else {
-            Entity toTransfer = Entity.getPlayableEntityByID(entityID);
+            Entity toTransfer = getWorldModel().getEntityCollection().getPlayableEntityByID(entityID);
             if (toTransfer == null)
-                toTransfer = Entity.getEntityByDisplayName(entityID, getSourceEntity().getRoomName(), getSourceEntity().getDisplayName());
+                toTransfer = getWorldModel().getEntityCollection().getEntityByDisplayName(entityID, getSourceEntity().getRoomName(), getSourceEntity().getDisplayName());
             World transferTo;
             try {
                 transferTo = World.getWorldByWorldID(Integer.parseInt(worldID));
@@ -54,7 +55,7 @@ public class TransferEntityCommand extends EntityCommand {
                         getSourceClient().sendMessage("Unable to move that entity there. Code: " + result);
                     else {
                         getSourceClient().sendMessage("You feel the space around you twist and warp. With resonate tearing sound, your vision twists and contorts. As it stops, you look around");
-                        executor.scheduleCommand(new LookCommand("", false, getSourceClient()));
+                        executor.scheduleCommand(new LookCommand("", false, getSourceClient(), getWorldModel()));
                     }
                 } else {
                     getSourceClient().sendMessage("I don't see a world with ID: " + worldID);

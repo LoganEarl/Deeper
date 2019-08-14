@@ -9,13 +9,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class WorldUtils {
-    public static Entity getEntityOfClient(Client c) {
+    public static Entity getEntityOfClient(Client c, WorldModel model) {
         if (c.getStatus() != Client.ClientStatus.ACTIVE)
             return null;
         String entityID = c.getUserName();
         World w = World.getWorldOfEntityID(entityID);
         if (w != null)
-            return Entity.getEntityByEntityID(entityID, w.getDatabaseName());
+            return model.getEntityCollection().getEntityByEntityID(entityID, w.getDatabaseName());
         return null;
     }
 

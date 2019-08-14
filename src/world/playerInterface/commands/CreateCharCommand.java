@@ -4,12 +4,12 @@ import client.Client;
 import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.MessagePipeline;
+import world.WorldModel;
 import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.EntityTable;
 import world.entity.race.Race;
 import world.meta.World;
-import world.notification.NotificationService;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -27,13 +27,12 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
 
     private int stage = STAGE_START;
 
-    private ClientRegistry registry;
+    private WorldModel model;
     private Client sourceClient;
     private MessagePipeline pipeline;
-    private CommandExecutor executor;
-    private NotificationService service;
+    private ClientRegistry registry;
 
-    private Entity.EntityBuilder builder = new Entity.EntityBuilder();
+    private Entity.EntityBuilder builder;
     private String[] newMessageArgs = null;
 
     private static final int STAGE_START = 0;
@@ -57,18 +56,17 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
     /**
      * cole constructor
      * @param sourceClient the client attempting to make a new character
-     * @param executor the executor the server is running on for server thread access
-     * @param registry the registry the client is connected under
      * @param pipeline the messaging pipeline the client's commands are parsed through. Used to establish a custom
      *                 MessageContext
      * @see network.messaging.MessagePipeline.MessageContext
      */
-    public CreateCharCommand(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline pipeline, NotificationService service){
-        this.registry = registry;
+    public CreateCharCommand(Client sourceClient, MessagePipeline pipeline, WorldModel model){
+        this.builder =  new Entity.EntityBuilder(model);
         this.sourceClient = sourceClient;
         this.pipeline = pipeline;
-        this.executor = executor;
-        this.service = service;
+
+        this.model = model;
+        this.registry = model.getRegistry();
 
         if(sourceClient.getStatus() == Client.ClientStatus.ACTIVE)
             userName = sourceClient.getUserName();
@@ -76,7 +74,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
         if(userName == null) {
             stage = STAGE_NO_USERNAME;
         }else{
-            if(WorldUtils.getEntityOfClient(sourceClient) != null) {
+            if(WorldUtils.getEntityOfClient(sourceClient, model) != null) {
                 stage = STAGE_EXISTING_CHARACTER;
             }
             this.pipeline.addMessageContext(sourceClient,this);
@@ -104,7 +102,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
 
     private void checkForUsername(){
         if (stage == STAGE_NO_USERNAME) {
-            registry.sendMessage("You must be logged in to create a character", sourceClient);
+            model.getRegistry().sendMessage("You must be logged in to create a character", sourceClient);
             stage = STAGE_COMPLETE;
         }
     }
@@ -114,7 +112,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
             if(newMessageArgs == null){
                 registry.sendMessage("You already have a character associated to that account. Do you want to delete that character and start fresh? [yes/no]", sourceClient);
             }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("yes")){
-                Entity preexisting = WorldUtils.getEntityOfClient(sourceClient);
+                Entity preexisting = WorldUtils.getEntityOfClient(sourceClient, model);
                 if(preexisting != null) {
                     if (World.deleteEntity(preexisting)) {
                         preexisting.removeFromDatabase(preexisting.getDatabaseName());
@@ -222,8 +220,8 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 registry.sendMessage("Very well, your character creation is now complete. Welcome " + selectedName + " to the Simulacrum!", sourceClient);
                 Entity newPlayer = builder.build();
                 newPlayer.transferToWorld(World.getHubWorld());
-                service.subscribe(newPlayer);
-                executor.scheduleCommand(new LookCommand("",false, sourceClient));
+                model.getNotificationService().subscribe(newPlayer);
+                model.getExecutor().scheduleCommand(new LookCommand("",false, sourceClient, model));
                 stage = STAGE_COMPLETE;
             }
         }

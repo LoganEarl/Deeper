@@ -1,6 +1,7 @@
 package world.playerInterface.commands;
 
 import client.Client;
+import world.WorldModel;
 import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.race.Race;
@@ -30,8 +31,8 @@ public class LookCommand extends EntityCommand {
      * @param lookInto true to look inside the selected thing. Does not apply to rooms
      * @param fromClient the client doing the looking.
      */
-    public LookCommand(String target, boolean lookInto, Client fromClient){
-        super(fromClient);
+    public LookCommand(String target, boolean lookInto, Client fromClient, WorldModel model){
+        super(fromClient, model);
 
         this.fromClient = fromClient;
         this.target = target;
@@ -68,7 +69,7 @@ public class LookCommand extends EntityCommand {
 
     private String lookInContainer(String target){
         String response;
-        Item rawItem = Item.getFromEntityContext(target,getSourceEntity());
+        Item rawItem = Item.getFromEntityContext(target,getSourceEntity(), getWorldModel().getItemFactory());
         if(rawItem != null){
             if(rawItem.getItemType() == ItemType.container && rawItem instanceof Container) {
                 Container container = (Container)rawItem;
@@ -133,7 +134,7 @@ public class LookCommand extends EntityCommand {
     }
 
     private String getCreatureString(Room r){
-        List<Entity> nearEntities = Entity.getEntitiesInRoom(r.getRoomName(), r.getDatabaseName(), getSourceEntity().getID());
+        List<Entity> nearEntities = getWorldModel().getEntityCollection().getEntitiesInRoom(r.getRoomName(), r.getDatabaseName(), getSourceEntity().getID());
         if(nearEntities.size() == 0)
             return "You are alone";
         else{
@@ -155,7 +156,7 @@ public class LookCommand extends EntityCommand {
     }
 
     private String getItemsString(Room r){
-        List<Item> nearItems = Item.getItemsInRoom(r.getRoomName(),r.getDatabaseName());
+        List<Item> nearItems = Item.getItemsInRoom(r.getRoomName(), getWorldModel().getItemFactory(),r.getDatabaseName());
         if(nearItems.size() == 0)
             return "";
         else{

@@ -1,6 +1,8 @@
 package network;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class CommandExecutor {
     private List<Command> commandQueue = Collections.synchronizedList(new LinkedList<>());

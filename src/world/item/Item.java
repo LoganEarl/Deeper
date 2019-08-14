@@ -42,10 +42,11 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     private int containerID;
     private int lockNumber;
     private Map<String,String> itemStats;
+    private ItemFactory itemFactory;
 
     public static final String NULL_ITEM_NAME = "!nullItemName!";
 
-    protected Item(ResultSet entry, String databaseName) throws Exception{
+    protected Item(ResultSet entry, ItemFactory factory, String databaseName) throws Exception{
         itemID = entry.getInt(ITEM_ID);
         roomName = entry.getString(ROOM_NAME);
         if(roomName == null)
@@ -62,6 +63,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
             displayName = "";
         lockNumber = entry.getInt(LOCK_NUMBER);
         this.databaseName = databaseName;
+        this.itemFactory = factory;
     }
 
     /**
@@ -69,8 +71,8 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
      * @param itemName the name of the item, used to get the item's stats
      * @param databaseName the name of the database containing the item's stats. item is stored in that database
      */
-    public Item(String itemName, String databaseName){
-        this(itemName, "", databaseName);
+    public Item(String itemName, ItemFactory factory, String databaseName){
+        this(itemName, "",factory, databaseName);
     }
 
     /**
@@ -79,9 +81,9 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
      * @param displayName the custom displayed name for the item
      * @param databaseName the name of the database containing the item's stats. item is stored in that database
      */
-    protected Item(String itemName, String displayName, String databaseName){
+    protected Item(String itemName, String displayName, ItemFactory factory, String databaseName){
         int id = Long.valueOf(System.currentTimeMillis()).hashCode();
-        while(getItemByID(id, databaseName) != null)
+        while(getItemByID(id, factory, databaseName) != null)
             id++;
         this.itemID = id;
         this.displayName = displayName;
@@ -99,15 +101,15 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
      * @param sourceEntity the entity doing the \"searching\"
      * @return either the Item or null if it could not be found
      */
-    public static Item getFromEntityContext(String identifier, Entity sourceEntity){
+    public static Item getFromEntityContext(String identifier, Entity sourceEntity, ItemFactory itemFactory){
         Item rawItem;
         try {
             int itemID = Integer.parseInt(identifier);
-            rawItem = Item.getItemByID(itemID, sourceEntity.getDatabaseName());
+            rawItem = Item.getItemByID(itemID,itemFactory, sourceEntity.getDatabaseName());
             if (rawItem == null)
                 rawItem = sourceEntity.getEquipment().getEquippedItem(itemID);
         } catch (NumberFormatException e) {
-            rawItem = Item.getItemByNameRoom(identifier, sourceEntity.getRoomName(), sourceEntity.getDatabaseName());
+            rawItem = Item.getItemByNameRoom(identifier, sourceEntity.getRoomName(),itemFactory, sourceEntity.getDatabaseName());
             if (rawItem == null)
                 rawItem = sourceEntity.getEquipment().getEquippedItem(identifier);
         }
@@ -121,7 +123,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
      * @param databaseName the name of the database containing the item
      * @return an Item instance or null if not found
      */
-    public static Item getItemByNameRoom(String itemName, String roomName, String databaseName){
+    public static Item getItemByNameRoom(String itemName, String roomName, ItemFactory itemFactory, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL = null;
         Item toReturn;
@@ -135,7 +137,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setString(3,roomName);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next()) {
-                    toReturn = ItemFactory.getInstance().parseFromResultSet(accountSet,databaseName);
+                    toReturn = itemFactory.parseFromResultSet(accountSet,databaseName);
                 }else
                     toReturn = null;
                 getSQL.close();
@@ -153,7 +155,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
      * @param databaseName the database containing the items
      * @return a list of all items in the room
      */
-    public static List<Item> getItemsInRoom(String roomName, String databaseName){
+    public static List<Item> getItemsInRoom(String roomName, ItemFactory itemFactory, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
         List<Item> foundItems = new LinkedList<>();
@@ -165,7 +167,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setString(1,roomName);
                 ResultSet accountSet = getSQL.executeQuery();
                 while(accountSet.next()) {
-                    foundItems.add(ItemFactory.getInstance().parseFromResultSet(accountSet,databaseName));
+                    foundItems.add(itemFactory.parseFromResultSet(accountSet,databaseName));
                 }
                 getSQL.close();
                 //c.close();
@@ -182,7 +184,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
      * @param databaseName the database containing the item
      * @return the instantiated item or null if not found
      */
-    public static Item getItemByID(int itemID, String databaseName){
+    public static Item getItemByID(int itemID, ItemFactory itemFactory, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
         Item toReturn;
@@ -194,7 +196,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setInt(1,itemID);
                 ResultSet accountSet = getSQL.executeQuery();
                 if(accountSet.next())
-                    toReturn = ItemFactory.getInstance().parseFromResultSet(accountSet,databaseName);
+                    toReturn = itemFactory.parseFromResultSet(accountSet,databaseName);
                 else
                     toReturn = null;
                 getSQL.close();
@@ -212,7 +214,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
      * @param databaseName the name of the database containing the data being searched for
      * @return a list of all items in the container
      */
-    public static List<Item> getItemsOfContainerID(int containerID, String databaseName){
+    public static List<Item> getItemsOfContainerID(int containerID, ItemFactory itemFactory, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
         List<Item> foundItems = new LinkedList<>();
@@ -224,7 +226,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
                 getSQL.setInt(1,containerID);
                 ResultSet accountSet = getSQL.executeQuery();
                 while(accountSet.next()) {
-                    foundItems.add(ItemFactory.getInstance().parseFromResultSet(accountSet,databaseName));
+                    foundItems.add(itemFactory.parseFromResultSet(accountSet,databaseName));
                 }
                 getSQL.close();
                 //c.close();
@@ -237,7 +239,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
 
     @Override
     public boolean saveToDatabase(String databaseName) {
-        Item item = getItemByID(itemID,databaseName);
+        Item item = getItemByID(itemID,itemFactory,databaseName);
         String stateString = "";
         if(state != null)
             stateString = state.toString();
@@ -265,7 +267,11 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
 
     @Override
     public boolean existsInDatabase(String databaseName) {
-        return getItemByID(itemID,databaseName) != null;
+        return getItemByID(itemID,itemFactory,databaseName) != null;
+    }
+
+    protected ItemFactory getItemFactory() {
+        return itemFactory;
     }
 
     /**

@@ -1,6 +1,7 @@
 package world.playerInterface.commands;
 
 import client.Client;
+import world.WorldModel;
 import world.entity.equipment.EquipmentContainer;
 import world.item.Item;
 import world.item.ItemType;
@@ -15,8 +16,8 @@ public class GrabDropCommand extends EntityCommand {
     private boolean pickUp;
     private boolean complete = false;
 
-    public GrabDropCommand(String itemIdentifier, String containerIdentifier, boolean pickUp, Client sourceClient) {
-        super(sourceClient);
+    public GrabDropCommand(String itemIdentifier, String containerIdentifier, boolean pickUp, Client sourceClient, WorldModel model) {
+        super(sourceClient, model);
 
         this.itemIdentifier = itemIdentifier;
         this.containerIdentifier = containerIdentifier;
@@ -44,7 +45,7 @@ public class GrabDropCommand extends EntityCommand {
     }
 
     private void putIn(){
-        Item toPutIn = Item.getFromEntityContext(itemIdentifier,getSourceEntity());
+        Item toPutIn = Item.getFromEntityContext(itemIdentifier,getSourceEntity(), getWorldModel().getItemFactory());
 //TODO remove the key or item from player inventory too
         if(toPutIn == null || !getSourceEntity().getEquipment().isHoldingItem(toPutIn))
             getSourceClient().sendMessage("You are not holding a " + itemIdentifier);
@@ -61,7 +62,7 @@ public class GrabDropCommand extends EntityCommand {
                 getSourceClient().sendMessage("An error has occurred. You are unable to drop a " + itemIdentifier + " (" + result + ")");
         }else{
             //try store in container
-            Item toStoreIn = Item.getFromEntityContext(containerIdentifier, getSourceEntity());
+            Item toStoreIn = Item.getFromEntityContext(containerIdentifier, getSourceEntity(), getWorldModel().getItemFactory());
             if(toStoreIn == null)
                 getSourceClient().sendMessage("There is not a " + containerIdentifier + " nearby");
             else if(toStoreIn.getItemType() != ItemType.container)
@@ -99,14 +100,14 @@ public class GrabDropCommand extends EntityCommand {
     }
 
     private Container getLocalContainer(String identifier){
-        Item container = Item.getFromEntityContext(identifier, getSourceEntity());
+        Item container = Item.getFromEntityContext(identifier, getSourceEntity(), getWorldModel().getItemFactory());
         if(container != null && container.getItemType() == ItemType.container)
             return (Container) container;
         return null;
     }
 
     private void pickUp(){
-        Item toPickUp = Item.getFromEntityContext(itemIdentifier,getSourceEntity());
+        Item toPickUp = Item.getFromEntityContext(itemIdentifier,getSourceEntity(), getWorldModel().getItemFactory());
         Container pickupFrom = null;
         if(toPickUp == null && !containerIdentifier.isEmpty() &&
                 (pickupFrom = getLocalContainer(containerIdentifier)) != null) {

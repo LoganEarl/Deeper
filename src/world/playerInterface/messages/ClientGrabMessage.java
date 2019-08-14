@@ -1,11 +1,9 @@
 package world.playerInterface.messages;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
-import world.notification.NotificationService;
+import world.WorldModel;
 import world.playerInterface.commands.GrabDropCommand;
 
 public class ClientGrabMessage extends ClientMessage {
@@ -14,8 +12,8 @@ public class ClientGrabMessage extends ClientMessage {
     private String itemID = "";
     private String fromContainer = "";
 
-    public ClientGrabMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
+    public ClientGrabMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -46,6 +44,6 @@ public class ClientGrabMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        getExecutor().scheduleCommand(new GrabDropCommand(itemID, fromContainer, true, getClient()));
+        getWorldModel().getExecutor().scheduleCommand(new GrabDropCommand(itemID, fromContainer, true, getClient(), getWorldModel()));
     }
 }

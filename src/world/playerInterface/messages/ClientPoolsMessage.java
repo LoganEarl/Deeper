@@ -1,11 +1,9 @@
 package world.playerInterface.messages;
 
 import client.Client;
-import client.ClientRegistry;
-import network.CommandExecutor;
 import network.messaging.ClientMessage;
 import network.messaging.MessagePipeline;
-import world.notification.NotificationService;
+import world.WorldModel;
 import world.playerInterface.commands.PoolsCommand;
 
 public class ClientPoolsMessage extends ClientMessage {
@@ -14,8 +12,8 @@ public class ClientPoolsMessage extends ClientMessage {
     private double updateInterval = -1;
     private boolean killExisting = false;
 
-    public ClientPoolsMessage(Client sourceClient, CommandExecutor executor, ClientRegistry registry, MessagePipeline messagePipeline, NotificationService notificationService) {
-        super(HEADER, sourceClient, executor, registry, messagePipeline, notificationService);
+    public ClientPoolsMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
+        super(HEADER, sourceClient, messagePipeline, worldModel);
     }
 
     @Override
@@ -53,6 +51,6 @@ public class ClientPoolsMessage extends ClientMessage {
             getClient().sendMessage("No longer updating pools");
             PoolsCommand.killUpdaterOfClient(getClient());
         }else
-            getExecutor().scheduleCommand(new PoolsCommand(true, updateInterval, getClient()));
+            getWorldModel().getExecutor().scheduleCommand(new PoolsCommand(true, updateInterval, getClient(), getWorldModel()));
     }
 }

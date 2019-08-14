@@ -4,10 +4,6 @@ import database.DatabaseManager;
 import world.item.ItemStatTable;
 import world.meta.World;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 import static world.item.Item.NULL_ITEM_NAME;
