@@ -4,7 +4,7 @@ import world.entity.Entity;
 import world.entity.StatContainer;
 import world.entity.skill.Skill;
 
-public class BaseStance {
+public class BaseStance extends Stance{
     private static final double BASE_HP_PER_TOUGH_PER_SEC = 0.02;
     private static final double BASE_STAM_PER_FIT_PER_SEC = 0.02;
     private static final double MP_PER_INT_PER_SEC = 0.013;
@@ -12,15 +12,28 @@ public class BaseStance {
     private static final double BURN_PER_WIS_PER_SEC = 0.013;
     private static final double BURN_PER_INT_PER_SEC = 0.007;
 
-    private long lastUpdateTime = 0;
-    private double carryoverHP = 0, carryOverMP = 0, carryOverStam = 0, carryOverBurn = 0;
-
-    public int getDamageDealt(int baseDamage, Entity agressor, int hitRoll){
+    public int getDamageDealt(int baseDamage, Entity aggressor, int hitRoll){
         return baseDamage;
     }
 
     public int getXPGained(int baseXP){
         return baseXP;
+    }
+
+    public double getFlatHpPerSec(){
+        return 0;
+    }
+
+    public double getFlatMpPerSec(){
+        return 0;
+    }
+
+    public double getFlatStamPerSec(){
+        return 0;
+    }
+
+    public double getFlatBurnPerSec(){
+        return 0;
     }
 
     public double getBaseHpPerToughPerSec(){
@@ -51,64 +64,7 @@ public class BaseStance {
         return null;
     }
 
-    public final RegenPacket receiveNextRegenPacket(StatContainer stats, long curTime){
-        if(lastUpdateTime == 0) lastUpdateTime = curTime;
-
-        double elapsedSecs = (curTime - lastUpdateTime)/1000.0;
-
-        double hp = stats.getToughness() * elapsedSecs * getBaseHpPerToughPerSec();
-        double stam = stats.getFitness() * elapsedSecs * getBaseStamPerFitPerSec();
-        double mp = (stats.getIntelligence() * getMpPerIntPerSec() + stats.getWisdom() * getMpPerWisPerSec()) * elapsedSecs;
-        double burn = (stats.getWisdom() * getBurnPerWisPerSec() + stats.getIntelligence() * getBurnPerIntPerSec()) * elapsedSecs;
-
-        int calculatedHP = (int)(hp + carryoverHP);
-        int calculatedStam = (int)(stam + carryOverStam);
-        int calculatedMP = (int)(mp + carryOverMP);
-        int calculatedBurn = (int)(burn + carryOverBurn);
-
-        RegenPacket regenPacket = new RegenPacket(calculatedHP,calculatedStam,calculatedMP,calculatedBurn);
-
-        carryoverHP = (hp + carryoverHP) - calculatedHP;
-        carryOverMP = (mp + carryOverMP) - calculatedMP;
-        carryOverStam = (stam + carryOverStam) - calculatedStam;
-        carryOverBurn = (burn + carryOverBurn) - calculatedBurn;
-
-        lastUpdateTime = curTime;
-
-        return regenPacket;
-    }
-
-    @Override
-    public final boolean equals(Object o){
-        if(this == o) return true;
-        if(o == null) return false;
-        return o.getClass().equals(getClass());
-    }
-
-    public final class RegenPacket{
-        private int hp, stamina, mp, burnout;
-
-        RegenPacket(int hp, int stamina, int mp, int burnout){
-            this.hp = hp;
-            this.stamina = stamina;
-            this.mp = mp;
-            this.burnout = burnout;
-        }
-
-        public int getHp() {
-            return hp;
-        }
-
-        public int getStamina() {
-            return stamina;
-        }
-
-        public int getMp() {
-            return mp;
-        }
-
-        public int getBurnout() {
-            return burnout;
-        }
+    public boolean isLearnable(){
+        return true;
     }
 }

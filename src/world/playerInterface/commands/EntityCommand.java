@@ -31,7 +31,7 @@ public abstract class EntityCommand implements CommandExecutor.Command {
             sourceClient.sendMessage("You must "+ getMessageInColor("have a character",FAILURE) + " to do that");
             done = true;
         } else if(sourceEntity.getPools().isDying() && !canDoWhenDying()){
-            sourceClient.sendMessage(getMessageInColor("You are dying.",FAILURE) + " You cannot do that right now. Seek help quickly before you pass on");
+            sourceClient.sendMessage(getMessageInColor("You are severely wounded.",FAILURE) + " You cannot do that right now. Seek help quickly for the end is near");
             done = true;
         }else if(sourceEntity.getPools().isDead() && !canDoWhenDead()){
             sourceClient.sendMessage(getMessageInColor("You are dead",FAILURE));

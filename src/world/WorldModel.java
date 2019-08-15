@@ -37,7 +37,7 @@ public class WorldModel {
     }
 
     public void startDefaultTasks(){
-        executor.scheduleCommand(new EntityRegenCommand());
+        executor.scheduleCommand(new EntityRegenCommand(registry, notificationService));
     }
 
     public void loadDefaultCommands(MessagePipeline messagePipeline){

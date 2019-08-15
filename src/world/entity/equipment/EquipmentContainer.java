@@ -2,6 +2,7 @@ package world.entity.equipment;
 
 import world.entity.Entity;
 import world.entity.stance.BaseStance;
+import world.entity.stance.Stance;
 import world.item.Item;
 import world.item.ItemCollection;
 import world.item.ItemType;
@@ -22,7 +23,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
 
     private Map<ArmorSlot, Integer> slots = new HashMap<>();
 
-    private BaseStance stance;
+    private Stance stance;
 
     private Entity entity;
     private ItemCollection itemCollection;
@@ -319,7 +320,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
     }
 
     @Override
-    public void registerStance(BaseStance toRegister) {
+    public void registerStance(Stance toRegister) {
         this.stance = toRegister;
     }
 }

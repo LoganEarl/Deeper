@@ -10,6 +10,7 @@ import world.entity.race.Race;
 import world.entity.skill.Skill;
 import world.entity.skill.SkillTable;
 import world.entity.stance.BaseStance;
+import world.entity.stance.Stance;
 import world.meta.World;
 import world.notification.Notification;
 import world.notification.NotificationSubscriber;
@@ -37,7 +38,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     private String roomName;
     private String raceID;
 
-    private BaseStance currentStance;
+    private Stance currentStance;
 
     private String databaseName;
     private WorldModel model;
@@ -341,7 +342,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         }
     }
 
-    public void setStance(BaseStance stance){
+    public void setStance(Stance stance){
         Skill requiredSkill = stance.getRequiredSkill();
         if(requiredSkill == null || SkillTable.entityHasSkill(this, requiredSkill)) {
             if (!stance.equals(currentStance)) {
@@ -351,6 +352,10 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
                 }
             }
         }
+    }
+
+    public Stance getStance() {
+        return currentStance;
     }
 
     public String getControllerType() {
@@ -464,7 +469,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(hp,maxHP,mp,maxMP,stamina,maxStamina,burnout,maxBurnout));
             extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom, toughness, fitness));
             extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(model.getItemCollection(), e));
-            extenders.put(ProgressionContainer.SIGNIFIER, new ProgressionContainer());
+            extenders.put(ProgressionContainer.SIGNIFIER, new ProgressionContainer(e));
 
             e.extenders = extenders;
             e.entityID = entityID;
@@ -603,6 +608,6 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         String getSignifier();
         Object[] getInsertSqlValues();
         String[] getSqlColumnHeaders();
-        void registerStance(BaseStance toRegister);
+        void registerStance(Stance toRegister);
     }
 }
