@@ -354,6 +354,10 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         }
     }
 
+    public Stance getStance() {
+        return currentStance;
+    }
+
     public String getControllerType() {
         return controllerType;
     }
