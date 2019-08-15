@@ -1,8 +1,7 @@
 package world.entity.progression;
 
-import client.commands.PromptCommand;
 import world.entity.Entity;
-import world.entity.stance.BaseStance;
+import world.entity.stance.Stance;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,9 +14,12 @@ public class ProgressionContainer implements Entity.SqlExtender {
     private int xp = 0;
 
     private static final String[] HEADERS = new String[]{XP};
-    private BaseStance stance;
+    private Stance stance;
 
-    public ProgressionContainer(){
+    private Entity sourceEntity;
+
+    public ProgressionContainer(Entity sourceEntity){
+        this.sourceEntity = sourceEntity;
     }
 
     public ProgressionContainer(ResultSet readEntry) throws SQLException {
@@ -36,6 +38,17 @@ public class ProgressionContainer implements Entity.SqlExtender {
         this.xp += stance.getXPGained(xp);
     }
 
+    public int getXPCostForNextStat(int newStatVal, int curStatVal, int racialBaseStat){
+        int totalXP = 0;
+        for(int statValue = curStatVal + 1; statValue <= newStatVal; statValue++) {
+            int nextLevelCost = 10 * (statValue - racialBaseStat);
+            if(nextLevelCost < 25) nextLevelCost = 25;
+            totalXP += nextLevelCost;
+        }
+
+        return totalXP;
+    }
+
     @Override
     public String getSignifier() {
         return SIGNIFIER;
@@ -52,7 +65,7 @@ public class ProgressionContainer implements Entity.SqlExtender {
     }
 
     @Override
-    public void registerStance(BaseStance toRegister) {
+    public void registerStance(Stance toRegister) {
         this.stance = toRegister;
     }
 }

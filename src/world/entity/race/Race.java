@@ -125,7 +125,7 @@ public class Race {
         for(Race r: defaultRaces()){
             DatabaseManager.executeStatement(INSERT_SQL,databaseName,
                     r.getRaceID(), r.getDisplayName(), r.getDescription(),
-                    r.getBaseInt(), r.getBaseWis(), r.getBaseStr(), r.getBaseDex());
+                    r.getBaseInt(), r.getBaseWis(), r.getBaseStr(), r.getBaseDex(), r.getBaseTough(),r.getBaseFit());
         }
     }
 

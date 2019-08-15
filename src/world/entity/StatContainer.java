@@ -1,6 +1,7 @@
 package world.entity;
 
 import world.entity.stance.BaseStance;
+import world.entity.stance.Stance;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +17,7 @@ public class StatContainer implements Entity.SqlExtender {
     private int toughness;
     private int fitness;
 
-    private BaseStance currnetStance;
+    private Stance currnetStance;
 
     private static final Random RND = new Random(System.currentTimeMillis());
 
@@ -115,7 +116,7 @@ public class StatContainer implements Entity.SqlExtender {
     }
 
     @Override
-    public void registerStance(BaseStance toRegister) {
+    public void registerStance(Stance toRegister) {
         currnetStance = toRegister;
     }
 

@@ -3,6 +3,9 @@ package world.entity.pool;
 import world.entity.Entity;
 import world.entity.StatContainer;
 import world.entity.stance.BaseStance;
+import world.entity.stance.DyingStance;
+import world.entity.stance.StablizedStance;
+import world.entity.stance.Stance;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,7 +22,7 @@ public class PoolContainer implements Entity.SqlExtender {
     private int burnout;
     private int maxBurnout;
 
-    private BaseStance currentStance;
+    private Stance currentStance;
 
     public static final String SIGNIFIER = "pools";
 
@@ -84,7 +87,7 @@ public class PoolContainer implements Entity.SqlExtender {
     }
 
     @Override
-    public void registerStance(BaseStance toRegister) {
+    public void registerStance(Stance toRegister) {
         this.currentStance = toRegister;
     }
 
