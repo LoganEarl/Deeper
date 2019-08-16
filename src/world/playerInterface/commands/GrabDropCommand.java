@@ -1,12 +1,22 @@
 package world.playerInterface.commands;
 
 import client.Client;
+import client.ClientRegistry;
 import world.WorldModel;
+import world.diplomacy.DiplomaticRelation;
+import world.diplomacy.Faction;
+import world.entity.Entity;
 import world.entity.equipment.EquipmentContainer;
 import world.item.Item;
 import world.item.ItemType;
 import world.item.armor.ArmorSlot;
 import world.item.container.Container;
+import world.notification.Notification;
+import world.notification.NotificationScope;
+import world.notification.NotificationSubscriber;
+import world.room.RoomNotificationScope;
+
+import static world.playerInterface.ColorTheme.*;
 
 import static world.entity.equipment.EquipmentContainer.*;
 
@@ -148,8 +158,50 @@ public class GrabDropCommand extends EntityCommand {
                 getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
                 toPickUp.updateInDatabase(toPickUp.getDatabaseName());
 
-                getSourceClient().sendMessage("You pick up the " + toPickUp.getDisplayableName());
+                Notification pickedUp = new ItemAcquiredNotification(getSourceEntity(),toPickUp,true,pickupFrom,getWorldModel().getRegistry());
+                NotificationScope scope = new RoomNotificationScope(getSourceEntity().getRoomName(),getSourceEntity().getDatabaseName());
+                getWorldModel().getNotificationService().notify(pickedUp, scope);
             }
+        }
+    }
+
+    private class ItemAcquiredNotification extends Notification{
+        private Entity actor;
+        private Item target;
+        private Item sourceContainer;
+        private boolean wasPickedUp;
+
+        public ItemAcquiredNotification(Entity actor, Item target, boolean wasPickedUp, Item sourceContainer, ClientRegistry registry) {
+            super(registry);
+            this.actor = actor;
+            this.target = target;
+            this.wasPickedUp = wasPickedUp;
+            this.sourceContainer = sourceContainer;
+        }
+
+        @Override
+        public String getAsMessage(NotificationSubscriber viewer) {
+            String response;
+            if(viewer.getID().equals(actor.getID())){
+                if(wasPickedUp)
+                    response = getMessageInColor("You take the ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(),ITEM);
+                else
+                    response = getMessageInColor("You drop up the ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(),ITEM);
+            }else {
+                Faction viewerFaction = ((Entity)viewer).getDiplomacy().getFaction();
+                DiplomaticRelation relation = getWorldModel().getDiplomacyManager().getRelation(viewerFaction,actor.getDiplomacy().getFaction());
+
+                if (wasPickedUp) {
+                    response = getMessageInColor(actor.getDisplayName(), relation) + getMessageInColor(" takes a ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(), ITEM);
+                    if (sourceContainer == null)
+                        response += getMessageInColor(" from the ground", INFORMATIVE);
+                    else
+                        response += getMessageInColor(" from the ", INFORMATIVE) + getMessageInColor(sourceContainer.getDisplayableName(), ITEM);
+                } else {
+                    response = getMessageInColor(actor.getDisplayName(), relation) + getMessageInColor( " drops up a ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(), ITEM);
+                }
+            }
+            return response;
         }
     }
 }

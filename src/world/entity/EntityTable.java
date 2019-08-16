@@ -76,6 +76,8 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
 
     public static final String XP = "xp";
 
+    public static final String FACTION_ID = "factionID";
+
     /**The type of controller responsible for the entity. Example, {@value CONTROLLER_TYPE_PLAYER} or {@value CONTROLLER_TYPE_STATIC}*/
     public static final String CONTROLLER_TYPE = "controller";
 
@@ -125,6 +127,7 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(SLOT_BELT_UTIL, "INT");
 
         TABLE_DEFINITION.put(XP,"INT");
+        TABLE_DEFINITION.put(FACTION_ID, "INT");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));

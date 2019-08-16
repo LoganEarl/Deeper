@@ -3,6 +3,7 @@ package world.entity;
 import client.Client;
 import database.DatabaseManager;
 import world.WorldModel;
+import world.entity.diplomacy.DiplomacyContainer;
 import world.entity.equipment.EquipmentContainer;
 import world.entity.pool.PoolContainer;
 import world.entity.progression.ProgressionContainer;
@@ -65,6 +66,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         extenders.put(StatContainer.SIGNIFIER, new StatContainer(readEntry));
         extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(readEntry, model.getItemCollection(), this));
         extenders.put(ProgressionContainer.SIGNIFIER, new ProgressionContainer(readEntry));
+        extenders.put(DiplomacyContainer.SIGNIFIER, new DiplomacyContainer());
 
         entityID = readEntry.getString(ENTITY_ID);
         displayName = readEntry.getString(DISPLAY_NAME);
@@ -398,6 +400,10 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         return (StatContainer) extenders.get(StatContainer.SIGNIFIER);
     }
 
+    public DiplomacyContainer getDiplomacy() {
+        return (DiplomacyContainer) extenders.get(DiplomacyContainer.SIGNIFIER);
+    }
+
     public ProgressionContainer getProgression(){
         return (ProgressionContainer) extenders.get(ProgressionContainer.SIGNIFIER);
     }
@@ -470,6 +476,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom, toughness, fitness));
             extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(model.getItemCollection(), e));
             extenders.put(ProgressionContainer.SIGNIFIER, new ProgressionContainer(e));
+            extenders.put(DiplomacyContainer.SIGNIFIER, new DiplomacyContainer());
 
             e.extenders = extenders;
             e.entityID = entityID;
