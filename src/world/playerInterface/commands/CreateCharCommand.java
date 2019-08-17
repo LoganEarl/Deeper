@@ -10,6 +10,7 @@ import world.entity.Entity;
 import world.entity.EntityTable;
 import world.entity.race.Race;
 import world.meta.World;
+import world.notification.NotificationService;
 
 import java.util.Arrays;
 import java.util.Locale;
@@ -114,6 +115,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
             }else if(newMessageArgs.length == 1 && newMessageArgs[0].equals("yes")){
                 Entity preexisting = WorldUtils.getEntityOfClient(sourceClient, model);
                 if(preexisting != null) {
+                    this.model.getNotificationService().unsubscribe(preexisting);
                     if (World.deleteEntity(preexisting)) {
                         preexisting.removeFromDatabase(preexisting.getDatabaseName());
                         registry.sendMessage("Your old character has been deleted", sourceClient);

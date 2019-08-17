@@ -3,8 +3,11 @@ package world.playerInterface.commands;
 import client.Client;
 import client.ClientRegistry;
 import world.WorldModel;
+import world.diplomacy.DiplomaticRelation;
+import world.diplomacy.Faction;
 import world.entity.Entity;
 import world.entity.StatContainer;
+import world.entity.diplomacy.DiplomacyContainer;
 import world.entity.equipment.EquipmentContainer;
 import world.item.Item;
 import world.item.ItemType;
@@ -48,13 +51,13 @@ public class AttackCommand extends EntityCommand {
 
     @Override
     protected void executeEntityCommand() {
-        Entity target = getWorldModel().getEntityCollection().getEntityByDisplayName(targetID, getSourceEntity().getRoomName(),getSourceEntity().getDatabaseName());
+        Entity target = getWorldModel().getEntityCollection().getEntityByDisplayName(targetID, getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName());
 
-        if(target == null)
-            target = getWorldModel().getEntityCollection().getEntityByEntityID(targetID,getSourceEntity().getDatabaseName());
-        if(target == null)
-            getSourceClient().sendMessage("There is " + getMessageInColor("nothing named " + targetID + " nearby",FAILURE));
-        else{
+        if (target == null)
+            target = getWorldModel().getEntityCollection().getEntityByEntityID(targetID, getSourceEntity().getDatabaseName());
+        if (target == null)
+            getSourceClient().sendMessage("There is " + getMessageInColor("nothing named " + targetID + " nearby", FAILURE));
+        else {
             EquipmentContainer equipment = getSourceEntity().getEquipment();
             StatContainer stats = getSourceEntity().getStats();
             Item rightHand = equipment.getEquippedItem(ArmorSlot.rightHand);
@@ -64,26 +67,26 @@ public class AttackCommand extends EntityCommand {
             boolean leftHandCanAttack = leftHand != null && leftHand.getItemType() == ItemType.weapon;
             boolean hasFists = rightHand == null && leftHand == null;
 
-            if(hasFists){
-                getSourceClient().sendMessage("You have " + getMessageInColor("no weapon",FAILURE) + " to attack with");
-            }else if(rightHandCanAttack && !leftHandCanAttack){
+            if (hasFists) {
+                getSourceClient().sendMessage("You have " + getMessageInColor("no weapon", FAILURE) + " to attack with");
+            } else if (rightHandCanAttack && !leftHandCanAttack) {
                 Weapon rightHandWeapon = (Weapon) rightHand;
-                singleAttack(rightHandWeapon,target,stats,0, 1);
-                cooldownMs = (int)Math.ceil(rightHandWeapon.getAttackSpeed() * 1000);
-            }else if(leftHandCanAttack && !rightHandCanAttack){
+                singleAttack(rightHandWeapon, target, stats, 0, 1);
+                cooldownMs = (int) Math.ceil(rightHandWeapon.getAttackSpeed() * 1000);
+            } else if (leftHandCanAttack && !rightHandCanAttack) {
                 Weapon leftHandWeapon = (Weapon) leftHand;
-                singleAttack(leftHandWeapon,target,stats,0,1);
-                cooldownMs = (int)Math.ceil(leftHandWeapon.getAttackSpeed() * 1000);
-            }else if(rightHandCanAttack && leftHandCanAttack){
+                singleAttack(leftHandWeapon, target, stats, 0, 1);
+                cooldownMs = (int) Math.ceil(leftHandWeapon.getAttackSpeed() * 1000);
+            } else if (rightHandCanAttack && leftHandCanAttack) {
                 Weapon rightHandWeapon = (Weapon) rightHand;
                 Weapon leftHandWeapon = (Weapon) leftHand;
-                singleAttack(rightHandWeapon,target,stats,-10,1.1);
-                singleAttack(leftHandWeapon,target,stats,-20, 1.1);
-                float maxWeaponSpeed = rightHandWeapon.getAttackSpeed() > leftHandWeapon.getAttackSpeed()?
-                        rightHandWeapon.getAttackSpeed(): leftHandWeapon.getAttackSpeed();
-                cooldownMs = (int)Math.ceil(maxWeaponSpeed * 1500);
-            }else if(!rightHandCanAttack && !leftHandCanAttack){
-                getSourceClient().sendMessage("You have " + getMessageInColor("no weapon",FAILURE) + " to attack with");
+                singleAttack(rightHandWeapon, target, stats, -10, 1.1);
+                singleAttack(leftHandWeapon, target, stats, -20, 1.1);
+                float maxWeaponSpeed = rightHandWeapon.getAttackSpeed() > leftHandWeapon.getAttackSpeed() ?
+                        rightHandWeapon.getAttackSpeed() : leftHandWeapon.getAttackSpeed();
+                cooldownMs = (int) Math.ceil(maxWeaponSpeed * 1500);
+            } else if (!rightHandCanAttack && !leftHandCanAttack) {
+                getSourceClient().sendMessage("You have " + getMessageInColor("no weapon", FAILURE) + " to attack with");
             }
         }
 
@@ -95,28 +98,28 @@ public class AttackCommand extends EntityCommand {
         return staminaUsed;
     }
 
-    private void notifyTarget(String message, Entity target){
+    private void notifyTarget(String message, Entity target) {
         Client targetClient = registry.getClientWithUsername(target.getID());
-        if(targetClient != null){
+        if (targetClient != null) {
             targetClient.sendMessage(message);
         }
     }
 
-    private void notifyRoom(String message, String... excludedEntityIDs){
+    private void notifyRoom(String message, String... excludedEntityIDs) {
         List<Entity> inRoom = getWorldModel().getEntityCollection().getEntitiesInRoom(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName(), excludedEntityIDs);
-        for(Entity ent: inRoom){
+        for (Entity ent : inRoom) {
             Client attachedClient = registry.getClientWithUsername(ent.getID());
-            if(attachedClient != null){
+            if (attachedClient != null) {
                 attachedClient.sendMessage(message);
             }
         }
     }
 
-    private void singleAttack(Weapon selectWeapon, Entity target, StatContainer stats, int bonus, double staminaMultiplier){
+    private void singleAttack(Weapon selectWeapon, Entity target, StatContainer stats, int bonus, double staminaMultiplier) {
         double rawStamina = selectWeapon.getStaminaUsage(stats.getStrength(), stats.getDexterity()) * staminaMultiplier;
-        int staminaNeeded = (int)Math.ceil(rawStamina);
-        if(staminaNeeded > getSourceEntity().getPools().getStamina())
-            getSourceClient().sendMessage("You are " + getMessageInColor("exhausted",STAMINA_COLOR) + " and cannot wield the " + selectWeapon.getDisplayableName());
+        int staminaNeeded = (int) Math.ceil(rawStamina);
+        if (staminaNeeded > getSourceEntity().getPools().getStamina())
+            getSourceClient().sendMessage("You are " + getMessageInColor("exhausted", STAMINA_COLOR) + " and cannot wield the " + selectWeapon.getDisplayableName());
         else {
             int roll = selectWeapon.rollHit(
                     stats.getStrength(),
@@ -139,8 +142,8 @@ public class AttackCommand extends EntityCommand {
 
     @Override
     protected void setBalance() {
-        if(cooldownMs > 0)
-            getSourceEntity().setBalanceTime(cooldownMs,getSourceClient());
+        if (cooldownMs > 0)
+            getSourceEntity().setBalanceTime(cooldownMs, getSourceClient());
     }
 
     public class AttackNotification extends Notification {
@@ -150,7 +153,7 @@ public class AttackCommand extends EntityCommand {
         private int netRoll;
         private int damage;
 
-        public AttackNotification(Entity attackEntity,Entity defenceEntity,Weapon attackWeapon,int netRoll,int damage,ClientRegistry registry) {
+        public AttackNotification(Entity attackEntity, Entity defenceEntity, Weapon attackWeapon, int netRoll, int damage, ClientRegistry registry) {
             super(registry);
             this.attackEntity = attackEntity;
             this.defenceEntity = defenceEntity;
@@ -161,26 +164,39 @@ public class AttackCommand extends EntityCommand {
 
         @Override
         public String getAsMessage(NotificationSubscriber viewer) {
-            if(viewer.getID().equals(attackEntity.getID()) && viewer.getDatabaseName().equals(attackEntity.getDatabaseName())){
-                if(netRoll >= 0)
-                    return String.format("You score a hit on %s with your %s(+%d) for " + getMessageInColor("%d damage", OUTGOING_DAMAGE),
-                            defenceEntity.getDisplayName(), attackWeapon.getDisplayableName(), netRoll, damage);
+            Faction viewerFaction = ((Entity) viewer).getDiplomacy().getFaction();
+
+            if (viewer.getID().equals(attackEntity.getID())) {
+                DiplomaticRelation relation = getWorldModel().getDiplomacyManager().getRelation(defenceEntity.getDiplomacy().getFaction(), viewerFaction);
+                if (netRoll >= 0)
+                    return String.format("You score a hit on " +
+                            getMessageInColor("%s",relation) + " the %s with your %s(+%d) for " + getMessageInColor("%d damage", OUTGOING_DAMAGE),
+                            defenceEntity.getDisplayName(),defenceEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName(), netRoll, damage);
                 else
-                    return String.format("You miss %s with your %s(%d)",
-                            defenceEntity.getDisplayName(),attackWeapon.getDisplayableName(), netRoll);
-            }else if(viewer.getID().equals(defenceEntity.getID()) && viewer.getDatabaseName().equals(attackEntity.getDatabaseName())){
-                if(netRoll >= 0)
-                    return String.format("%s the %s attacks you with a %s for " + getMessageInColor("%d damage", INCOMING_DAMAGE),
+                    return String.format("You miss " +
+                            getMessageInColor("%s",relation) +
+                            " the %s with your %s(%d)",
+                            defenceEntity.getDisplayName(), defenceEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName(), netRoll);
+            } else if (viewer.getID().equals(defenceEntity.getID())) {
+                DiplomaticRelation relation = getWorldModel().getDiplomacyManager().getRelation(attackEntity.getDiplomacy().getFaction(), viewerFaction);
+                if (netRoll >= 0)
+                    return String.format(getMessageInColor("%s", relation) + " the %s attacks you with a %s for " + getMessageInColor("%d damage", INCOMING_DAMAGE),
                             attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName(), damage);
                 else
-                    return String.format(getMessageInColor("%s the %s misses", WARNING) + " you with his %s",
+                    return String.format(
+                            getMessageInColor("%s", relation) +
+                                    getMessageInColor(" the %s misses you with his", WARNING) +
+                                    getMessageInColor("%s", ITEM),
                             attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName());
-            }else{
-                return String.format("%s the %s is fighting %s the %s",
+            } else {
+                DiplomaticRelation relationAtc = getWorldModel().getDiplomacyManager().getRelation(viewerFaction, attackEntity.getDiplomacy().getFaction());
+                DiplomaticRelation relationDef = getWorldModel().getDiplomacyManager().getRelation(viewerFaction, defenceEntity.getDiplomacy().getFaction());
+                return String.format(
+                        getMessageInColor("%s", relationAtc) + " the %s is attacking " +
+                                getMessageInColor("%s", relationDef) + " the %s",
                         attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(),
                         defenceEntity.getDisplayName(), defenceEntity.getRace().getDisplayName());
             }
-
         }
 
         public Entity getAttackEntity() {

@@ -1,5 +1,7 @@
 package world.playerInterface;
 
+import world.diplomacy.DiplomaticRelation;
+
 import java.awt.*;
 import java.util.Locale;
 
@@ -24,6 +26,26 @@ public class ColorTheme {
     public static final Color MP_COLOR = new Color(0,79,135);
     public static final Color STAMINA_COLOR = new Color(0,165,11);
     public static final Color BURNOUT_COLOR = new Color(210,118,0);
+
+    public static String getMessageInColor(String message, DiplomaticRelation relation){
+        return getMessageInColor(message, getColorOfRelation(relation));
+    }
+
+    public static Color getColorOfRelation(DiplomaticRelation relation){
+        switch (relation){
+            case allied:
+                return ALLY;
+            case friendly:
+                return FRIENDLY;
+            case neutral:
+                return NEUTRAL;
+            case unfriendly:
+                return UNFRIENDLY;
+            case enemies:
+                return ENEMY;
+        }
+        return NEUTRAL;
+    }
 
     public static String getMessageInColor(String message, Color selectColor){
         return String.format(Locale.US, "<font color=\"%s\">%s</font>", getHexValue(selectColor), message);

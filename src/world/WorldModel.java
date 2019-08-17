@@ -3,6 +3,7 @@ package world;
 import client.ClientRegistry;
 import network.CommandExecutor;
 import network.messaging.MessagePipeline;
+import world.diplomacy.DiplomacyManager;
 import world.entity.EntityCollection;
 import world.entity.pool.EntityRegenCommand;
 import world.item.ItemCollection;
@@ -20,6 +21,7 @@ public class WorldModel {
     private ItemFactory itemFactory;
     private ItemCollection itemCollection;
     private EntityCollection entityCollection;
+    private DiplomacyManager diplomacyManager;
 
     public WorldModel(CommandExecutor executor, ClientRegistry registry){
         this.executor = executor;
@@ -31,6 +33,8 @@ public class WorldModel {
         itemFactory.addParser(Weapon.factory());
         itemFactory.addParser(MiscItem.factory());
         itemFactory.addParser(Container.factory());
+
+        diplomacyManager = new DiplomacyManager();
 
         itemCollection = new ItemCollection(itemFactory);
         entityCollection = new EntityCollection(this);
@@ -81,5 +85,9 @@ public class WorldModel {
 
     public EntityCollection getEntityCollection() {
         return entityCollection;
+    }
+
+    public DiplomacyManager getDiplomacyManager(){
+        return diplomacyManager;
     }
 }
