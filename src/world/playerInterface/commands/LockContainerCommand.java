@@ -1,10 +1,18 @@
 package world.playerInterface.commands;
 
 import client.Client;
+import client.ClientRegistry;
 import world.WorldModel;
+import world.entity.Entity;
 import world.item.Item;
 import world.item.ItemType;
 import world.item.container.Container;
+import world.notification.Notification;
+import world.notification.NotificationScope;
+import world.notification.NotificationSubscriber;
+import world.room.RoomNotificationScope;
+
+import static world.playerInterface.ColorTheme.*;
 
 public class LockContainerCommand extends EntityCommand {
     private boolean complete = false;
@@ -27,19 +35,22 @@ public class LockContainerCommand extends EntityCommand {
 
     @Override
     protected void executeEntityCommand() {
-        String lock = desiredLockState? "lock":"unlock";
+        String lock = desiredLockState ? "lock" : "unlock";
 
         Container targetContainer = parseContainer(containerIDName);
         Item targetKey = parseKey(itemIDName);
-        if(targetContainer != null && targetKey != null){
-            if(targetContainer.getIsLocked() == desiredLockState)
+        if (targetContainer != null && targetKey != null) {
+            if (targetContainer.getIsLocked() == desiredLockState)
                 getSourceClient().sendMessage("The " + targetContainer.getDisplayableName() + " is already " + lock + "ed");
-            else if(targetContainer.getLockNumber() != targetKey.getLockNumber())
-                getSourceClient().sendMessage("You cannot seem to fit the " + targetKey.getDisplayableName() + " into the lock");
-            else if(targetContainer.setLockedWithItem(targetKey,desiredLockState)){
-                getSourceClient().sendMessage("You slide the " + targetKey.getDisplayableName() + " into the lock and it " + lock + "s with a turn and a click");
-
-            }else{
+            else if (targetContainer.getLockNumber() != targetKey.getLockNumber()){
+                Notification notification = new ContainerLockedNotification(getSourceEntity(),targetKey,targetContainer,desiredLockState,false, getWorldModel().getRegistry());
+                NotificationScope scope = new RoomNotificationScope(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName());
+                getWorldModel().getNotificationService().notify(notification,scope);
+            }else if (targetContainer.setLockedWithItem(targetKey, desiredLockState)) {
+                Notification notification = new ContainerLockedNotification(getSourceEntity(),targetKey,targetContainer,desiredLockState,true, getWorldModel().getRegistry());
+                NotificationScope scope = new RoomNotificationScope(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName());
+                getWorldModel().getNotificationService().notify(notification,scope);
+            } else {
                 getSourceClient().sendMessage("You are unable to " + lock + " the " + targetContainer.getDisplayableName());
             }
         }
@@ -53,7 +64,7 @@ public class LockContainerCommand extends EntityCommand {
     }
 
     private Container parseContainer(String identifier) {
-        Item rawContainer = Item.getFromEntityContext(identifier, getSourceEntity(),getWorldModel().getItemFactory());
+        Item rawContainer = Item.getFromEntityContext(identifier, getSourceEntity(), getWorldModel().getItemFactory());
 
         if (rawContainer != null) {
             if (rawContainer.getItemType().equals(ItemType.container) && rawContainer instanceof Container && rawContainer.getLockNumber() > 0)
@@ -68,21 +79,56 @@ public class LockContainerCommand extends EntityCommand {
         }
     }
 
-    private Item parseKey(String identifier){
+    private Item parseKey(String identifier) {
         Item rawItem = Item.getFromEntityContext(identifier, getSourceEntity(), getWorldModel().getItemFactory());
 
-        if(rawItem != null){
-            if(rawItem.getLockNumber() > 0)
+        if (rawItem != null) {
+            if (rawItem.getLockNumber() > 0)
                 return rawItem;
-            else{
+            else {
                 getSourceClient().sendMessage("The " + identifier + " is not a key");
                 return null;
             }
-        }else {
+        } else {
             getSourceClient().sendMessage("You cannot find the " + identifier + " here");
             return null;
         }
     }
 
+    public class ContainerLockedNotification extends Notification {
+        private Entity sourceEntity;
+        private Container targetContainer;
+        private Item targetKey;
+        private boolean wasLocked;
+        private boolean wasSuccessful;
 
+        public ContainerLockedNotification(Entity sourceEntity, Item targetKey, Container targetContainer, boolean wasLocked, boolean wasSuccessful, ClientRegistry registry) {
+            super(registry);
+
+            this.targetContainer = targetContainer;
+            this.sourceEntity = sourceEntity;
+            this.targetKey = targetKey;
+            this.wasLocked = wasLocked;
+            this.wasSuccessful = wasSuccessful;
+        }
+
+        @Override
+        public String getAsMessage(NotificationSubscriber viewer) {
+            String message;
+            String lock = desiredLockState ? "lock" : "unlock";
+            if (viewer.getID().equals(sourceEntity.getID())) {
+                if (wasSuccessful)
+                    message = getMessageInColor("You slide the " + getItemColored(targetKey) + " into the lock and it " + lock + "s with a turn and a click", SUCCESS);
+                else
+                    message = getMessageInColor("You cannot seem to fit the " + getItemColored(targetKey) + " into the lock", FAILURE);
+            } else {
+                if(wasSuccessful)
+                    message = getEntityColored((Entity)viewer,sourceEntity,getWorldModel()) + " " + lock + "s a " + getItemColored(targetContainer) + " with a " + getItemColored(targetKey);
+                else
+                    message = getEntityColored((Entity)viewer,sourceEntity,getWorldModel()) + " tries to " + lock + " a " + getItemColored(targetContainer) + " with a " + getItemColored(targetKey);
+            }
+
+            return message;
+        }
+    }
 }

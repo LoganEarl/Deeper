@@ -1,6 +1,11 @@
 package world.playerInterface;
 
+import world.WorldModel;
+import world.diplomacy.DiplomacyManager;
 import world.diplomacy.DiplomaticRelation;
+import world.diplomacy.Faction;
+import world.entity.Entity;
+import world.item.Item;
 
 import java.awt.*;
 import java.util.Locale;
@@ -45,6 +50,20 @@ public class ColorTheme {
                 return ENEMY;
         }
         return NEUTRAL;
+    }
+
+    public static String getItemColored(Item item){
+        return getMessageInColor(item.getDisplayableName(),ITEM);
+    }
+
+    public static String getEntityColored(Entity targetEntity, Entity sourceEntity, WorldModel worldModel){
+        return getEntityColored(targetEntity, sourceEntity,worldModel.getDiplomacyManager());
+    }
+
+    public static String getEntityColored(Entity viewedEntity, Entity observerEntity, DiplomacyManager diplomacyManager){
+        Faction viewedFaction = viewedEntity.getDiplomacy().getFaction();
+        DiplomaticRelation relation = diplomacyManager.getRelation(viewedFaction,observerEntity.getDiplomacy().getFaction());
+        return getMessageInColor(viewedEntity.getDisplayName() + " the " + viewedEntity.getRace().getDisplayName(),relation);
     }
 
     public static String getMessageInColor(String message, Color selectColor){

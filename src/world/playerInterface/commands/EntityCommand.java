@@ -7,6 +7,8 @@ import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.skill.Skill;
 import world.entity.skill.SkillTable;
+import world.notification.Notification;
+import world.room.RoomNotificationScope;
 
 import static world.playerInterface.ColorTheme.*;
 
@@ -123,5 +125,10 @@ public abstract class EntityCommand implements CommandExecutor.Command {
 
     protected final WorldModel getWorldModel() {
         return worldModel;
+    }
+
+    protected final void notifyEntityRoom(Notification notification, String... excludedIDs){
+        RoomNotificationScope scope = new RoomNotificationScope(sourceEntity.getRoomName(), sourceEntity.getDatabaseName(),excludedIDs);
+        getWorldModel().getNotificationService().notify(notification, scope);
     }
 }

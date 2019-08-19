@@ -165,7 +165,7 @@ public class GrabDropCommand extends EntityCommand {
         }
     }
 
-    private class ItemAcquiredNotification extends Notification{
+    public class ItemAcquiredNotification extends Notification{
         private Entity actor;
         private Item target;
         private Item sourceContainer;
