@@ -64,6 +64,7 @@ public class GrabDropCommand extends EntityCommand {
             int result = getSourceEntity().getEquipment().dropItem(toPutIn);
             if(result == CODE_SUCCESS) {
                 getSourceClient().sendMessage("You drop the " + toPutIn.getDisplayableName());
+
                 toPutIn.updateInDatabase(toPutIn.getDatabaseName());
                 getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
             }else if(result == CODE_NO_ITEM)
@@ -92,6 +93,9 @@ public class GrabDropCommand extends EntityCommand {
                         getSourceClient().sendMessage("You put the " +
                                 toPutIn.getDisplayableName() + " in the " +
                                 container.getDisplayableName());
+                        Notification notification = new ItemAcquiredNotification(getSourceEntity(),toPutIn,false,null,toStoreIn,getWorldModel().getRegistry());
+                        notifyEntityRoom(notification);
+
                         toPutIn.updateInDatabase(toPutIn.getDatabaseName());
                         container.updateInDatabase(container.getDatabaseName());
                         getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
@@ -158,7 +162,7 @@ public class GrabDropCommand extends EntityCommand {
                 getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
                 toPickUp.updateInDatabase(toPickUp.getDatabaseName());
 
-                Notification pickedUp = new ItemAcquiredNotification(getSourceEntity(),toPickUp,true,pickupFrom,getWorldModel().getRegistry());
+                Notification pickedUp = new ItemAcquiredNotification(getSourceEntity(),toPickUp,true,pickupFrom,null,getWorldModel().getRegistry());
                 NotificationScope scope = new RoomNotificationScope(getSourceEntity().getRoomName(),getSourceEntity().getDatabaseName());
                 getWorldModel().getNotificationService().notify(pickedUp, scope);
             }
@@ -169,14 +173,16 @@ public class GrabDropCommand extends EntityCommand {
         private Entity actor;
         private Item target;
         private Item sourceContainer;
+        private Item destinationContainer;
         private boolean wasPickedUp;
 
-        public ItemAcquiredNotification(Entity actor, Item target, boolean wasPickedUp, Item sourceContainer, ClientRegistry registry) {
+        public ItemAcquiredNotification(Entity actor, Item target, boolean wasPickedUp, Item sourceContainer, Item destinationContainer, ClientRegistry registry) {
             super(registry);
             this.actor = actor;
             this.target = target;
             this.wasPickedUp = wasPickedUp;
             this.sourceContainer = sourceContainer;
+            this.destinationContainer = destinationContainer;
         }
 
         @Override
@@ -184,21 +190,22 @@ public class GrabDropCommand extends EntityCommand {
             String response;
             if(viewer.getID().equals(actor.getID())){
                 if(wasPickedUp)
-                    response = getMessageInColor("You take the ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(),ITEM);
+                    response = getMessageInColor("You take the ", INFORMATIVE) + getItemColored(target);
+                else if(destinationContainer == null)
+                    response = getMessageInColor("You drop the ", INFORMATIVE) + getItemColored(target);
                 else
-                    response = getMessageInColor("You drop up the ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(),ITEM);
+                    response = getMessageInColor("You put the " + getItemColored(target) + " in the " + getItemColored(destinationContainer),INFORMATIVE);
             }else {
-                Faction viewerFaction = ((Entity)viewer).getDiplomacy().getFaction();
-                DiplomaticRelation relation = getWorldModel().getDiplomacyManager().getRelation(viewerFaction,actor.getDiplomacy().getFaction());
-
                 if (wasPickedUp) {
-                    response = getMessageInColor(actor.getDisplayName(), relation) + getMessageInColor(" takes a ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(), ITEM);
+                    response = getEntityColored(actor,(Entity)viewer,getWorldModel()) + getMessageInColor(" takes a ", INFORMATIVE) + getItemColored(target);
                     if (sourceContainer == null)
                         response += getMessageInColor(" from the ground", INFORMATIVE);
                     else
-                        response += getMessageInColor(" from the ", INFORMATIVE) + getMessageInColor(sourceContainer.getDisplayableName(), ITEM);
-                } else {
-                    response = getMessageInColor(actor.getDisplayName(), relation) + getMessageInColor( " drops up a ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(), ITEM);
+                        response += getMessageInColor(" from the ", INFORMATIVE) + getItemColored(sourceContainer);
+                } else if (destinationContainer != null){
+                    response = getEntityColored(actor,(Entity)viewer,getWorldModel()) + getMessageInColor(" puts a ", INFORMATIVE) + getItemColored(target) + " in the " + getItemColored(destinationContainer);
+                }else {
+                    response = getEntityColored(actor,(Entity)viewer,getWorldModel()) + getMessageInColor( " drops up a ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(), ITEM);
                 }
             }
             return response;

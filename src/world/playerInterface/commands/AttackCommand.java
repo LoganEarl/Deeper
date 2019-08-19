@@ -185,7 +185,7 @@ public class AttackCommand extends EntityCommand {
                 else
                     return String.format(
                             getMessageInColor("%s", relation) +
-                                    getMessageInColor(" the %s misses you with his", WARNING) +
+                                    getMessageInColor(" the %s misses you with his ", WARNING) +
                                     getMessageInColor("%s", ITEM),
                             attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName());
             } else {
