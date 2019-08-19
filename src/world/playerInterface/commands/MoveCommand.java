@@ -42,7 +42,7 @@ public class MoveCommand extends EntityCommand {
                     notifyEntityRoom(new TransferRoomNotification(getSourceEntity(), false, direction, getWorldModel().getRegistry()),getSourceEntity().getID());
                     sourceEntity.setRoom(travelRoom);
                     sourceEntity.updateInDatabase(sourceEntity.getDatabaseName());
-                    notifyEntityRoom(new TransferRoomNotification(getSourceEntity(), false, direction, getWorldModel().getRegistry()),getSourceEntity().getID());
+                    notifyEntityRoom(new TransferRoomNotification(getSourceEntity(), true, direction, getWorldModel().getRegistry()),getSourceEntity().getID());
                     new LookCommand("",false,getSourceClient(),getWorldModel()).execute();
                 }else
                     getSourceClient().sendMessage("You cannot travel " + direction);
