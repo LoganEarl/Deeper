@@ -4,8 +4,10 @@ import client.Client;
 import client.ClientRegistry;
 import world.WorldModel;
 import world.entity.Entity;
+import world.notification.Notification;
+import world.notification.NotificationSubscriber;
 
-import java.util.List;
+import static world.playerInterface.ColorTheme.*;
 
 public class SayCommand extends EntityCommand {
     boolean complete = false;
@@ -20,17 +22,7 @@ public class SayCommand extends EntityCommand {
 
     @Override
     protected void executeEntityCommand() {
-        List<Entity> nearby = getWorldModel().getEntityCollection().getEntitiesInRoom(
-                getSourceEntity().getRoomName(),
-                getSourceEntity().getDatabaseName(),
-                getSourceEntity().getID());
-
-        for(Entity near: nearby){
-            Client connected;
-            if((connected = registry.getClientWithUsername(near.getID())) != null)
-                connected.sendMessage(getSourceEntity().getDisplayName() + " says " + message);
-        }
-        getSourceClient().sendMessage("You say " + message);
+        notifyEntityRoom(new SpeechNotification(getSourceEntity(),message, registry));
 
         complete = true;
     }
@@ -48,5 +40,28 @@ public class SayCommand extends EntityCommand {
     @Override
     public boolean entityCommandIsComplete() {
         return complete;
+    }
+
+    public class SpeechNotification extends Notification{
+        private Entity sourceEntity;
+        private String toSay;
+
+        private SpeechNotification(Entity sourceEntity, String message, ClientRegistry registry) {
+            super(registry);
+
+            this.sourceEntity = sourceEntity;
+            this.toSay = message;
+        }
+
+        @Override
+        public String getAsMessage(NotificationSubscriber viewer) {
+            String message;
+            if(viewer.getID().equals(sourceEntity.getID()))
+                message = getMessageInColor( "You say " + toSay, INFORMATIVE);
+            else
+                message = getEntityColored((Entity)viewer,sourceEntity,getWorldModel()) + getMessageInColor( " says " + toSay, INFORMATIVE);
+
+            return message;
+        }
     }
 }

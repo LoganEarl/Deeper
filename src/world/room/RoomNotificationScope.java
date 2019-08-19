@@ -13,6 +13,10 @@ public class RoomNotificationScope implements NotificationScope {
     private String targetDatabaseName;
     private List<String> excludedIDs;
 
+    public RoomNotificationScope(Room room, String... excludedSubscribers){
+        this(room.getRoomName(),room.getDatabaseName(), excludedSubscribers);
+    }
+
     public RoomNotificationScope(String targetRoomName, String targetDatabaseName, String... excludedSubscribers){
         this.targetRoomName = targetRoomName;
         if(this.targetRoomName == null)
