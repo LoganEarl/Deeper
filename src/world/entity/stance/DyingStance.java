@@ -4,24 +4,26 @@ import world.entity.Entity;
 import world.entity.skill.Skill;
 
 public class DyingStance extends Stance {
+    private static final double LOSS_RATE = -.8;
+
     @Override
     public double getFlatHpPerSec() {
-        return -1;
+        return LOSS_RATE;
     }
 
     @Override
     public double getFlatMpPerSec() {
-        return -5;
+        return LOSS_RATE;
     }
 
     @Override
     public double getFlatStamPerSec() {
-        return -5;
+        return LOSS_RATE;
     }
 
     @Override
     public double getFlatBurnPerSec() {
-        return -5;
+        return LOSS_RATE;
     }
 
     @Override

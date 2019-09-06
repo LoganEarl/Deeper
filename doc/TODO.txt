@@ -1,6 +1,3 @@
-TODO
-- fix the death process
-    - once dying, hp does not decrease with time. Why?
 
 - add ability to look at entities/items in room
 

@@ -93,7 +93,7 @@ public class PoolContainer implements Entity.SqlExtender {
 
     public void regenPools(long curTime, StatContainer stats){
         calculatePoolMaxes(stats);
-        if(!isDying() && !isDead()) {
+        if(!isDead()) {
             BaseStance.RegenPacket regenPacket = currentStance.receiveNextRegenPacket(stats, curTime);
             hp += regenPacket.getHp();
             mp += regenPacket.getMp();
