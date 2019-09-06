@@ -106,8 +106,8 @@ public class ClientForm {
 
     private void setupSocket(){
         try {
-            //Socket socket = new Socket("localhost", 5555);
-            Socket socket = new Socket(InetAddress.getByName("67.110.214.100"), 25560);
+            Socket socket = new Socket("localhost", 5555);
+            //Socket socket = new Socket(InetAddress.getByName("67.110.214.100"), 25560);
             in = new BufferedInputStream(socket.getInputStream());
             new Thread(() -> {
                 boolean quit = false;

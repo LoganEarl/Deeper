@@ -8,3 +8,6 @@ TODO
     - some stances are unlocked by skills
     - skills have a trained bonus to rolls, and an untrained detriment to them
     - learning a skill means that you no longer get a penalty to doing it?
+- refactor WebServer
+    - make clients be identified by their internet connection and a socket ID
+    - make sure you can't log in from more than one location at once

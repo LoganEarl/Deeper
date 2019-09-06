@@ -11,14 +11,16 @@ public class Client {
     private ClientStatus status;
     private Account associatedAccount;
     private String address;
+    private long identifier;
     private ClientRegistry clientRegistry;
 
-    public Client(ClientRegistry clientRegistry, String address) {
+    public Client(ClientRegistry clientRegistry, String address, long identifier) {
         this.status = ClientStatus.UNAUTHENTICATED;
         this.clientRegistry = clientRegistry;
         this.address = address;
+        this.identifier = identifier;
         this.clientRegistry.sendMessage("Hello, Welcome to the project.\n" +
-                "Please use the login or register commands to proceed. If you have any questions on command usage, use 'help [your command here]' or just 'help' to get more info", address);
+                "Please use the login or register commands to proceed. If you have any questions on command usage, use 'help [your command here]' or just 'help' to get more info", this);
     }
 
     public void setStatus(ClientStatus newStatus) {
@@ -53,7 +55,7 @@ public class Client {
                 clientRegistry.sendMessage("You cannot kick " + associatedAccount.getUserName() + " as they have greater or equal privileges to yourself", sourceClient);
             } else {
                 clientRegistry.sendMessage("Got em', you have kicked " + targetedClient.associatedAccount.getUserName() + " from the server", sourceClient);
-                clientRegistry.sendMessage("Oof, you have been kicked by " + associatedAccount.getUserName(), targetedClient.address);
+                clientRegistry.sendMessage("Oof, you have been kicked by " + associatedAccount.getUserName(), targetedClient);
                 targetedClient.status = ClientStatus.UNAUTHENTICATED;
                 targetedClient.associatedAccount = null;
             }
@@ -69,15 +71,15 @@ public class Client {
             Account newAccount = new Account(newUser, newHPass, newEmail, Account.AccountType.BASIC);
             newAccount.saveToDatabase(clientRegistry.getDatabaseName());
             associatedAccount = newAccount;
-            clientRegistry.sendMessage("Success, new account created", sourceClient.getAddress());
+            clientRegistry.sendMessage("Success, new account created", sourceClient);
             //they are not logged in
         } else if (associatedAccount == null || status == ClientStatus.INACTIVE || status == ClientStatus.UNAUTHENTICATED) {
             clientRegistry.sendMessage("Unknown Username/Password. Please try again",
-                    sourceClient.getAddress());
+                    sourceClient);
             //they are trying the change name to existing name
         } else if (attemptedNewUser != null && !associatedAccount.getUserName().equals(attemptedNewUser.getUserName())) {
             clientRegistry.sendMessage("That username is already taken. Please try again",
-                    sourceClient.getAddress());
+                    sourceClient);
             //they are logged in and updating info
         } else if (associatedAccount.checkPassword(oldHPass)) {
             associatedAccount.setUserName(newUser);
@@ -86,10 +88,10 @@ public class Client {
                 associatedAccount.setEmail(newEmail);
             associatedAccount.updateInDatabase(clientRegistry.getDatabaseName());
             clientRegistry.sendMessage("Success. Account information has been updated",
-                    sourceClient.getAddress());
+                    sourceClient);
         } else {
             clientRegistry.sendMessage("Unable to update info, old UserName/Password combination does not match any users",
-                    sourceClient.getAddress());
+                    sourceClient);
         }
     }
 
@@ -98,26 +100,26 @@ public class Client {
         Account userToElevate = Account.getAccountByUsername(targetUserName, clientRegistry.getDatabaseName());
         if (userToElevate == null) {
             clientRegistry.sendMessage("Unable to find user " + targetUserName,
-                    sourceClient.getAddress());
+                    sourceClient);
         } else if (associatedAccount.getAccountType() == Account.AccountType.GOD) {
             userToElevate.setAccountType(newAccountType);
             userToElevate.updateInDatabase(clientRegistry.getDatabaseName());
             clientRegistry.sendMessage(String.format(Locale.US, "Oh powerful one, you have changed %s's permission level to %d",
                     targetUserName, newAccountType.getSavableForm()),
-                    sourceClient.getAddress());
+                    sourceClient);
         } else {
             if (associatedAccount.getAccountType().compareToAcountType(userToElevate.getAccountType()) <= 0) {
                 clientRegistry.sendMessage("Cannot change permissions of user greater than yourself",
-                        sourceClient.getAddress());
+                        sourceClient);
             } else if (associatedAccount.getAccountType().compareToAcountType(newAccountType) <= 0) {
                 clientRegistry.sendMessage("Cannot assign privileges to user greater than or equal to your own",
-                        sourceClient.getAddress());
+                        sourceClient);
             } else {
                 userToElevate.setAccountType(newAccountType);
                 userToElevate.updateInDatabase(clientRegistry.getDatabaseName());
                 clientRegistry.sendMessage(String.format(Locale.US, "You have changed %s's permission level to %d",
                         targetUserName, newAccountType.getSavableForm()),
-                        sourceClient.getAddress());
+                        sourceClient);
             }
         }
     }
@@ -130,6 +132,10 @@ public class Client {
         if (this.associatedAccount != null)
             return associatedAccount.getUserName();
         return null;
+    }
+
+    public long getIdentifier() {
+        return identifier;
     }
 
     public void sendMessage(String message){

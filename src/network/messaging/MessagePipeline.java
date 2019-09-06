@@ -30,11 +30,7 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
     }
 
     @Override
-    public void onClientMessage(String clientAddress, String rawMessage) {
-        if (registry.getClient(clientAddress) == null)
-            registry.addClient(clientAddress);
-        Client client = registry.getClient(clientAddress);
-
+    public void onClientMessage(Client client, String rawMessage) {
         if (specificContexts.containsKey(client)) {
             List<MessageContext> contexts = specificContexts.get(client);
             if(contexts != null) {
