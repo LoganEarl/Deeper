@@ -5,6 +5,7 @@ import world.WorldModel;
 import world.entity.Entity;
 import world.item.Item;
 import world.item.armor.ArmorSlot;
+import world.playerInterface.ColorTheme;
 
 import java.util.Locale;
 
@@ -56,10 +57,10 @@ public class InventoryCommand extends EntityCommand {
                 itemWeight = equipped.getWeight();
             }
 
-            desc.append(String.format(Locale.US,"\t%14.14s  %16.16s  %10.10s  %2.2fkgs\n",
+            desc.append(String.format(Locale.US,"\t%14.14s  " + ColorTheme.getMessageInColor("%16.16s",ColorTheme.ITEM) + "  %10.10s  %2.2fkgs\n",
                     slot.name(),itemName,itemType,itemWeight));
         }
-        desc.append(String.format(Locale.US, "Total equipment weight: %.2fkgs out of %.2f/%.2fkgs",
+        desc.append(String.format(Locale.US, ColorTheme.getMessageInColor("Total equipment weight: %.2fkgs out of %.2f/%.2fkgs",ColorTheme.INFORMATIVE),
                 entity.getEquipment().getEquipmentWeight(), entity.getStats().getWeightSoftLimit(), entity.getStats().getWeightHardLimit()));
 
         return desc.toString();

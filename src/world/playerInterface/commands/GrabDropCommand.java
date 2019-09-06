@@ -56,7 +56,6 @@ public class GrabDropCommand extends EntityCommand {
 
     private void putIn(){
         Item toPutIn = Item.getFromEntityContext(itemIdentifier,getSourceEntity(), getWorldModel().getItemFactory());
-//TODO remove the key or item from player inventory too
         if(toPutIn == null || !getSourceEntity().getEquipment().isHoldingItem(toPutIn))
             getSourceClient().sendMessage("You are not holding a " + itemIdentifier);
         else if(containerIdentifier.isEmpty()){
