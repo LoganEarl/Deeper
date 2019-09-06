@@ -1,6 +1,7 @@
 package client;
 
 import java.util.Locale;
+import static world.playerInterface.ColorTheme.*;
 
 /**
  * Class that provides the link between an account and a client connection
@@ -20,7 +21,7 @@ public class Client {
         this.address = address;
         this.identifier = identifier;
         this.clientRegistry.sendMessage("Hello, Welcome to the project.\n" +
-                "Please use the login or register commands to proceed. If you have any questions on command usage, use 'help [your command here]' or just 'help' to get more info", this);
+                getMessageInColor("Please use the login or register commands to proceed.",INFORMATIVE)  + " If you have any questions on command usage, use 'help [your command here]' or just 'help' to get more info", this);
     }
 
     public void setStatus(ClientStatus newStatus) {
@@ -34,11 +35,18 @@ public class Client {
     public void tryLogIn(final Client sourceClient, final String userName, final String hPass) {
         Account myAccount = Account.getAccountByUsername(userName, clientRegistry.getDatabaseName());
         if (myAccount == null || !myAccount.checkPassword(hPass))
-            clientRegistry.sendMessage("Unknown Username/Password. Please try again", sourceClient);
+            clientRegistry.sendMessage(getMessageInColor("Unknown Username/Password. Please try again",FAILURE), sourceClient);
         else {
+            Client preexisting = clientRegistry.getClient(myAccount);
+            if(preexisting != null) {
+                preexisting.status = ClientStatus.UNAUTHENTICATED;
+                preexisting.associatedAccount = null;
+                preexisting.sendMessage(getMessageInColor("You have logged in from another location. You are now logged out",FAILURE));
+            }
+
             associatedAccount = myAccount;
             status = ClientStatus.ACTIVE;
-            clientRegistry.sendMessage("Success, welcome " + associatedAccount.getUserName(), sourceClient);
+            clientRegistry.sendMessage(getMessageInColor("Success, welcome " + associatedAccount.getUserName(),SUCCESS), sourceClient);
         }
     }
 
@@ -46,16 +54,16 @@ public class Client {
         if (targetUsername.isEmpty()) {
             status = ClientStatus.UNAUTHENTICATED;
             associatedAccount = null;
-            clientRegistry.sendMessage("You have been logged out", sourceClient);
+            clientRegistry.sendMessage(getMessageInColor("You have been logged out",INFORMATIVE), sourceClient);
         } else {
-            Client targetedClient = clientRegistry.getClientWithUsername(targetUsername);
+            Client targetedClient = clientRegistry.getClient(targetUsername);
             if (targetedClient == null) {
-                clientRegistry.sendMessage("There is no client logged in with that name", sourceClient);
+                clientRegistry.sendMessage(getMessageInColor("There is no client logged in with that name",FAILURE), sourceClient);
             } else if (associatedAccount.getAccountType().compareToAcountType(targetedClient.associatedAccount.getAccountType()) <= 0) {
-                clientRegistry.sendMessage("You cannot kick " + associatedAccount.getUserName() + " as they have greater or equal privileges to yourself", sourceClient);
+                clientRegistry.sendMessage(getMessageInColor("You cannot kick " + associatedAccount.getUserName() + " as they have greater or equal privileges to yourself",FAILURE), sourceClient);
             } else {
-                clientRegistry.sendMessage("Got em', you have kicked " + targetedClient.associatedAccount.getUserName() + " from the server", sourceClient);
-                clientRegistry.sendMessage("Oof, you have been kicked by " + associatedAccount.getUserName(), targetedClient);
+                clientRegistry.sendMessage(getMessageInColor("Got em', you have kicked " + targetedClient.associatedAccount.getUserName() + " from the server",SUCCESS), sourceClient);
+                clientRegistry.sendMessage(getMessageInColor("Oof, you have been kicked by " + associatedAccount.getUserName(),FAILURE), targetedClient);
                 targetedClient.status = ClientStatus.UNAUTHENTICATED;
                 targetedClient.associatedAccount = null;
             }
@@ -71,14 +79,14 @@ public class Client {
             Account newAccount = new Account(newUser, newHPass, newEmail, Account.AccountType.BASIC);
             newAccount.saveToDatabase(clientRegistry.getDatabaseName());
             associatedAccount = newAccount;
-            clientRegistry.sendMessage("Success, new account created", sourceClient);
+            clientRegistry.sendMessage(getMessageInColor("Success, new account created",SUCCESS), sourceClient);
             //they are not logged in
         } else if (associatedAccount == null || status == ClientStatus.INACTIVE || status == ClientStatus.UNAUTHENTICATED) {
-            clientRegistry.sendMessage("Unknown Username/Password. Please try again",
+            clientRegistry.sendMessage(getMessageInColor("Unknown Username/Password. Please try again",FAILURE),
                     sourceClient);
             //they are trying the change name to existing name
         } else if (attemptedNewUser != null && !associatedAccount.getUserName().equals(attemptedNewUser.getUserName())) {
-            clientRegistry.sendMessage("That username is already taken. Please try again",
+            clientRegistry.sendMessage(getMessageInColor("That username is already taken. Please try again",FAILURE),
                     sourceClient);
             //they are logged in and updating info
         } else if (associatedAccount.checkPassword(oldHPass)) {
@@ -87,10 +95,10 @@ public class Client {
             if (!newEmail.isEmpty())
                 associatedAccount.setEmail(newEmail);
             associatedAccount.updateInDatabase(clientRegistry.getDatabaseName());
-            clientRegistry.sendMessage("Success. Account information has been updated",
+            clientRegistry.sendMessage(getMessageInColor("Success. Account information has been updated",SUCCESS),
                     sourceClient);
         } else {
-            clientRegistry.sendMessage("Unable to update info, old UserName/Password combination does not match any users",
+            clientRegistry.sendMessage(getMessageInColor("Unable to update info, old UserName/Password combination does not match any users",FAILURE),
                     sourceClient);
         }
     }
@@ -99,25 +107,25 @@ public class Client {
     public void tryElevateUser(final Client sourceClient, final String targetUserName, final Account.AccountType newAccountType) {
         Account userToElevate = Account.getAccountByUsername(targetUserName, clientRegistry.getDatabaseName());
         if (userToElevate == null) {
-            clientRegistry.sendMessage("Unable to find user " + targetUserName,
+            clientRegistry.sendMessage(getMessageInColor("Unable to find user " + targetUserName,FAILURE),
                     sourceClient);
         } else if (associatedAccount.getAccountType() == Account.AccountType.GOD) {
             userToElevate.setAccountType(newAccountType);
             userToElevate.updateInDatabase(clientRegistry.getDatabaseName());
-            clientRegistry.sendMessage(String.format(Locale.US, "Oh powerful one, you have changed %s's permission level to %d",
+            clientRegistry.sendMessage(String.format(Locale.US, getMessageInColor("Oh powerful one, you have changed %s's permission level to %d",SUCCESS),
                     targetUserName, newAccountType.getSavableForm()),
                     sourceClient);
         } else {
             if (associatedAccount.getAccountType().compareToAcountType(userToElevate.getAccountType()) <= 0) {
-                clientRegistry.sendMessage("Cannot change permissions of user greater than yourself",
+                clientRegistry.sendMessage(getMessageInColor("Cannot change permissions of user greater than yourself",FAILURE),
                         sourceClient);
             } else if (associatedAccount.getAccountType().compareToAcountType(newAccountType) <= 0) {
-                clientRegistry.sendMessage("Cannot assign privileges to user greater than or equal to your own",
+                clientRegistry.sendMessage(getMessageInColor("Cannot assign privileges to user greater than or equal to your own",FAILURE),
                         sourceClient);
             } else {
                 userToElevate.setAccountType(newAccountType);
                 userToElevate.updateInDatabase(clientRegistry.getDatabaseName());
-                clientRegistry.sendMessage(String.format(Locale.US, "You have changed %s's permission level to %d",
+                clientRegistry.sendMessage(String.format(Locale.US, getMessageInColor("You have changed %s's permission level to %d",SUCCESS),
                         targetUserName, newAccountType.getSavableForm()),
                         sourceClient);
             }

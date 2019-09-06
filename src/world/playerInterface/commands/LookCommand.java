@@ -13,6 +13,8 @@ import world.room.Room;
 import java.util.List;
 import java.util.Locale;
 
+import static world.playerInterface.ColorTheme.*;
+
 /**
  * command used to get item and room descriptions. Can also be used to look into unlocked containers.
  * @author Logan Earl
@@ -48,7 +50,7 @@ public class LookCommand extends EntityCommand {
         else if(lookInto){
             response = lookInContainer(target);
         }else{
-            response = "Not yet implemented";
+            response = getMessageInColor("Not yet implemented",FAILURE);
         }
 
         fromClient.sendMessage(response);
@@ -75,10 +77,10 @@ public class LookCommand extends EntityCommand {
                 Container container = (Container)rawItem;
                 response = readContainer(container);
             }else{
-                response = "You peer closely at the " + rawItem.getDisplayableName() + ". It has no openings you can see.";
+                response = getMessageInColor("You peer closely at the " + getItemColored(rawItem) + ". ",INFORMATIVE) + getMessageInColor("It has no openings you can see.",FAILURE);
             }
         }else{
-            response = "You cannot find a " + target + " to look into";
+            response = getMessageInColor("You cannot find a " + target + " to look into",FAILURE);
         }
 
         return response;
@@ -86,7 +88,7 @@ public class LookCommand extends EntityCommand {
 
     private String readContainer(Container container){
         if(container.getIsLocked()){
-            return "It is locked. You are unable to discover it's contents";
+            return getMessageInColor("It is locked. You are unable to discover it's contents",FAILURE);
         }else {
             List<Item> storedItems = container.getStoredItems();
             if(storedItems.size() == 0)
@@ -112,7 +114,7 @@ public class LookCommand extends EntityCommand {
         Room r = Room.getRoomByRoomName(roomName,getSourceEntity().getDatabaseName());
         if(r == null){
             System.out.println("Failed to get room info for look command sourced by entityID:" + getSourceEntity().getID() + " in database " + getSourceEntity().getDatabaseName());
-            return "An error has occurred. Unable to get room info for you at this time";
+            return getMessageInColor("An error has occurred. Unable to get room info for you at this time",FAILURE);
         }
         roomDesc = r.getRoomDescription();
         waysDesc = getWays(r);
@@ -127,16 +129,16 @@ public class LookCommand extends EntityCommand {
     private String getWays(Room r){
         String[] directions = r.getAvailableDirections();
         if(directions.length == 0)
-            return "There is no way out";
+            return getMessageInColor("There is no way out",WARNING);
         if(directions.length == 1)
-            return "There is a way to the " + directions[0];
-        return "There are ways to the " + WorldUtils.commaSeparate(directions);
+            return "There is a way to the " + getMessageInColor(directions[0],INFORMATIVE);
+        return "There are ways to the " + getMessageInColor(WorldUtils.commaSeparate(directions),INFORMATIVE);
     }
 
     private String getCreatureString(Room r){
         List<Entity> nearEntities = getWorldModel().getEntityCollection().getEntitiesInRoom(r.getRoomName(), r.getDatabaseName(), getSourceEntity().getID());
         if(nearEntities.size() == 0)
-            return "You are alone";
+            return getMessageInColor("You are alone",INFORMATIVE);
         else{
             StringBuilder creatureStringBuilder = new StringBuilder();
             boolean first = true;
@@ -146,10 +148,7 @@ public class LookCommand extends EntityCommand {
                 else
                     creatureStringBuilder.append("\n");
 
-                creatureStringBuilder.append(e.getDisplayName());
-                Race entityRace = e.getRace();
-                if (entityRace != null)
-                    creatureStringBuilder.append(" the ").append(entityRace.getDisplayName()).append(" is nearby");
+                creatureStringBuilder.append(getEntityColored(e,getSourceEntity(),getWorldModel())).append(getMessageInColor(" is nearby",INFORMATIVE));
             }
            return creatureStringBuilder.toString();
         }
@@ -167,9 +166,9 @@ public class LookCommand extends EntityCommand {
                     first = false;
                 else
                     itemStringBuilder.append("\n");
-                itemStringBuilder.append("There is a ").append(i.getDisplayableName()).append(" nearby");
+                itemStringBuilder.append("There is a ").append(getItemColored(i)).append(" nearby");
                 if(i instanceof Container){
-                    itemStringBuilder.append(". It is ").append(((Container)i).getIsLocked()? "locked": "unlocked");
+                    itemStringBuilder.append(". It is ").append(getMessageInColor((((Container)i).getIsLocked()? "locked": "unlocked"),INFORMATIVE));
                 }
             }
             return itemStringBuilder.toString();

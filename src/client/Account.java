@@ -170,6 +170,17 @@ public class Account implements DatabaseManager.DatabaseEntry {
         this.accountType = accountType;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj)
+            return true;
+        if(obj == null)
+            return false;
+        if(obj instanceof Account)
+            return ((Account)obj).userName.equals(userName);
+        return false;
+    }
+
     public enum AccountType {
         BASIC(1), MODERATOR(2), ADMIN(3), GOD(5);
 

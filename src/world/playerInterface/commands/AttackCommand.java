@@ -3,11 +3,8 @@ package world.playerInterface.commands;
 import client.Client;
 import client.ClientRegistry;
 import world.WorldModel;
-import world.diplomacy.DiplomaticRelation;
-import world.diplomacy.Faction;
 import world.entity.Entity;
 import world.entity.StatContainer;
-import world.entity.diplomacy.DiplomacyContainer;
 import world.entity.equipment.EquipmentContainer;
 import world.item.Item;
 import world.item.ItemType;
@@ -16,7 +13,6 @@ import world.item.weapon.Weapon;
 import world.notification.Notification;
 import world.notification.NotificationService;
 import world.notification.NotificationSubscriber;
-import world.playerInterface.ColorTheme;
 import world.room.RoomNotificationScope;
 
 import java.util.List;
@@ -100,7 +96,7 @@ public class AttackCommand extends EntityCommand {
     }
 
     private void notifyTarget(String message, Entity target) {
-        Client targetClient = registry.getClientWithUsername(target.getID());
+        Client targetClient = registry.getClient(target.getID());
         if (targetClient != null) {
             targetClient.sendMessage(message);
         }
@@ -109,7 +105,7 @@ public class AttackCommand extends EntityCommand {
     private void notifyRoom(String message, String... excludedEntityIDs) {
         List<Entity> inRoom = getWorldModel().getEntityCollection().getEntitiesInRoom(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName(), excludedEntityIDs);
         for (Entity ent : inRoom) {
-            Client attachedClient = registry.getClientWithUsername(ent.getID());
+            Client attachedClient = registry.getClient(ent.getID());
             if (attachedClient != null) {
                 attachedClient.sendMessage(message);
             }

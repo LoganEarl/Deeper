@@ -614,7 +614,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     @Override
     public void notify(Notification notification) {
         if(EntityTable.CONTROLLER_TYPE_PLAYER.equals(getControllerType())) {
-            Client toNotify = notification.getClientRegistry().getClientWithUsername(entityID);
+            Client toNotify = notification.getClientRegistry().getClient(entityID);
             toNotify.sendMessage(notification.getAsMessage(this));
         }
     }

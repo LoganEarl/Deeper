@@ -39,12 +39,28 @@ public class ClientRegistry {
      * @param username the username of the client
      * @return the client if found, null otherwise
      */
-    public Client getClientWithUsername(String username) {
+    public Client getClient(String username) {
         if (username == null)
             throw new NullPointerException("Cannot get client with null username");
         for (Client client : clients.values()) {
             if (client.getAssociatedAccount() != null &&
                     client.getAssociatedAccount().getUserName().equals(username))
+                return client;
+        }
+        return null;
+    }
+
+    /**
+     * gets the client with the given account if they are currently logged in
+     *
+     * @param account the account of the client
+     * @return the client if found, null otherwise
+     */
+    public Client getClient(Account account){
+        if(account == null)
+            throw new NullPointerException("Cannot get client with null account");
+        for(Client client:clients.values()) {
+            if(account.equals(client.getAssociatedAccount()))
                 return client;
         }
         return null;
