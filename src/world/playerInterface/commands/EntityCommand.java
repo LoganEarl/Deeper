@@ -42,7 +42,10 @@ public abstract class EntityCommand implements CommandExecutor.Command {
             sourceClient.sendMessage("You must regain your balance first!");
             done = true;
         } else if((requiredSkill = getRequiredSkill()) != null && !SkillTable.entityHasSkill(sourceEntity,requiredSkill)) {
-            sourceClient.sendMessage("You must " + getMessageInColor("learn " + requiredSkill.getDisplayName(),FAILURE) + " before you can do that");
+            if(requiredSkill.isVisibleToEntity(sourceEntity))
+                sourceClient.sendMessage("You must " + getMessageInColor("learn " + requiredSkill.getDisplayName(),FAILURE) + " before you can do that");
+            else
+                sourceClient.sendMessage("You must " + getMessageInColor("learn a hidden skill",FAILURE) + " before you can do that");
             done = true;
         } else if(getRequiredStamina() > sourceEntity.getPools().getStamina()){
             sourceClient.sendMessage("You are " + getMessageInColor("exhausted", STAMINA_COLOR));

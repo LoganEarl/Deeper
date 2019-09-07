@@ -2,9 +2,15 @@
 - add ability to look at entities/items in room
 
 - add some basic skills
-    - skills will be their own database table
-    - we need a dodge and a deflect skill first
-    - stealth and perception will be next
+    - add ability to view all learned skills
+    - add ability to view skills that are available to learn
+    - add ability to learn skills
+    - skills to implement
+        - stabilize skill
+        - dodge and a deflect skill
+        - stealth and perception
+
+
 - add combat stances that change rates
     - some stances are unlocked by skills
     - skills have a trained bonus to rolls, and an untrained detriment to them
