@@ -13,10 +13,12 @@ import java.util.Map;
  * @author Logan Eark
  */
 public class ClientRegistry {
-    private Map<String, Client> clients = new HashMap<>();
+    private Map<Long, Client> clients = new HashMap<>();
     private CommandExecutor commandExecutor;
     private WebServer localServer;
     private String accountDatabaseName;
+
+    private long lastID = 0;
 
     /**
      * Sole constructor
@@ -37,7 +39,7 @@ public class ClientRegistry {
      * @param username the username of the client
      * @return the client if found, null otherwise
      */
-    public Client getClientWithUsername(String username) {
+    public Client getClient(String username) {
         if (username == null)
             throw new NullPointerException("Cannot get client with null username");
         for (Client client : clients.values()) {
@@ -49,81 +51,76 @@ public class ClientRegistry {
     }
 
     /**
+     * gets the client with the given account if they are currently logged in
+     *
+     * @param account the account of the client
+     * @return the client if found, null otherwise
+     */
+    public Client getClient(Account account){
+        if(account == null)
+            throw new NullPointerException("Cannot get client with null account");
+        for(Client client:clients.values()) {
+            if(account.equals(client.getAssociatedAccount()))
+                return client;
+        }
+        return null;
+    }
+
+    /**
      * gets all clients mapped by their internet addresses
      *
      * @return a Map of the clients where the key is their ip address and the value is the client
      */
-    public Map<String, Client> getClients() {
+    public Map<Long, Client> getClients() {
         return clients;
+    }
+
+
+    public Client createClient(String address){
+        long newID = lastID + 1;
+
+        Client newClient = new Client(this,address,newID);
+        clients.put(newID,newClient);
+
+        lastID = newID;
+
+        return newClient;
     }
 
     /**
      * gets the client with the given internet address
      *
-     * @param address the internet address of the client
+     * @param id the identifier of the client
      * @return either the client or null if not found
      */
-    public Client getClient(String address) {
-        return clients.get(address);
-    }
-
-    /**
-     * creates a new client in the registry with the given address
-     *
-     * @param address the address of the new client
-     */
-    public void addClient(String address) {
-        if (!clients.containsKey(address))
-            clients.put(address, new Client(this, address));
+    public Client getClient(long id) {
+        return clients.get(id);
     }
 
     /**
      * sends the given message in the form of a {@link PromptCommand} to all the given clients
      *
      * @param message         the message to send
-     * @param clientAddresses the address(es) of the clients to receive the message
-     */
-    public void sendMessage(String message, String... clientAddresses) {
-        commandExecutor.scheduleCommand(new PromptCommand(message, localServer, clientAddresses));
-    }
-
-    /**
-     * sends the given message in the form of a {@link PromptCommand} to all the given clients
-     *
-     * @param message         the message to send
-     * @param clientAddresses the address(es) of the clients to receive the message
-     */
-    public void sendMessage(String message, long messageTimestamp, String... clientAddresses) {
-        commandExecutor.scheduleCommand(new PromptCommand(message, messageTimestamp, localServer, clientAddresses));
-    }
-
-    /**
-     * sends the given message in the form of a {@link PromptCommand} to all the given clients
-     *
-     * @param message the message to send
      * @param clients the client(s) to receive the message
      */
     public void sendMessage(String message, Client... clients) {
-        String[] addresses = new String[clients.length];
-        for (int i = 0; i < clients.length; i++)
-            addresses[i] = clients[i].getAddress();
-        sendMessage(message, addresses);
+        commandExecutor.scheduleCommand(new PromptCommand(message, localServer, clients));
     }
 
-    public void sendMessage(String message, long sendTimestamp, Client... clients){
-        String[] addresses = new String[clients.length];
-        for (int i = 0; i < clients.length; i++)
-            addresses[i] = clients[i].getAddress();
-        sendMessage(message, sendTimestamp, addresses);
+    /**
+     * sends the given message in the form of a {@link PromptCommand} to all the given clients
+     *
+     * @param message         the message to send
+     * @param clients the address(es) of the clients to receive the message
+     */
+    public void sendMessage(String message, long messageTimestamp, Client... clients) {
+        commandExecutor.scheduleCommand(new PromptCommand(message, messageTimestamp, localServer, clients));
     }
 
     public void disconnect(Client... toDisconnect){
-        String[] addresses = new String[toDisconnect.length];
-        for (int i = 0; i < toDisconnect.length; i++)
-            addresses[i] = toDisconnect[i].getAddress();
-        localServer.disconnectClients(addresses);
+        localServer.disconnectClients(toDisconnect);
         for(Client c: toDisconnect)
-            clients.remove(c.getAddress());
+            clients.remove(c.getIdentifier());
     }
 
     /**

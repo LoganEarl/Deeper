@@ -5,6 +5,8 @@
       <w>eldritch</w>
       <w>learnable</w>
       <w>nocase</w>
+      <w>prereq</w>
+      <w>prereqs</w>
       <w>respawned</w>
       <w>unequipps</w>
     </words>

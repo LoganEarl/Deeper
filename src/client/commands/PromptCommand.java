@@ -1,5 +1,6 @@
 package client.commands;
 
+import client.Client;
 import network.CommandExecutor;
 import network.WebServer;
 
@@ -10,7 +11,7 @@ import network.WebServer;
 public class PromptCommand implements CommandExecutor.Command, WebServer.ServerMessage {
     private boolean complete = false;
     private String toSend;
-    private String[] clients;
+    private Client[] clients;
     private WebServer server;
     private long messageTimestamp;
 
@@ -21,10 +22,10 @@ public class PromptCommand implements CommandExecutor.Command, WebServer.ServerM
      * Constructor to send command immediately
      * @param message the message to deliver
      * @param server the server used to send the message
-     * @param addresses the client(s) to receive the message
+     * @param clients the client(s) to receive the message
      */
-    public PromptCommand(String message, WebServer server, String... addresses){
-        this(message, 0, server, addresses);
+    public PromptCommand(String message, WebServer server, Client... clients){
+        this(message, 0, server, clients);
     }
 
     /**
@@ -32,12 +33,12 @@ public class PromptCommand implements CommandExecutor.Command, WebServer.ServerM
      * @param message the message to deliver
      * @param messageTimestamp the unix timestamp to send the message after
      * @param server the server used to send the message
-     * @param addresses the client(s) to receive the message
+     * @param clients the client(s) to receive the message
      */
-    public PromptCommand(String message, long messageTimestamp, WebServer server, String... addresses){
+    public PromptCommand(String message, long messageTimestamp, WebServer server, Client... clients){
         toSend = message;
         this.server = server;
-        this.clients = addresses;
+        this.clients = clients;
         this.messageTimestamp = messageTimestamp;
     }
 

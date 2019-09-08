@@ -3,11 +3,8 @@ package world.playerInterface.commands;
 import client.Client;
 import client.ClientRegistry;
 import world.WorldModel;
-import world.diplomacy.DiplomaticRelation;
-import world.diplomacy.Faction;
 import world.entity.Entity;
 import world.entity.StatContainer;
-import world.entity.diplomacy.DiplomacyContainer;
 import world.entity.equipment.EquipmentContainer;
 import world.item.Item;
 import world.item.ItemType;
@@ -99,7 +96,7 @@ public class AttackCommand extends EntityCommand {
     }
 
     private void notifyTarget(String message, Entity target) {
-        Client targetClient = registry.getClientWithUsername(target.getID());
+        Client targetClient = registry.getClient(target.getID());
         if (targetClient != null) {
             targetClient.sendMessage(message);
         }
@@ -108,7 +105,7 @@ public class AttackCommand extends EntityCommand {
     private void notifyRoom(String message, String... excludedEntityIDs) {
         List<Entity> inRoom = getWorldModel().getEntityCollection().getEntitiesInRoom(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName(), excludedEntityIDs);
         for (Entity ent : inRoom) {
-            Client attachedClient = registry.getClientWithUsername(ent.getID());
+            Client attachedClient = registry.getClient(ent.getID());
             if (attachedClient != null) {
                 attachedClient.sendMessage(message);
             }
@@ -164,38 +161,20 @@ public class AttackCommand extends EntityCommand {
 
         @Override
         public String getAsMessage(NotificationSubscriber viewer) {
-            Faction viewerFaction = ((Entity) viewer).getDiplomacy().getFaction();
-
+            Entity viewerEntity = (Entity)viewer;
             if (viewer.getID().equals(attackEntity.getID())) {
-                DiplomaticRelation relation = getWorldModel().getDiplomacyManager().getRelation(defenceEntity.getDiplomacy().getFaction(), viewerFaction);
                 if (netRoll >= 0)
-                    return String.format("You score a hit on " +
-                            getMessageInColor("%s",relation) + " the %s with your %s(+%d) for " + getMessageInColor("%d damage", OUTGOING_DAMAGE),
-                            defenceEntity.getDisplayName(),defenceEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName(), netRoll, damage);
+                    return String.format("You score a hit on " + getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " with your " + getItemColored(attackWeapon) + "(%d) for " + getMessageInColor("%d damage", OUTGOING_DAMAGE), netRoll, damage);
                 else
-                    return String.format("You miss " +
-                            getMessageInColor("%s",relation) +
-                            " the %s with your %s(%d)",
-                            defenceEntity.getDisplayName(), defenceEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName(), netRoll);
+                    return String.format("You miss " + getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " with your " + getItemColored(attackWeapon) + "(%d)", netRoll);
             } else if (viewer.getID().equals(defenceEntity.getID())) {
-                DiplomaticRelation relation = getWorldModel().getDiplomacyManager().getRelation(attackEntity.getDiplomacy().getFaction(), viewerFaction);
                 if (netRoll >= 0)
-                    return String.format(getMessageInColor("%s", relation) + " the %s attacks you with a %s for " + getMessageInColor("%d damage", INCOMING_DAMAGE),
-                            attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName(), damage);
+                    return String.format(getEntityColored(attackEntity, defenceEntity, getWorldModel()) + " attacks you with a " + getItemColored(attackWeapon) + " for " + getMessageInColor("%d damage", INCOMING_DAMAGE), damage);
                 else
-                    return String.format(
-                            getMessageInColor("%s", relation) +
-                                    getMessageInColor(" the %s misses you with his ", WARNING) +
-                                    getMessageInColor("%s", ITEM),
-                            attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(), attackWeapon.getDisplayableName());
+                    return String.format(getMessageInColor(getEntityColored(attackEntity,defenceEntity,getWorldModel()) + " misses you with %s " + getItemColored(attackWeapon), WARNING),attackEntity.getPossesivePronoun());
             } else {
-                DiplomaticRelation relationAtc = getWorldModel().getDiplomacyManager().getRelation(viewerFaction, attackEntity.getDiplomacy().getFaction());
-                DiplomaticRelation relationDef = getWorldModel().getDiplomacyManager().getRelation(viewerFaction, defenceEntity.getDiplomacy().getFaction());
-                return String.format(
-                        getMessageInColor("%s", relationAtc) + " the %s is attacking " +
-                                getMessageInColor("%s", relationDef) + " the %s",
-                        attackEntity.getDisplayName(), attackEntity.getRace().getDisplayName(),
-                        defenceEntity.getDisplayName(), defenceEntity.getRace().getDisplayName());
+                return getMessageInColor(getEntityColored(attackEntity,viewerEntity,getWorldModel()) + " is attacking " +
+                                getEntityColored(defenceEntity,viewerEntity,getWorldModel()),INFORMATIVE);
             }
         }
 

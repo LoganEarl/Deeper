@@ -98,7 +98,7 @@ public class MoveCommand extends EntityCommand {
         @Override
         public String getAsMessage(NotificationSubscriber viewer) {
             String arrives = didEnter? " arrives from the ":" leaves to the ";
-            return getMessageInColor(getEntityColored((Entity)viewer,sourceEntity,getWorldModel()) + arrives + direction, INFORMATIVE);
+            return getMessageInColor(getEntityColored(sourceEntity,(Entity)viewer,getWorldModel()) + arrives + direction, INFORMATIVE);
         }
     }
 }

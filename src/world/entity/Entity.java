@@ -603,10 +603,18 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         }
     }
 
+    public String getPronoun(){
+        return "it";
+    }
+
+    public String getPossesivePronoun(){
+        return "it's";
+    }
+
     @Override
     public void notify(Notification notification) {
         if(EntityTable.CONTROLLER_TYPE_PLAYER.equals(getControllerType())) {
-            Client toNotify = notification.getClientRegistry().getClientWithUsername(entityID);
+            Client toNotify = notification.getClientRegistry().getClient(entityID);
             toNotify.sendMessage(notification.getAsMessage(this));
         }
     }

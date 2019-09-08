@@ -56,14 +56,14 @@ public class ColorTheme {
         return getMessageInColor(item.getDisplayableName(),ITEM);
     }
 
-    public static String getEntityColored(Entity targetEntity, Entity sourceEntity, WorldModel worldModel){
-        return getEntityColored(targetEntity, sourceEntity,worldModel.getDiplomacyManager());
+    public static String getEntityColored(Entity displayedEntity, Entity povEntity, WorldModel worldModel){
+        return getEntityColored(displayedEntity, povEntity,worldModel.getDiplomacyManager());
     }
 
-    public static String getEntityColored(Entity viewedEntity, Entity observerEntity, DiplomacyManager diplomacyManager){
-        Faction viewedFaction = viewedEntity.getDiplomacy().getFaction();
-        DiplomaticRelation relation = diplomacyManager.getRelation(viewedFaction,observerEntity.getDiplomacy().getFaction());
-        return getMessageInColor(viewedEntity.getDisplayName() + " the " + viewedEntity.getRace().getDisplayName(),relation);
+    public static String getEntityColored(Entity displayedEntity, Entity povEntity, DiplomacyManager diplomacyManager){
+        Faction viewedFaction = displayedEntity.getDiplomacy().getFaction();
+        DiplomaticRelation relation = diplomacyManager.getRelation(viewedFaction,povEntity.getDiplomacy().getFaction());
+        return getMessageInColor(displayedEntity.getDisplayName() + " the " + displayedEntity.getRace().getDisplayName(),relation);
     }
 
     public static String getMessageInColor(String message, Color selectColor){

@@ -42,6 +42,7 @@ public class SimulationManager {
         messagePipeline = new MessagePipeline(clientRegistry,executor, worldModel);
 
         server.setMessageReceivedListener(messagePipeline);
+        server.setClientRegistry(clientRegistry);
     }
 
     /**Starts the server and ensures the directory system and world system is all in place*/

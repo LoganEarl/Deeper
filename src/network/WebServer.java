@@ -1,14 +1,14 @@
 package network;
 
+import client.Client;
+import client.ClientRegistry;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Responsible for creating and maintaining a single server thread for sending messages and any number of client threads used
@@ -20,6 +20,7 @@ public class WebServer {
     private Thread serverThread;
     private boolean serverRunning = false;
 
+    private ClientRegistry clientRegistry;
     private OnMessageReceivedListener clientListener;
 
     /**Used to denote the end of a message*/
@@ -38,7 +39,7 @@ public class WebServer {
                 ServerSocket serverSocket = new ServerSocket(port);
                 while (true) {
                     Socket newSocket = serverSocket.accept();
-                    ClientConnection clientConnection = new ClientConnection(newSocket);
+                    ClientConnection clientConnection = new ClientConnection(newSocket, clientRegistry);
                     connectedClients.add(clientConnection);
                     clientConnection.start();
                 }
@@ -55,10 +56,19 @@ public class WebServer {
         this.clientListener = clientListener;
     }
 
+    public void setClientRegistry(ClientRegistry clientRegistry){
+        this.clientRegistry = clientRegistry;
+    }
+
     /**
      * Starts the server thread, allowing clients to connect.
      */
     public void startServer() {
+        if(clientListener == null)
+            throw new IllegalStateException("cannot start without a client listener");
+        if(clientRegistry == null)
+            throw new IllegalStateException("cannot start without a client registry");
+
         if (serverThread != null && !serverRunning)
             serverThread.start();
     }
@@ -68,9 +78,9 @@ public class WebServer {
      * @param message the message to send to the given clients
      * @param toNotify the identifiers of all clients to notify
      */
-    public void notifyClients(ServerMessage message, String... toNotify) {
+    public void notifyClients(ServerMessage message, Client... toNotify) {
         for (ClientConnection conn : connectedClients)
-            if (toNotify.length == 0 || Arrays.asList(toNotify).contains(conn.identifier))
+            if (toNotify.length == 0 || Arrays.asList(toNotify).contains(conn.assignedClient))
                 conn.sendMessage(message);
     }
 
@@ -78,10 +88,10 @@ public class WebServer {
      * disconnects the given client connections. If none are specified, disconnects all connections
      * @param toDisconnect the identifiers of all clients to disconnect
      */
-    public void disconnectClients(String... toDisconnect){
+    public void disconnectClients(Client... toDisconnect){
         List<ClientConnection> toRemove = new ArrayList<>(1);
         for (ClientConnection conn : connectedClients)
-            if (toDisconnect.length == 0 || Arrays.asList(toDisconnect).contains(conn.identifier)) {
+            if (toDisconnect.length == 0 || Arrays.asList(toDisconnect).contains(conn.assignedClient)) {
                 conn.kill();
                 toRemove.add(conn);
             }
@@ -92,7 +102,8 @@ public class WebServer {
 
     private class ClientConnection extends Thread{
         private Socket clientSocket;
-        private String identifier;
+        private String internetAddress;
+        private Client assignedClient;
 
         private BufferedOutputStream out;
         private BufferedInputStream in;
@@ -101,9 +112,11 @@ public class WebServer {
 
         private boolean alive = true;
 
-        ClientConnection(Socket clientSocket) {
+        ClientConnection(Socket clientSocket, ClientRegistry registry) {
             this.clientSocket = clientSocket;
-            identifier = clientSocket.getInetAddress().toString();
+            internetAddress = clientSocket.getInetAddress().toString();
+
+            assignedClient = registry.createClient(internetAddress);
 
             try{
                 out = new BufferedOutputStream(clientSocket.getOutputStream());
@@ -137,7 +150,7 @@ public class WebServer {
                         if(clientListener != null)
                             for(String message: messages)
                                 if(message != null && !message.isEmpty())
-                                    clientListener.onClientMessage(identifier,message);
+                                    clientListener.onClientMessage(assignedClient,message);
                     }
                 }catch (SocketException e) {
                     alive = false;
@@ -173,9 +186,9 @@ public class WebServer {
     public interface OnMessageReceivedListener{
         /**
          * method called when a new message is received
-         * @param client the client's internet address
+         * @param client the client that sent the message
          * @param rawMessage the message the client sent
          */
-        void onClientMessage(String client, String rawMessage);
+        void onClientMessage(Client client, String rawMessage);
     }
 }

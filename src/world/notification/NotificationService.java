@@ -30,7 +30,7 @@ public class NotificationService {
                 lastPing = lastTimestamps.get(subscriber);
             if(lastPing + TIMEOUT_INTERVAL < curTime){
                 subscriber.notify(new TimeoutNotification(registry));
-                Client connectedClient = registry.getClientWithUsername(subscriber.getID());
+                Client connectedClient = registry.getClient(subscriber.getID());
                 if(connectedClient != null){
                     connectedClient.tryLogOut(connectedClient, "");
                     toUnsubscribe.add(subscriber);
