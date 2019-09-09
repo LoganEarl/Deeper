@@ -1,9 +1,8 @@
 
+
 - add ability to look at entities/items in room
 
 - add some basic skills
-    - add ability to view all learned skills
-    - add ability to view skills that are available to learn
     - add ability to learn skills
     - skills to implement
         - stabilize skill

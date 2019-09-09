@@ -52,7 +52,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
 
     private int[] allocations = {0,0,0,0,0,0};
     private String[] allocationNames = {"str","dex","int","wis", "fit", "tough"};
-    private int pointsAvailable = 20;
+    private int pointsAvailable = 100;
 
     /**
      * cole constructor
