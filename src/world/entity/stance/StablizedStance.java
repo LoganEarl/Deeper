@@ -17,8 +17,8 @@ public class StablizedStance extends Stance {
     }
 
     @Override
-    public int getXPGained(int baseXP) {
-        return baseXP;
+    public int getIPGained(int baseIP) {
+        return baseIP;
     }
 
     @Override

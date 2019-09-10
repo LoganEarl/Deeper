@@ -62,6 +62,8 @@ public class WorldModel {
         messagePipeline.loadMessage(ClientAttackMessage.class);
         messagePipeline.loadMessage(ClientPoolsMessage.class);
         messagePipeline.loadMessage(ClientSkillsMessage.class);
+        messagePipeline.loadMessage(ClientStabilizeMessage.class);
+        messagePipeline.loadMessage(ClientLearnMessage.class);
     }
 
     public NotificationService getNotificationService() {

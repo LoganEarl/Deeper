@@ -3,8 +3,6 @@ package world.entity.pool;
 import world.entity.Entity;
 import world.entity.StatContainer;
 import world.entity.stance.BaseStance;
-import world.entity.stance.DyingStance;
-import world.entity.stance.StablizedStance;
 import world.entity.stance.Stance;
 
 import java.sql.ResultSet;

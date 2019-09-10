@@ -55,7 +55,7 @@ public class StatContainer implements Entity.SqlExtender {
         return baseStat - RND.nextInt(100)+difficultyModifier;
     }
 
-    private int getStat(String columnName) {
+    public int getStat(String columnName) {
         switch (columnName) {
             case STR:
                 return strength;

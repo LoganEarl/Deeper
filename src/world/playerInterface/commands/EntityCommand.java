@@ -6,6 +6,7 @@ import world.WorldModel;
 import world.WorldUtils;
 import world.entity.Entity;
 import world.entity.skill.Skill;
+import world.entity.skill.SkillContainer;
 import world.entity.skill.SkillTable;
 import world.notification.Notification;
 import world.room.RoomNotificationScope;
@@ -41,14 +42,14 @@ public abstract class EntityCommand implements CommandExecutor.Command {
         } else if(requiresBalance() && !sourceEntity.isBalanced()) {
             sourceClient.sendMessage("You must regain your balance first!");
             done = true;
-        } else if((requiredSkill = getRequiredSkill()) != null && !SkillTable.entityHasSkill(sourceEntity,requiredSkill)) {
+        } else if((requiredSkill = getRequiredSkill()) != null && sourceEntity.getSkills().getLearnLevel(requiredSkill) == SkillContainer.UNLEARNED) {
             if(requiredSkill.isVisibleToEntity(sourceEntity))
                 sourceClient.sendMessage("You must " + getMessageInColor("learn " + requiredSkill.getDisplayName(),FAILURE) + " before you can do that");
             else
-                sourceClient.sendMessage("You must " + getMessageInColor("learn a hidden skill",FAILURE) + " before you can do that");
+                sourceClient.sendMessage("You must " + getMessageInColor("learn an unknown skill",FAILURE) + " before you can do that");
             done = true;
         } else if(getRequiredStamina() > sourceEntity.getPools().getStamina()){
-            sourceClient.sendMessage("You are " + getMessageInColor("exhausted", STAMINA_COLOR));
+            sourceClient.sendMessage("You are too " + getMessageInColor("exhausted", STAMINA_COLOR) + " to do that");
             done = true;
         }else{
             executeEntityCommand();

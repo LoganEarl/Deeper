@@ -16,8 +16,8 @@ public class BaseStance extends Stance{
         return baseDamage;
     }
 
-    public int getXPGained(int baseXP){
-        return baseXP;
+    public int getIPGained(int baseIP){
+        return baseIP;
     }
 
     public double getFlatHpPerSec(){

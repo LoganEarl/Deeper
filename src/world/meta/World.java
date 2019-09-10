@@ -6,6 +6,7 @@ import world.entity.Entity;
 import world.entity.EntityTable;
 import world.entity.race.Race;
 import world.entity.race.RaceTable;
+import world.entity.skill.SkillTable;
 import world.item.ItemInstanceTable;
 import world.item.ItemStatTable;
 import world.item.armor.ArmorStatTable;
@@ -133,6 +134,7 @@ public class World implements DatabaseManager.DatabaseEntry {
         //tables.add(new MiscItemStatTable());
         //tables.add(new AmmoStatTable());
         tables.add(new WeaponStatTable());
+        tables.add(new SkillTable());
 
         tables.add(new RoomTable());
         tables.add(new RaceTable());
@@ -226,20 +228,19 @@ public class World implements DatabaseManager.DatabaseEntry {
         if(newWorld != null) {
             List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
             tables.add(new ItemStatTable());
-
             tables.add(new ContainerStatTable());
-
-
+            tables.add(new ArmorStatTable());
+            tables.add(new ConsumableStatTable());
+            //tables.add(new MiscItemStatTable());
+            //tables.add(new AmmoStatTable());
+            tables.add(new WeaponStatTable());
+            tables.add(new SkillTable());
             tables.add(new RoomTable());
             tables.add(new RaceTable());
             tables.add(new EntityTable());
             tables.add(new StoryArcTable());
-            tables.add(new EntityDialogTable());
-            tables.add(new DialogTable());
-            tables.add(new QuestTable());
-
             tables.add(new ItemInstanceTable());
-            tables.add(new WorldMetaTable());
+
             DatabaseManager.createWorldTables(newWorld.getWorldID() + ".db",tables);
         }
 

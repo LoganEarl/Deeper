@@ -6,14 +6,14 @@ import world.entity.stance.Stance;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static world.entity.EntityTable.XP;
+import static world.entity.EntityTable.IP;
 
 public class ProgressionContainer implements Entity.SqlExtender {
     public static final String SIGNIFIER = "progression";
 
-    private int xp = 0;
+    private int ip = 0;
 
-    private static final String[] HEADERS = new String[]{XP};
+    private static final String[] HEADERS = new String[]{IP};
     private Stance stance;
 
     private Entity sourceEntity;
@@ -23,30 +23,30 @@ public class ProgressionContainer implements Entity.SqlExtender {
     }
 
     public ProgressionContainer(ResultSet readEntry) throws SQLException {
-        xp = readEntry.getInt(XP);
+        ip = readEntry.getInt(IP);
     }
 
-    public int getXP() {
-        return xp;
+    public int getIP() {
+        return ip;
     }
 
-    public void setXP(int xp) {
-        this.xp = xp;
+    public void setIP(int ip) {
+        this.ip = ip;
     }
 
-    public void addXP(int xp){
-        this.xp += stance.getXPGained(xp);
+    public void addIP(int ip){
+        this.ip += stance.getIPGained(ip);
     }
 
-    public int getXPCostForNextStat(int newStatVal, int curStatVal, int racialBaseStat){
-        int totalXP = 0;
+    public int getIPCostForNextStat(int newStatVal, int curStatVal, int racialBaseStat){
+        int totalIP = 0;
         for(int statValue = curStatVal + 1; statValue <= newStatVal; statValue++) {
             int nextLevelCost = 10 * (statValue - racialBaseStat);
             if(nextLevelCost < 25) nextLevelCost = 25;
-            totalXP += nextLevelCost;
+            totalIP += nextLevelCost;
         }
 
-        return totalXP;
+        return totalIP;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ProgressionContainer implements Entity.SqlExtender {
 
     @Override
     public Object[] getInsertSqlValues() {
-        return new Object[]{xp};
+        return new Object[]{ip};
     }
 
     @Override
@@ -67,5 +67,21 @@ public class ProgressionContainer implements Entity.SqlExtender {
     @Override
     public void registerStance(Stance toRegister) {
         this.stance = toRegister;
+    }
+
+    public static String getIPBrightnessDescriptor(int ipAmount){
+        if(ipAmount <= 800)
+            return "dim";
+        if(ipAmount <= 1500)
+            return "shining";
+        if(ipAmount <= 3000)
+            return "bright";
+        if(ipAmount <= 6000)
+            return "radiant";
+        if(ipAmount <= 12000)
+            return "dazzling";
+        if(ipAmount <= 24000)
+            return "scintillating";
+        return "blinding";
     }
 }

@@ -10,7 +10,7 @@ public abstract class Stance {
 
     public abstract int getDamageDealt(int baseDamage, Entity aggressor, int hitRoll);
 
-    public abstract int getXPGained(int baseXP);
+    public abstract int getIPGained(int baseIP);
 
     public abstract double getFlatHpPerSec();
 

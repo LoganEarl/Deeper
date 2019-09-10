@@ -9,6 +9,7 @@ import world.entity.pool.PoolContainer;
 import world.entity.progression.ProgressionContainer;
 import world.entity.race.Race;
 import world.entity.skill.Skill;
+import world.entity.skill.SkillContainer;
 import world.entity.skill.SkillTable;
 import world.entity.stance.BaseStance;
 import world.entity.stance.Stance;
@@ -82,6 +83,9 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
         this.databaseName = databaseName;
         this.model = model;
+
+        //this last to load the skills
+        extenders.put(SkillContainer.SIGNIFIER, new SkillContainer(this));
 
         setStance(new BaseStance());
     }
@@ -346,7 +350,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
     public void setStance(Stance stance){
         Skill requiredSkill = stance.getRequiredSkill();
-        if(requiredSkill == null || SkillTable.entityHasSkill(this, requiredSkill)) {
+        if(requiredSkill == null || getSkills().getLearnLevel(requiredSkill) != SkillContainer.UNLEARNED) {
             if (!stance.equals(currentStance)) {
                 this.currentStance = stance;
                 for (SqlExtender extender : extenders.values()) {
@@ -400,6 +404,10 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         return (StatContainer) extenders.get(StatContainer.SIGNIFIER);
     }
 
+    public SkillContainer getSkills() {
+        return (SkillContainer) extenders.get(SkillContainer.SIGNIFIER);
+    }
+
     public DiplomacyContainer getDiplomacy() {
         return (DiplomacyContainer) extenders.get(DiplomacyContainer.SIGNIFIER);
     }
@@ -429,9 +437,11 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
      * @param attachedClient an optional client to notify once balance is restored
      */
     public void setBalanceTime(long waitMs, Client attachedClient){
-        balanceRecoveryTimestamp = System.currentTimeMillis() + waitMs;
-        if(attachedClient != null){
-            attachedClient.sendMessage("You recover your balance", balanceRecoveryTimestamp);
+        if(waitMs > 0) {
+            balanceRecoveryTimestamp = System.currentTimeMillis() + waitMs;
+            if (attachedClient != null) {
+                attachedClient.sendMessage("You recover your balance", balanceRecoveryTimestamp);
+            }
         }
     }
 
@@ -477,6 +487,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(model.getItemCollection(), e));
             extenders.put(ProgressionContainer.SIGNIFIER, new ProgressionContainer(e));
             extenders.put(DiplomacyContainer.SIGNIFIER, new DiplomacyContainer());
+            extenders.put(SkillContainer.SIGNIFIER, new SkillContainer(e));
 
             e.extenders = extenders;
             e.entityID = entityID;
@@ -487,6 +498,8 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             e.databaseName = databaseName;
 
             e.getPools().calculatePoolMaxes(e.getStats());
+            //TODO remove this
+            e.getProgression().setIP(100000);
 
             e.setStance(new BaseStance());
 

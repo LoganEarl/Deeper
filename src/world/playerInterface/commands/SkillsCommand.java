@@ -3,7 +3,7 @@ package world.playerInterface.commands;
 import client.Client;
 import world.WorldModel;
 import world.entity.skill.Skill;
-import world.entity.skill.SkillTable;
+import world.entity.skill.SkillContainer;
 import static world.playerInterface.ColorTheme.*;
 
 public class SkillsCommand extends EntityCommand {
@@ -35,9 +35,9 @@ public class SkillsCommand extends EntityCommand {
         StringBuilder spacing = new StringBuilder();
         for (int i = 0; i < indentNum; i++)
             spacing.append("  ");
-        if (skill.isVisibleToEntity(getSourceEntity()) || SkillTable.entityHasSkill(getSourceEntity(),skill)) {
+        if (skill.isVisibleToEntity(getSourceEntity()) || getSourceEntity().getSkills().getLearnLevel(skill) != SkillContainer.UNLEARNED) {
             existingMessage += spacing;
-            if(SkillTable.entityHasSkill(getSourceEntity(),skill))
+            if(getSourceEntity().getSkills().getLearnLevel(skill) >= skill.getElevationLevel())
                 existingMessage += getMessageInColor(skill.getDisplayName(),SUCCESS);
             else if(skill.isLearnableByEntity(getSourceEntity()))
                 existingMessage += getMessageInColor(skill.getDisplayName(),INFORMATIVE);

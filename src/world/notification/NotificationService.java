@@ -51,6 +51,28 @@ public class NotificationService {
         }
     }
 
+    public void notifyDelayed(final Notification notification, final NotificationScope scope, long delayMs, CommandExecutor executor){
+        final long executionTime = System.currentTimeMillis() + delayMs;
+        executor.scheduleCommand(new CommandExecutor.Command() {
+            private boolean complete = false;
+            @Override
+            public void execute() {
+                NotificationService.this.notify(notification,scope);
+                complete = true;
+            }
+
+            @Override
+            public long getStartTimestamp() {
+                return executionTime;
+            }
+
+            @Override
+            public boolean isComplete() {
+                return complete;
+            }
+        });
+    }
+
     public void subscribe(NotificationSubscriber subscriber){
         subscribers.add(subscriber);
         lastTimestamps.put(subscriber, System.currentTimeMillis());

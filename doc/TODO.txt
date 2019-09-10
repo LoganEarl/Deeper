@@ -3,9 +3,7 @@
 - add ability to look at entities/items in room
 
 - add some basic skills
-    - add ability to learn skills
     - skills to implement
-        - stabilize skill
         - dodge and a deflect skill
         - stealth and perception
 

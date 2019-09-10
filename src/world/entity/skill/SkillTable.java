@@ -14,50 +14,56 @@ public class SkillTable implements DatabaseManager.DatabaseTable {
 
     public static final String ENTITY_ID = EntityTable.ENTITY_ID;
     public static final String SKILL_NAME = "skillName";
+    public static final String SKILL_LEVEL = "skillLevel";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
     private final Set<String> CONSTRAINTS = new HashSet<>(2);
 
-    private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=? AND %s=?",TABLE_NAME,ENTITY_ID, SKILL_NAME);
-    private static final String LEARN_SQL = String.format(Locale.US, "REPLACE INTO %s(%s, %s) VALUES (?, ?)",TABLE_NAME,ENTITY_ID,SKILL_NAME);
+    private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,ENTITY_ID);
+    private static final String LEARN_SQL = String.format(Locale.US, "REPLACE INTO %s(%s, %s, %s) VALUES (?, ?, ?)",TABLE_NAME,ENTITY_ID,SKILL_NAME, SKILL_LEVEL);
     private static final String FORGET_SQL = String.format(Locale.US,"DELETE FROM %s WHERE (%s=? AND %s=?)",TABLE_NAME,ENTITY_ID,SKILL_NAME);
 
     public SkillTable(){
         TABLE_DEFINITION.put(ENTITY_ID, "VARCHAR(32) NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(SKILL_NAME, "VARCHAR(32) NOT NULL COLLATE NOCASE");
+        TABLE_DEFINITION.put(SKILL_LEVEL, "INT NOT NULL");
 
         CONSTRAINTS.add(String.format(Locale.US,"PRIMARY KEY (%s, %s)",ENTITY_ID,SKILL_NAME));
     }
 
-    public static boolean learnSkill(Entity sourceEntity, Skill toLearn){
-        return DatabaseManager.executeStatement(LEARN_SQL,sourceEntity.getDatabaseName(), sourceEntity.getID(),toLearn.getSavableName()) > 0;
+    public static boolean learnSkill(Entity sourceEntity, Skill toLearn, int level){
+        return DatabaseManager.executeStatement(LEARN_SQL,sourceEntity.getDatabaseName(), sourceEntity.getID(),toLearn.getSavableName(), level) > 0;
     }
 
     public static boolean forgetSkill(Entity sourceEntity, Skill toForget){
         return DatabaseManager.executeStatement(FORGET_SQL,sourceEntity.getDatabaseName(),sourceEntity.getID(), toForget.getSavableName()) > 0;
     }
 
-    public static boolean entityHasSkill(Entity sourceEntity, Skill sourceSkill){
+    public static Skill[] getEntitySkills(Entity sourceEntity){
         Connection c = DatabaseManager.getDatabaseConnection(sourceEntity.getDatabaseName());
         PreparedStatement getSQL = null;
-        boolean toReturn;
+        List<Skill> skills;
         if(c == null)
-            toReturn = false;
+            skills = Collections.emptyList();
         else{
             try {
                 getSQL = c.prepareStatement(GET_SQL);
                 getSQL.setString(1,sourceEntity.getID());
-                getSQL.setString(2,sourceSkill.getSavableName());
                 ResultSet accountSet = getSQL.executeQuery();
 
-                toReturn = accountSet.next();
+                skills = new ArrayList<>();
+                while(accountSet.next()){
+                    Skill skill = Skill.getSkill(accountSet.getString(SKILL_NAME), accountSet.getInt(SKILL_LEVEL));
+                    if(skill != null)
+                        skills.add(skill);
+                }
 
                 getSQL.close();
             }catch (Exception e){
-                toReturn = false;
+                skills = Collections.emptyList();
             }
         }
-        return toReturn;
+        return skills.toArray(new Skill[0]);
     }
 
     @Override
