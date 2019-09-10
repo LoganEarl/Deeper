@@ -12,51 +12,51 @@ import static world.entity.skill.Skill.VisibilityType.*;
 
 public enum Skill {
     //Stabilize===========================
-    stabilize1("stabilize1", "Stabilize", 500,
+    stabilize1("stabilize1", "Stabilize", 500, 10,
             new StatContainer(0, 0, 0, 12, 0, 0), visible),
-    stabilize2("stabilize2", "Improved Stabilize", 2000,
+    stabilize2("stabilize2", "Improved Stabilize", 2000, 20,
             new StatContainer(0, 0, 0, 20, 0, 0), hiddenUntilSkills,
             stabilize1),
-    stabilize3("stabilize3", "Refined Stabilize", 8000,
+    stabilize3("stabilize3", "Refined Stabilize", 8000, 30,
             new StatContainer(0, 0, 0, 38, 0, 0), hiddenUntilSkills,
             stabilize2),
 
     //Recover===========================
-    recover1("recover1", "Recover", 250,
+    recover1("recover1", "Recover", 250, .5,
             new StatContainer(0, 0, 0, 0, 14, 10), visible),
-    recover2("recover2", "Improved Recover", 1000,
+    recover2("recover2", "Improved Recover", 1000, 1,
             new StatContainer(0, 0, 0, 0, 28, 20), hiddenUntilSkills,
             recover1),
-    recover3("recover3", "Unnatural Recover", 4000,
+    recover3("recover3", "Unnatural Recover", 4000, 2,
             new StatContainer(0, 0, 0, 0, 62, 40), hiddenUntilLearnable,
             recover2),
-    recover4("recover4", "Supernatural Recover", 16000,
+    recover4("recover4", "Supernatural Recover", 16000, 4,
             new StatContainer(0, 0, 0, 0, 100, 88), hiddenUntilLearnable,
             recover3),
 
     //Dodge===========================
-    dodge1("dodge1", "Dodge", 750,
+    dodge1("dodge1", "Dodge", 750, 10,
             new StatContainer(0, 12, 0, 0, 0, 0), visible),
-    dodge2("dodge2", "Improved Dodge", 3000,
+    dodge2("dodge2", "Improved Dodge", 3000, 20,
             new StatContainer(0, 32, 0, 0, 0, 0), hiddenUntilSkills,
             dodge1),
-    dodge3("dodge3", "Unnatural Dodge", 6000,
+    dodge3("dodge3", "Unnatural Dodge", 6000, 30,
             new StatContainer(0, 64, 0, 0, 0, 0), hiddenUntilLearnable,
             dodge2),
-    dodge4("dodge4", "Supernatural Dodge", 24000,
+    dodge4("dodge4", "Supernatural Dodge", 24000, 40,
             new StatContainer(0, 120, 0, 0, 0, 0), hiddenUntilLearnable,
             dodge3),
 
     //Deflect===========================
-    deflect1("deflect1", "Deflect", 750,
+    deflect1("deflect1", "Deflect", 750, .2,
             new StatContainer(12, 0, 0, 0, 0, 0), visible),
-    deflect2("deflect2", "Improved Deflect", 3000,
+    deflect2("deflect2", "Improved Deflect", 3000, .3,
             new StatContainer(32, 0, 0, 0, 0, 0), hiddenUntilSkills,
             deflect1),
-    deflect3("deflect3", "Unnatural Deflect", 6000,
+    deflect3("deflect3", "Unnatural Deflect", 6000, .4,
             new StatContainer(64, 0, 0, 0, 0, 0), hiddenUntilLearnable,
             deflect2),
-    deflect4("deflect4", "Supernatural Deflect", 24000,
+    deflect4("deflect4", "Supernatural Deflect", 24000, .5,
             new StatContainer(120, 0, 0, 0, 0, 0), hiddenUntilLearnable,
             deflect3);
 
@@ -68,17 +68,24 @@ public enum Skill {
     private StatContainer requiredStats;
     private VisibilityType visibilityType;
 
-    Skill(String savableName, String displayName, int xpCost, @Nullable StatContainer requiredStats, VisibilityType visibilityType, Skill... requiredSkills) {
+    private double bonusAmount;
+
+    Skill(String savableName, String displayName, int xpCost, double bonusAmount, @Nullable StatContainer requiredStats, VisibilityType visibilityType, Skill... requiredSkills) {
         this.displayName = displayName;
         this.savableName = savableName;
         this.xpCost = xpCost;
         this.requiredSkills = requiredSkills;
         this.requiredStats = requiredStats;
         this.visibilityType = visibilityType;
+        this.bonusAmount = bonusAmount;
     }
 
     public String getSavableName() {
         return savableName;
+    }
+
+    public double getBonusAmount() {
+        return bonusAmount;
     }
 
     public String getDisplayName() {

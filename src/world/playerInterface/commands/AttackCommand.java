@@ -171,7 +171,7 @@ public class AttackCommand extends EntityCommand {
                 if (netRoll >= 0)
                     return String.format(getEntityColored(attackEntity, defenceEntity, getWorldModel()) + " attacks you with a " + getItemColored(attackWeapon) + " for " + getMessageInColor("%d damage", INCOMING_DAMAGE), damage);
                 else
-                    return String.format(getMessageInColor(getEntityColored(attackEntity,defenceEntity,getWorldModel()) + " misses you with %s " + getItemColored(attackWeapon), WARNING),attackEntity.getPossesivePronoun());
+                    return String.format(getMessageInColor(getEntityColored(attackEntity,defenceEntity,getWorldModel()) + " misses you with %s " + getItemColored(attackWeapon), WARNING),attackEntity.getPossessivePronoun());
             } else {
                 return getMessageInColor(getEntityColored(attackEntity,viewerEntity,getWorldModel()) + " is attacking " +
                                 getEntityColored(defenceEntity,viewerEntity,getWorldModel()),INFORMATIVE);

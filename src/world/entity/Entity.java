@@ -607,8 +607,12 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         return "it";
     }
 
-    public String getPossesivePronoun(){
-        return "it's";
+    public String getPossessivePronoun(){
+        return "its";
+    }
+
+    public String getReflexivePronoun(){
+        return "itself";
     }
 
     @Override
