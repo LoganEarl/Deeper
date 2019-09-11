@@ -73,7 +73,7 @@ public class ProgressionContainer implements Entity.SqlExtender {
         if(ipAmount <= 800)
             return "dim";
         if(ipAmount <= 1500)
-            return "shining";
+            return "warm";
         if(ipAmount <= 3000)
             return "bright";
         if(ipAmount <= 6000)
@@ -81,7 +81,7 @@ public class ProgressionContainer implements Entity.SqlExtender {
         if(ipAmount <= 12000)
             return "dazzling";
         if(ipAmount <= 24000)
-            return "scintillating";
+            return "luminous";
         return "blinding";
     }
 }

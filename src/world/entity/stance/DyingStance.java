@@ -57,7 +57,7 @@ public class DyingStance extends Stance {
     }
 
     @Override
-    public int getDamageDealt(int baseDamage, Entity aggressor, int hitRoll) {
+    public int onDamageIncoming(int baseDamage, Entity aggressor, int hitRoll) {
         return 0;
     }
 

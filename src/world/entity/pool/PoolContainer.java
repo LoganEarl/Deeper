@@ -57,16 +57,38 @@ public class PoolContainer implements Entity.SqlExtender {
         damage(damage, null, 0);
     }
 
-    public void damage(int damage, Entity aggressor, int hitRoll){
+    public AttackResult damage(int damage, Entity aggressor, int hitRoll){
+        AttackResult attackResult = new AttackResult();
         if(currentStance != null)
-            damage = currentStance.getDamageDealt(damage, aggressor, hitRoll);
+            attackResult = currentStance.onDamageIncoming(damage, aggressor, hitRoll, attackResult);
 
         this.hp -= damage;
         if(hp <= 0){
             //TODO enter dying state
         }else if(hp< maxHP/-4){
-            //TODO enter dead stats
+            //TODO enter dead state
         }
+        return attackResult;
+    }
+
+    public static class AttackResult{
+        private int damageDealt = 0;
+        private int baseRoll = 0;
+        private Entity agressor;
+        private Entity defendor;
+        private boolean didDeflect = false;
+        private boolean didDodge = false;
+        private boolean didEnterDyingState = false;
+        private boolean didDie = false;
+
+        public int getDamageDealt() {return damageDealt;}
+        public boolean isDidDeflect() {return didDeflect;}
+        public boolean isDidDodge() {return didDodge;}
+        public boolean isDidEnterDyingState() {return didEnterDyingState;}
+        public boolean isDidDie() {return didDie;}
+        public int getBaseRoll() {return baseRoll;}
+        public Entity getAgressor() {return agressor;}
+        public Entity getDefendor() {return defendor;}
     }
 
     @Override

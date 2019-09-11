@@ -12,7 +12,7 @@ public class StablizedStance extends Stance {
     private static final double BURN_PER_INT_PER_SEC = 0.002;
 
     @Override
-    public int getDamageDealt(int baseDamage, Entity aggressor, int hitRoll) {
+    public int onDamageIncoming(int baseDamage, Entity aggressor, int hitRoll) {
         return 0;
     }
 

@@ -149,32 +149,50 @@ public class AttackCommand extends EntityCommand {
         private Weapon attackWeapon;
         private int netRoll;
         private int damage;
+        private boolean didDodge;
+        private boolean didDeflect;
 
-        public AttackNotification(Entity attackEntity, Entity defenceEntity, Weapon attackWeapon, int netRoll, int damage, ClientRegistry registry) {
+        public AttackNotification(Entity attackEntity,
+                                  Entity defenceEntity,
+                                  Weapon attackWeapon,
+                                  int netRoll,
+                                  int damage,
+                                  boolean didDodge,
+                                  boolean didDeflect,
+                                  ClientRegistry registry) {
             super(registry);
             this.attackEntity = attackEntity;
             this.defenceEntity = defenceEntity;
             this.attackWeapon = attackWeapon;
             this.netRoll = netRoll;
             this.damage = damage;
+            this.didDeflect = didDeflect;
+            this.didDodge = didDodge;
         }
 
         @Override
         public String getAsMessage(NotificationSubscriber viewer) {
-            Entity viewerEntity = (Entity)viewer;
+            Entity viewerEntity = (Entity) viewer;
+
+            String hitType = didDeflect ? "glancing" : "direct";
+
             if (viewer.getID().equals(attackEntity.getID())) {
                 if (netRoll >= 0)
-                    return String.format("You score a hit on " + getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " with your " + getItemColored(attackWeapon) + "(%d) for " + getMessageInColor("%d damage", OUTGOING_DAMAGE), netRoll, damage);
+                    return String.format("You score a %s hit(%d) on " + getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " with your " + getItemColored(attackWeapon) + " for " + getMessageInColor("%d damage", OUTGOING_DAMAGE), hitType, netRoll, damage);
+                else if (didDodge)
+                    return String.format(getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " dodges(%d) your " + getItemColored(attackWeapon), netRoll);
                 else
-                    return String.format("You miss " + getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " with your " + getItemColored(attackWeapon) + "(%d)", netRoll);
+                    return String.format("You miss(%d) " + getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " with your " + getItemColored(attackWeapon), netRoll);
             } else if (viewer.getID().equals(defenceEntity.getID())) {
                 if (netRoll >= 0)
-                    return String.format(getEntityColored(attackEntity, defenceEntity, getWorldModel()) + " attacks you with a " + getItemColored(attackWeapon) + " for " + getMessageInColor("%d damage", INCOMING_DAMAGE), damage);
+                    return String.format(getEntityColored(attackEntity, defenceEntity, getWorldModel()) + " attacks you. You are hit(%d) with a %s blow with %s " + getItemColored(attackWeapon) + " for " + getMessageInColor("%d damage", INCOMING_DAMAGE),netRoll, hitType, attackEntity.getPossessivePronoun(), damage);
+                else if (didDodge)
+                    return String.format(getMessageInColor( " You dodge(%d) " + getEntityColored(attackEntity, defenceEntity, getWorldModel()) + "'s " + getItemColored(attackWeapon), WARNING), netRoll, attackEntity.getPossessivePronoun());
                 else
-                    return String.format(getMessageInColor(getEntityColored(attackEntity,defenceEntity,getWorldModel()) + " misses you with %s " + getItemColored(attackWeapon), WARNING),attackEntity.getPossessivePronoun());
+                    return String.format(getMessageInColor(getEntityColored(attackEntity, defenceEntity, getWorldModel()) + " misses(%d) you with %s " + getItemColored(attackWeapon), WARNING), netRoll, attackEntity.getPossessivePronoun());
             } else {
-                return getMessageInColor(getEntityColored(attackEntity,viewerEntity,getWorldModel()) + " is attacking " +
-                                getEntityColored(defenceEntity,viewerEntity,getWorldModel()),INFORMATIVE);
+                return getMessageInColor(getEntityColored(attackEntity, viewerEntity, getWorldModel()) + " is attacking " +
+                        getEntityColored(defenceEntity, viewerEntity, getWorldModel()), INFORMATIVE);
             }
         }
 

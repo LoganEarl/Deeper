@@ -12,7 +12,7 @@ public class BaseStance extends Stance{
     private static final double BURN_PER_WIS_PER_SEC = 0.013;
     private static final double BURN_PER_INT_PER_SEC = 0.007;
 
-    public int getDamageDealt(int baseDamage, Entity aggressor, int hitRoll){
+    public int onDamageIncoming(int baseDamage, Entity aggressor, int hitRoll){
         return baseDamage;
     }
 

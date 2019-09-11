@@ -1,4 +1,4 @@
-
+- finish the AttackResult change. This will come in VARY handy later
 
 - add ability to look at entities/items in room
 
