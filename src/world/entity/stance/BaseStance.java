@@ -1,5 +1,6 @@
 package world.entity.stance;
 
+import world.entity.Attack;
 import world.entity.Entity;
 import world.entity.StatContainer;
 import world.entity.skill.Skill;
@@ -62,6 +63,11 @@ public class BaseStance extends Stance{
 
     public Skill getRequiredSkill(){
         return null;
+    }
+
+    @Override
+    public Attack modifyAttack(Attack in) {
+        return in.setDamageDealt(in.getAttemptedDamage());
     }
 
     public boolean isLearnable(){

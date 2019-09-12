@@ -48,7 +48,7 @@ public class Weapon extends Item {
         double strengthReduction = 0.05 * str;
         double balanceReduction = (50-dex)/100.0*balance*weight;
 
-        return base - strengthReduction - balanceReduction;
+        return (base - strengthReduction - balanceReduction) * 10;
     }
 
     public int rollDamage(int str, int dex, int intel, int wis){

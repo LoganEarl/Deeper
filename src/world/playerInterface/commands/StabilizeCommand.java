@@ -45,8 +45,8 @@ public class StabilizeCommand extends EntityCommand {
         if (usedStamina) {
             int stat = getSourceEntity().getStats().getStat(getRequiredSkill().getAssociatedStat());
             int dex = getSourceEntity().getStats().getDexterity();
-            //5-20 depending on primary stat and dex
-            return (int) Math.ceil(20 - 7.5 * (stat / 100.0) - 7.5 * (dex / 100.0));
+            //50-200 depending on primary stat and dex
+            return 10 * (int) Math.ceil(20 - 7.5 * (stat / 100.0) - 7.5 * (dex / 100.0));
         }
         return 0;
     }

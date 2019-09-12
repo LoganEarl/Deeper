@@ -133,7 +133,8 @@ public class EquipmentContainer implements Entity.SqlExtender {
                 Item curEquip = itemCollection.getItemByID(curEquipID, entity.getDatabaseName());
                 if (curEquip != null)
                     slots.put(sourceSlot, curEquipID);
-            }
+            }else
+                slots.remove(sourceSlot);
             slots.put(slotType, armorPiece.getItemID());
             return true;
         }
@@ -270,7 +271,7 @@ public class EquipmentContainer implements Entity.SqlExtender {
         return null;
     }
 
-    private ArmorSlot getFreeHand() {
+    public ArmorSlot getFreeHand() {
         if (empty(slots.get(rightHand)))
             return rightHand;
         if (empty(slots.get(leftHand)))

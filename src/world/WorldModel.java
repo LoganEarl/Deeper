@@ -8,6 +8,7 @@ import world.entity.EntityCollection;
 import world.entity.pool.EntityRegenCommand;
 import world.item.ItemCollection;
 import world.item.ItemFactory;
+import world.item.armor.Armor;
 import world.item.container.Container;
 import world.item.misc.MiscItem;
 import world.item.weapon.Weapon;
@@ -33,6 +34,7 @@ public class WorldModel {
         itemFactory.addParser(Weapon.factory());
         itemFactory.addParser(MiscItem.factory());
         itemFactory.addParser(Container.factory());
+        itemFactory.addParser(Armor.factory());
 
         diplomacyManager = new DiplomacyManager();
 
@@ -54,7 +56,8 @@ public class WorldModel {
         messagePipeline.loadMessage(ClientTransferEntityMessage.class);
         messagePipeline.loadMessage(ClientLockContainerMessage.class);
         messagePipeline.loadMessage(ClientUnlockContainerMessage.class);
-
+        messagePipeline.loadMessage(ClientEquipMessage.class);
+        messagePipeline.loadMessage(ClientUnequipMessage.class);
         messagePipeline.loadMessage(ClientDropMessage.class);
         messagePipeline.loadMessage(ClientGrabMessage.class);
         messagePipeline.loadMessage(ClientPutMessage.class);
@@ -64,6 +67,7 @@ public class WorldModel {
         messagePipeline.loadMessage(ClientSkillsMessage.class);
         messagePipeline.loadMessage(ClientStabilizeMessage.class);
         messagePipeline.loadMessage(ClientLearnMessage.class);
+
     }
 
     public NotificationService getNotificationService() {

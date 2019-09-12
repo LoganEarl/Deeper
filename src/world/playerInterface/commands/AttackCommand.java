@@ -133,6 +133,7 @@ public class AttackCommand extends EntityCommand {
                     .setAttemptedDamage(damage)
                     .setBaseRoll(roll)
                     .setAggressor(getSourceEntity())
+                    .setAttackWeapon(selectWeapon)
                     .setDefender(target);
 
             attack = target.receiveAttack(attack);

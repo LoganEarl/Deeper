@@ -1,3 +1,4 @@
+- make equip command
 - test armor
 - finish the AttackResult change. This will come in VERY handy later
 - make the PoolContainer recalculate max pools based on stats every now and then

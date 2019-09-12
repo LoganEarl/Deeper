@@ -27,7 +27,7 @@ public class MoveCommand extends EntityCommand {
         if(getSourceEntity() != null && !getSourceEntity().getEquipment().isEncumbered())
             staminaNeeded = 0;
         else
-            staminaNeeded = 1;
+            staminaNeeded = 10;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package world.entity.stance;
 
-import world.entity.Entity;
+import world.entity.Attack;
 import world.entity.skill.Skill;
 
 public class DyingStance extends Stance {
@@ -69,5 +69,10 @@ public class DyingStance extends Stance {
     @Override
     public boolean isLearnable() {
         return false;
+    }
+
+    @Override
+    public Attack modifyAttack(Attack in) {
+        return in.setDamageDealt((int)(in.getAttemptedDamage() * 1.5));
     }
 }

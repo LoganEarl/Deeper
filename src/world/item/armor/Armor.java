@@ -4,6 +4,7 @@ import world.item.DamageType;
 import world.item.Item;
 import world.item.ItemFactory;
 import world.item.ItemType;
+import world.item.container.Container;
 import world.meta.World;
 
 import java.sql.ResultSet;
@@ -91,5 +92,21 @@ public class Armor extends Item {
             System.out.println("Unable to parse armor type:" + rawArmorSlot + " of item " + getItemName());
             return ArmorSlot.chest;
         }
+    }
+
+    private static ItemFactory.ItemParser parser = new ItemFactory.ItemParser() {
+        @Override
+        public ItemType getAssociatedType() {
+            return ItemType.armor;
+        }
+
+        @Override
+        public Item parseFromResultSet(ResultSet fromEntry, ItemFactory sourceFactory, String databaseName) throws Exception {
+            return new Armor(fromEntry, sourceFactory, databaseName);
+        }
+    };
+
+    public static ItemFactory.ItemParser factory() {
+        return parser;
     }
 }
