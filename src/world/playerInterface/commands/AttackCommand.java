@@ -3,6 +3,7 @@ package world.playerInterface.commands;
 import client.Client;
 import client.ClientRegistry;
 import world.WorldModel;
+import world.entity.Attack;
 import world.entity.Entity;
 import world.entity.StatContainer;
 import world.entity.equipment.EquipmentContainer;
@@ -126,12 +127,17 @@ public class AttackCommand extends EntityCommand {
             roll = roll - target.getEquipment().getEquipmentAC();
             roll = roll + bonus;
 
-            int damage = 0;
-            if (roll >= 0) {
-                damage = selectWeapon.rollDamage(stats.getStrength(), stats.getDexterity(), stats.getIntelligence(), stats.getWisdom());
-                target.getPools().damage(damage, getSourceEntity(), roll);
-            }
-            AttackNotification notification = new AttackNotification(getSourceEntity(), target, selectWeapon, roll, damage, registry);
+            int damage = selectWeapon.rollDamage(stats.getStrength(), stats.getDexterity(), stats.getIntelligence(), stats.getWisdom());
+
+            Attack attack = new Attack()
+                    .setAttemptedDamage(damage)
+                    .setBaseRoll(roll)
+                    .setAggressor(getSourceEntity())
+                    .setDefender(target);
+
+            attack = target.receiveAttack(attack);
+
+            AttackNotification notification = new AttackNotification(attack, registry);
             service.notify(notification, new RoomNotificationScope(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName()));
             staminaUsed += staminaNeeded;
         }
@@ -144,50 +150,38 @@ public class AttackCommand extends EntityCommand {
     }
 
     public class AttackNotification extends Notification {
-        private Entity attackEntity;
-        private Entity defenceEntity;
-        private Weapon attackWeapon;
-        private int netRoll;
-        private int damage;
-        private boolean didDodge;
-        private boolean didDeflect;
+        private Attack attack;
 
-        public AttackNotification(Entity attackEntity,
-                                  Entity defenceEntity,
-                                  Weapon attackWeapon,
-                                  int netRoll,
-                                  int damage,
-                                  boolean didDodge,
-                                  boolean didDeflect,
-                                  ClientRegistry registry) {
+        AttackNotification(Attack attack, ClientRegistry registry) {
             super(registry);
-            this.attackEntity = attackEntity;
-            this.defenceEntity = defenceEntity;
-            this.attackWeapon = attackWeapon;
-            this.netRoll = netRoll;
-            this.damage = damage;
-            this.didDeflect = didDeflect;
-            this.didDodge = didDodge;
+            this.attack = attack;
         }
 
         @Override
         public String getAsMessage(NotificationSubscriber viewer) {
             Entity viewerEntity = (Entity) viewer;
 
-            String hitType = didDeflect ? "glancing" : "direct";
+            Entity attackEntity = attack.getAggressor();
+            Entity defenceEntity = attack.getDefender();
+            Weapon attackWeapon = attack.getAttackWeapon();
+            int netRoll = attack.getBaseRoll();
+            int damage = attack.getDamageDealt();
+
+            String hitType = attack.getDidDeflect() ? "glancing" : "direct";
+
 
             if (viewer.getID().equals(attackEntity.getID())) {
                 if (netRoll >= 0)
                     return String.format("You score a %s hit(%d) on " + getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " with your " + getItemColored(attackWeapon) + " for " + getMessageInColor("%d damage", OUTGOING_DAMAGE), hitType, netRoll, damage);
-                else if (didDodge)
+                else if (attack.getDidDodge())
                     return String.format(getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " dodges(%d) your " + getItemColored(attackWeapon), netRoll);
                 else
                     return String.format("You miss(%d) " + getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " with your " + getItemColored(attackWeapon), netRoll);
             } else if (viewer.getID().equals(defenceEntity.getID())) {
                 if (netRoll >= 0)
-                    return String.format(getEntityColored(attackEntity, defenceEntity, getWorldModel()) + " attacks you. You are hit(%d) with a %s blow with %s " + getItemColored(attackWeapon) + " for " + getMessageInColor("%d damage", INCOMING_DAMAGE),netRoll, hitType, attackEntity.getPossessivePronoun(), damage);
-                else if (didDodge)
-                    return String.format(getMessageInColor( " You dodge(%d) " + getEntityColored(attackEntity, defenceEntity, getWorldModel()) + "'s " + getItemColored(attackWeapon), WARNING), netRoll, attackEntity.getPossessivePronoun());
+                    return String.format(getEntityColored(attackEntity, defenceEntity, getWorldModel()) + " attacks you. You are hit(%d) with a %s blow with %s " + getItemColored(attackWeapon) + " for " + getMessageInColor("%d damage", INCOMING_DAMAGE), netRoll, hitType, attackEntity.getPossessivePronoun(), damage);
+                else if (attack.getDidDodge())
+                    return String.format(getMessageInColor(" You dodge(%d) " + getEntityColored(attackEntity, defenceEntity, getWorldModel()) + "'s " + getItemColored(attackWeapon), WARNING), netRoll, attackEntity.getPossessivePronoun());
                 else
                     return String.format(getMessageInColor(getEntityColored(attackEntity, defenceEntity, getWorldModel()) + " misses(%d) you with %s " + getItemColored(attackWeapon), WARNING), netRoll, attackEntity.getPossessivePronoun());
             } else {
@@ -196,24 +190,8 @@ public class AttackCommand extends EntityCommand {
             }
         }
 
-        public Entity getAttackEntity() {
-            return attackEntity;
-        }
-
-        public Entity getDefenceEntity() {
-            return defenceEntity;
-        }
-
-        public Weapon getAttackWeapon() {
-            return attackWeapon;
-        }
-
-        public int getNetRoll() {
-            return netRoll;
-        }
-
-        public int getDamage() {
-            return damage;
+        public Attack getAttack(){
+            return attack;
         }
     }
 }

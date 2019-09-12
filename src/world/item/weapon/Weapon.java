@@ -68,7 +68,17 @@ public class Weapon extends Item {
     public int rollHit(int str, int dex, int intel, int wis){
         int rawRoll = rnd.nextInt(99) + 1;
         rawRoll = modWithPrimaryStat(rawRoll,str,dex,intel,wis);
+
+        if(rawRoll < 0){
+            int simpleBonus = getSimpleBonus();
+            if(rawRoll + simpleBonus > 0)
+                rawRoll = 0;
+            else
+                rawRoll += simpleBonus;
+        }
+
         rawRoll += getHitBonus();
+
         return rawRoll;
     }
 
@@ -129,6 +139,11 @@ public class Weapon extends Item {
     public int getHitBonus() {
         initStats();
         return getCastInt(HIT_BONUS);
+    }
+
+    public int getSimpleBonus() {
+        initStats();
+        return getCastInt(SIMPLE_BONUS);
     }
 
     public DamageType getDamageType() {

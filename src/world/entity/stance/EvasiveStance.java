@@ -1,5 +1,6 @@
 package world.entity.stance;
 
+import world.entity.Attack;
 import world.entity.Entity;
 import world.entity.skill.Skill;
 
@@ -26,24 +27,26 @@ public class EvasiveStance extends Stance {
     }
 
     @Override
-    public int onDamageIncoming(int baseDamage, Entity aggressor, int hitRoll) {
+    public Attack modifyAttack(Attack in) {
         if(hitHistory.size() > 10) hitHistory.clear();
 
         double dodgeCloseness = Math.abs(getRatioIfDodge() - targetEvasivenessPercent);
         double takeCloseness = Math.abs(getRatioIfNoDodge() - targetEvasivenessPercent);
 
         if(dodgeCloseness <= takeCloseness) {
+            hitHistory.add(1);
             int learnLevel = sourceEntity.getSkills().getLearnLevel(getRequiredSkill());
+            int staminaUsed = 10-2*learnLevel;
+            sourceEntity.getPools().expendStamina(staminaUsed);
+
             int associatedStat = sourceEntity.getStats().getStat(getRequiredSkill().getAssociatedStat());
             int roll = sourceEntity.getSkills().performSkillCheck(getRequiredSkill(), 0, associatedStat);
-            if(hitRoll <= roll)
-                return 0;
-            else
-                return baseDamage;
+            if(in.getBaseRoll() <= roll)
+                in.setDamageDealt(0).setDidDodge(true);
         }else{
-
+            hitHistory.add(0);
         }
-        return baseDamage;
+        return in;
     }
 
     private double getRatioIfDodge(){

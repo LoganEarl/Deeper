@@ -1,15 +1,17 @@
 package world.entity.stance;
 
-import world.entity.Entity;
+import world.entity.Attack;
 import world.entity.StatContainer;
-import world.entity.pool.PoolContainer;
 import world.entity.skill.Skill;
 
-public abstract class Stance {
+public abstract class Stance implements Attack.AttackModifier {
     private long lastUpdateTime = 0;
     private double carryoverHP = 0, carryOverMP = 0, carryOverStam = 0, carryOverBurn = 0;
 
-    public abstract PoolContainer.AttackResult onDamageIncoming(int baseDamage, Entity aggressor, int hitRoll, PoolContainer.AttackResult baseAttack);
+    @Override
+    public Attack modifyAttack(Attack in) {
+        return in;
+    }
 
     public abstract int getIPGained(int baseIP);
 

@@ -14,7 +14,6 @@ public class ProgressionContainer implements Entity.SqlExtender {
     private int ip = 0;
 
     private static final String[] HEADERS = new String[]{IP};
-    private Stance stance;
 
     private Entity sourceEntity;
 
@@ -35,7 +34,7 @@ public class ProgressionContainer implements Entity.SqlExtender {
     }
 
     public void addIP(int ip){
-        this.ip += stance.getIPGained(ip);
+        this.ip += ip;
     }
 
     public int getIPCostForNextStat(int newStatVal, int curStatVal, int racialBaseStat){
@@ -62,11 +61,6 @@ public class ProgressionContainer implements Entity.SqlExtender {
     @Override
     public String[] getSqlColumnHeaders() {
         return HEADERS;
-    }
-
-    @Override
-    public void registerStance(Stance toRegister) {
-        this.stance = toRegister;
     }
 
     public static String getIPBrightnessDescriptor(int ipAmount){

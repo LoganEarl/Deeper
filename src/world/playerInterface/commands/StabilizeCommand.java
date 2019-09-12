@@ -5,10 +5,9 @@ import client.ClientRegistry;
 import world.WorldModel;
 import world.entity.Entity;
 import world.entity.skill.Skill;
-import world.entity.stance.StablizedStance;
+import world.entity.stance.StabilizedStance;
 import world.notification.Notification;
 import world.notification.NotificationSubscriber;
-import world.room.RoomNotificationScope;
 
 import java.awt.*;
 
@@ -101,7 +100,7 @@ public class StabilizeCommand extends EntityCommand {
             int result = getSourceEntity().getSkills().performSkillCheck(getRequiredSkill(), difficulty, statLevel);
 
             if (result >= 0)
-                getSourceEntity().setStance(new StablizedStance());
+                getSourceEntity().setStance(new StabilizedStance());
             notifyEntityRoom(new StabilizeNotification(getSourceEntity(), target, result, getWorldModel().getRegistry()));
             usedStamina = true;
         }

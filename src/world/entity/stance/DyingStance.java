@@ -57,11 +57,6 @@ public class DyingStance extends Stance {
     }
 
     @Override
-    public int onDamageIncoming(int baseDamage, Entity aggressor, int hitRoll) {
-        return 0;
-    }
-
-    @Override
     public int getIPGained(int baseIP) {
         return baseIP;
     }

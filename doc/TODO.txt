@@ -1,4 +1,12 @@
-- finish the AttackResult change. This will come in VARY handy later
+- test armor
+- finish the AttackResult change. This will come in VERY handy later
+- make the PoolContainer recalculate max pools based on stats every now and then
+
+- make a command for the evasive stance
+- make a defensive stance
+- make a command for the defensive stance
+
+- test the new hp scale
 
 - add ability to look at entities/items in room
 
@@ -9,14 +17,11 @@
 
 - add ability to buy new stat points
 
+- think about adding DR to armor?
+
 - add an analyze skill to get hp of other entities
 
 -query issues
     - add a tab-to-autocomplete feature. Send a list of nearby (visible) entities and items to the client, which it can reference.
         - make item substitutions client side!! Use full entity/item IDs to avoid issues with spaces in names. Send nearby shit in a JSON chunk
     - add an entity target field so subsequent attacks/queries from an entity yield the same result
-
-- add combat stances that change rates
-    - some stances are unlocked by skills
-    - skills have a trained bonus to rolls, and an untrained detriment to them
-    - learning a skill means that you no longer get a penalty to doing it?

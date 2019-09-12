@@ -1,7 +1,6 @@
 package world.entity.equipment;
 
 import world.entity.Entity;
-import world.entity.stance.BaseStance;
 import world.entity.stance.Stance;
 import world.item.Item;
 import world.item.ItemCollection;
@@ -22,8 +21,6 @@ public class EquipmentContainer implements Entity.SqlExtender {
     public static final String SIGNIFIER = "items";
 
     private Map<ArmorSlot, Integer> slots = new HashMap<>();
-
-    private Stance stance;
 
     private Entity entity;
     private ItemCollection itemCollection;
@@ -317,10 +314,5 @@ public class EquipmentContainer implements Entity.SqlExtender {
     @Override
     public String[] getSqlColumnHeaders() {
         return HEADERS.toArray(new String[0]);
-    }
-
-    @Override
-    public void registerStance(Stance toRegister) {
-        this.stance = toRegister;
     }
 }

@@ -81,9 +81,4 @@ public class SkillContainer implements Entity.SqlExtender {
     public String[] getSqlColumnHeaders() {
         return new String[0];
     }
-
-    @Override
-    public void registerStance(Stance toRegister) {
-
-    }
 }

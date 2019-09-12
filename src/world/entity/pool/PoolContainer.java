@@ -20,8 +20,6 @@ public class PoolContainer implements Entity.SqlExtender {
     private int burnout;
     private int maxBurnout;
 
-    private Stance currentStance;
-
     public static final String SIGNIFIER = "pools";
 
     private static final String[] HEADERS = new String[]{HP, MAX_HP, MP,MAX_MP, STAMINA,MAX_STAMINA,BURNOUT,MAX_BURNOUT};
@@ -57,38 +55,13 @@ public class PoolContainer implements Entity.SqlExtender {
         damage(damage, null, 0);
     }
 
-    public AttackResult damage(int damage, Entity aggressor, int hitRoll){
-        AttackResult attackResult = new AttackResult();
-        if(currentStance != null)
-            attackResult = currentStance.onDamageIncoming(damage, aggressor, hitRoll, attackResult);
-
+    public void damage(int damage, Entity aggressor, int hitRoll){
         this.hp -= damage;
         if(hp <= 0){
             //TODO enter dying state
         }else if(hp< maxHP/-4){
             //TODO enter dead state
         }
-        return attackResult;
-    }
-
-    public static class AttackResult{
-        private int damageDealt = 0;
-        private int baseRoll = 0;
-        private Entity agressor;
-        private Entity defendor;
-        private boolean didDeflect = false;
-        private boolean didDodge = false;
-        private boolean didEnterDyingState = false;
-        private boolean didDie = false;
-
-        public int getDamageDealt() {return damageDealt;}
-        public boolean isDidDeflect() {return didDeflect;}
-        public boolean isDidDodge() {return didDodge;}
-        public boolean isDidEnterDyingState() {return didEnterDyingState;}
-        public boolean isDidDie() {return didDie;}
-        public int getBaseRoll() {return baseRoll;}
-        public Entity getAgressor() {return agressor;}
-        public Entity getDefendor() {return defendor;}
     }
 
     @Override
@@ -106,15 +79,9 @@ public class PoolContainer implements Entity.SqlExtender {
         return HEADERS;
     }
 
-    @Override
-    public void registerStance(Stance toRegister) {
-        this.currentStance = toRegister;
-    }
 
-    public void regenPools(long curTime, StatContainer stats){
-        calculatePoolMaxes(stats);
+    public void regenPools(BaseStance.RegenPacket regenPacket){
         if(!isDead()) {
-            BaseStance.RegenPacket regenPacket = currentStance.receiveNextRegenPacket(stats, curTime);
             hp += regenPacket.getHp();
             mp += regenPacket.getMp();
             stamina += regenPacket.getStamina();
@@ -132,10 +99,10 @@ public class PoolContainer implements Entity.SqlExtender {
 
     /**Recalculates the maximum hp/mp/stamina/burnout values based on the entity's stats*/
     public void calculatePoolMaxes(StatContainer stats){
-        maxHP = stats.getStrength() / 2 + stats.getDexterity() / 2 + (int)(stats.getToughness() * 1.5);
-        maxStamina = stats.getDexterity() / 2 + stats.getStrength() / 2 + (int)(stats.getFitness() * 1.5);
-        maxMP = stats.getIntelligence() * 2 + stats.getWisdom();
-        maxBurnout = stats.getWisdom() * 2 + stats.getIntelligence();
+        maxHP = (stats.getStrength() / 2 + stats.getDexterity() / 2 + (int)(stats.getToughness() * 1.5) * 10);
+        maxStamina = (stats.getDexterity() / 2 + stats.getStrength() / 2 + (int)(stats.getFitness() * 1.5) * 10);
+        maxMP = (stats.getIntelligence() * 2 + stats.getWisdom()) * 10;
+        maxBurnout = (stats.getWisdom() * 2 + stats.getIntelligence()) * 10;
     }
 
     public boolean isDying(){

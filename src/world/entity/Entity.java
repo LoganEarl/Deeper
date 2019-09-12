@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 import static world.entity.EntityTable.*;
 
-public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscriber {
+public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscriber, Attack.AttackReceiver {
     private static Map<String,Entity> entityCache = new HashMap<>();
 
     private String entityID;
@@ -348,14 +348,18 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         }
     }
 
+    @Override
+    public Attack receiveAttack(Attack attack) {
+        attack = currentStance.modifyAttack(attack);
+
+        return attack.complete();
+    }
+
     public void setStance(Stance stance){
         Skill requiredSkill = stance.getRequiredSkill();
         if(requiredSkill == null || getSkills().getLearnLevel(requiredSkill) != SkillContainer.UNLEARNED) {
             if (!stance.equals(currentStance)) {
                 this.currentStance = stance;
-                for (SqlExtender extender : extenders.values()) {
-                    extender.registerStance(currentStance);
-                }
             }
         }
     }
@@ -636,10 +640,9 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         }
     }
 
-    public interface SqlExtender{
+    public interface SqlExtender {
         String getSignifier();
         Object[] getInsertSqlValues();
         String[] getSqlColumnHeaders();
-        void registerStance(Stance toRegister);
     }
 }

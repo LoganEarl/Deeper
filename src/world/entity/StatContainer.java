@@ -17,8 +17,6 @@ public class StatContainer implements Entity.SqlExtender {
     private int toughness;
     private int fitness;
 
-    private Stance currnetStance;
-
     private static final Random RND = new Random(System.currentTimeMillis());
 
     public static final String SIGNIFIER = "stats";
@@ -113,11 +111,6 @@ public class StatContainer implements Entity.SqlExtender {
     @Override
     public String[] getSqlColumnHeaders() {
         return HEADERS;
-    }
-
-    @Override
-    public void registerStance(Stance toRegister) {
-        currnetStance = toRegister;
     }
 
     public int getStrength() {

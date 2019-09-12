@@ -4,7 +4,6 @@ package world.entity.diplomacy;
 import world.diplomacy.Faction;
 import world.entity.Entity;
 import world.entity.EntityTable;
-import world.entity.stance.Stance;
 
 public class DiplomacyContainer implements Entity.SqlExtender {
     public static final String SIGNIFIER = "diplomacy";
@@ -27,10 +26,6 @@ public class DiplomacyContainer implements Entity.SqlExtender {
         return new String[]{EntityTable.FACTION_ID};
     }
 
-    @Override
-    public void registerStance(Stance toRegister) {
-
-    }
 
     public Faction getFaction(){
         return null;

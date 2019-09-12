@@ -1,14 +1,12 @@
 package world.entity.pool;
 
-import client.Client;
 import client.ClientRegistry;
 import network.CommandExecutor;
 import world.entity.Entity;
 import world.entity.stance.DyingStance;
-import world.entity.stance.StablizedStance;
+import world.entity.stance.StabilizedStance;
 import world.entity.stance.Stance;
 import world.notification.NotificationService;
-import world.playerInterface.ColorTheme;
 import world.room.RoomNotificationScope;
 
 public class EntityRegenCommand implements CommandExecutor.Command {
@@ -26,12 +24,13 @@ public class EntityRegenCommand implements CommandExecutor.Command {
         for (Entity loadedEntity : Entity.getAllLoadedEntities()) {
             Stance curStance = loadedEntity.getStance();
             if(loadedEntity.getPools().isDying() &&
-                    !(curStance.equals(new DyingStance()) || curStance.equals(new StablizedStance()))){
+                    !(curStance.equals(new DyingStance()) || curStance.equals(new StabilizedStance()))){
                 loadedEntity.setStance(new DyingStance());
                 service.notify(new DyingNotification(loadedEntity, registry),new RoomNotificationScope(loadedEntity.getRoomName(),loadedEntity.getDatabaseName()));
             }
 
-            loadedEntity.getPools().regenPools(curTime, loadedEntity.getStats());
+            Stance.RegenPacket packet = loadedEntity.getStance().receiveNextRegenPacket(loadedEntity.getStats(),curTime);
+            loadedEntity.getPools().regenPools(packet);
             loadedEntity.updateInDatabase(loadedEntity.getDatabaseName());
         }
     }
