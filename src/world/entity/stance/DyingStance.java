@@ -4,7 +4,7 @@ import world.entity.Attack;
 import world.entity.skill.Skill;
 
 public class DyingStance extends Stance {
-    private static final double LOSS_RATE = -.8;
+    private static final double LOSS_RATE = -5;
 
     @Override
     public double getFlatHpPerSec() {

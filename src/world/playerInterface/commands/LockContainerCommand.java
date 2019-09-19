@@ -113,19 +113,19 @@ public class LockContainerCommand extends EntityCommand {
         }
 
         @Override
-        public String getAsMessage(NotificationSubscriber viewer) {
+        public String getAsMessage(Entity viewer) {
             String message;
             String lock = desiredLockState ? "lock" : "unlock";
-            if (viewer.getID().equals(sourceEntity.getID())) {
+            if (viewer.equals(sourceEntity)) {
                 if (wasSuccessful)
                     message = getMessageInColor("You slide the " + getItemColored(targetKey) + " into the lock and it " + lock + "s with a turn and a click", SUCCESS);
                 else
                     message = getMessageInColor("You cannot seem to fit the " + getItemColored(targetKey) + " into the lock", FAILURE);
             } else {
                 if(wasSuccessful)
-                    message = getEntityColored((Entity)viewer,sourceEntity,getWorldModel()) + " " + lock + "s a " + getItemColored(targetContainer) + " with a " + getItemColored(targetKey);
+                    message = getEntityColored(viewer,sourceEntity,getWorldModel()) + " " + lock + "s a " + getItemColored(targetContainer) + " with a " + getItemColored(targetKey);
                 else
-                    message = getEntityColored((Entity)viewer,sourceEntity,getWorldModel()) + " tries to " + lock + " a " + getItemColored(targetContainer) + " with a " + getItemColored(targetKey);
+                    message = getEntityColored(viewer,sourceEntity,getWorldModel()) + " tries to " + lock + " a " + getItemColored(targetContainer) + " with a " + getItemColored(targetKey);
             }
 
             return message;

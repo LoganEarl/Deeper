@@ -1,6 +1,7 @@
 package world.notification;
 
 import client.ClientRegistry;
+import world.entity.Entity;
 
 public abstract class Notification {
     private ClientRegistry registry;
@@ -13,5 +14,5 @@ public abstract class Notification {
         return registry;
     }
 
-    public abstract String getAsMessage(NotificationSubscriber viewer);
+    public abstract String getAsMessage(Entity viewer);
 }

@@ -157,21 +157,20 @@ public class LearnSkillCommand extends EntityCommand {
         }
 
         @Override
-        public String getAsMessage(NotificationSubscriber viewer) {
-            Entity viewerEntity = (Entity) viewer;
+        public String getAsMessage(Entity viewer) {
             if(!success){
-                if (viewerEntity.equals(learning))
+                if (viewer.equals(learning))
                     return getMessageInColor("With a wrenching tear, the energy escapes your grasp. You fail to learn " + toLearn.getDisplayName() , FAILURE);
                 else {
-                    String skillName = toLearn.isVisibleToEntity(viewerEntity) ? toLearn.getDisplayName() : "an unknown skill";
-                    return getMessageInColor("With a pop and a tear the static around " + getEntityColored(learning, viewerEntity, getWorldModel()) + " dissipates into nothing. " + learning.getPronoun() + " has failed to learn " + skillName, INFORMATIVE);
+                    String skillName = toLearn.isVisibleToEntity(viewer) ? toLearn.getDisplayName() : "an unknown skill";
+                    return getMessageInColor("With a pop and a tear the static around " + getEntityColored(learning, viewer, getWorldModel()) + " dissipates into nothing. " + learning.getPronoun() + " has failed to learn " + skillName, INFORMATIVE);
                 }
             }else if (lastPercentage == 0) {
                 int currentIP = (int) Math.floor(toLearn.getIPCost() * learnPercentage);
-                if (viewerEntity.equals(learning))
+                if (viewer.equals(learning))
                     return getMessageInColor("You gather your information potential around you in a halo of " + ProgressionContainer.getIPBrightnessDescriptor(currentIP) + " static", INFORMATIVE);
                 else
-                    return getEntityColored(learning, viewerEntity, getWorldModel()) + getMessageInColor(" gathers " + learning.getPossessivePronoun() + " information potential around " + learning.getReflexivePronoun() + " in a halo of " + ProgressionContainer.getIPBrightnessDescriptor(currentIP) + " static", INFORMATIVE);
+                    return getEntityColored(learning, viewer, getWorldModel()) + getMessageInColor(" gathers " + learning.getPossessivePronoun() + " information potential around " + learning.getReflexivePronoun() + " in a halo of " + ProgressionContainer.getIPBrightnessDescriptor(currentIP) + " static", INFORMATIVE);
             } else if (learnPercentage < 1) {
                 int lastIP = (int) Math.floor(toLearn.getIPCost() * lastPercentage);
                 String lastDescriptor = ProgressionContainer.getIPBrightnessDescriptor(lastIP);
@@ -182,17 +181,17 @@ public class LearnSkillCommand extends EntityCommand {
                 if (!currentDescriptor.equals(lastDescriptor))
                     action = " " + currentDescriptor;
 
-                if (viewerEntity.equals(learning))
+                if (viewer.equals(learning))
                     return getMessageInColor("The light around you grows" + action, INFORMATIVE);
                 else
-                    return getMessageInColor("The light around " + getEntityColored(learning, viewerEntity, getWorldModel()) + " grows" + action, INFORMATIVE);
+                    return getMessageInColor("The light around " + getEntityColored(learning, viewer, getWorldModel()) + " grows" + action, INFORMATIVE);
             } else {
                 String currentDescriptor = ProgressionContainer.getIPBrightnessDescriptor(toLearn.getIPCost());
-                if (viewerEntity.equals(learning))
+                if (viewer.equals(learning))
                     return getMessageInColor("The energy around you crystallizes around you in a wreath of " + currentDescriptor + " static. As it sinks into your skin you learn " + toLearn.getDisplayName(), SUCCESS);
                 else {
-                    String skillName = toLearn.isVisibleToEntity(viewerEntity) ? toLearn.getDisplayName() : "an unknown skill";
-                    return getMessageInColor("There is an implosion of " + currentDescriptor + " static around " + getEntityColored(learning, viewerEntity, getWorldModel()) + ". " + learning.getPronoun() + " has learned " + skillName, INFORMATIVE);
+                    String skillName = toLearn.isVisibleToEntity(viewer) ? toLearn.getDisplayName() : "an unknown skill";
+                    return getMessageInColor("There is an implosion of " + currentDescriptor + " static around " + getEntityColored(learning, viewer, getWorldModel()) + ". " + learning.getPronoun() + " has learned " + skillName, INFORMATIVE);
                 }
             }
         }

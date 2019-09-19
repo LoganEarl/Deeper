@@ -185,9 +185,9 @@ public class GrabDropCommand extends EntityCommand {
         }
 
         @Override
-        public String getAsMessage(NotificationSubscriber viewer) {
+        public String getAsMessage(Entity viewer) {
             String response;
-            if(viewer.getID().equals(actor.getID())){
+            if(viewer.equals(actor)){
                 if(wasPickedUp)
                     response = getMessageInColor("You take the ", INFORMATIVE) + getItemColored(target);
                 else if(destinationContainer == null)
@@ -196,15 +196,15 @@ public class GrabDropCommand extends EntityCommand {
                     response = getMessageInColor("You put the " + getItemColored(target) + " in the " + getItemColored(destinationContainer),INFORMATIVE);
             }else {
                 if (wasPickedUp) {
-                    response = getEntityColored(actor,(Entity)viewer,getWorldModel()) + getMessageInColor(" takes a ", INFORMATIVE) + getItemColored(target);
+                    response = getEntityColored(actor,viewer,getWorldModel()) + getMessageInColor(" takes a ", INFORMATIVE) + getItemColored(target);
                     if (sourceContainer == null)
                         response += getMessageInColor(" from the ground", INFORMATIVE);
                     else
                         response += getMessageInColor(" from the ", INFORMATIVE) + getItemColored(sourceContainer);
                 } else if (destinationContainer != null){
-                    response = getEntityColored(actor,(Entity)viewer,getWorldModel()) + getMessageInColor(" puts a ", INFORMATIVE) + getItemColored(target) + " in the " + getItemColored(destinationContainer);
+                    response = getEntityColored(actor,viewer,getWorldModel()) + getMessageInColor(" puts a ", INFORMATIVE) + getItemColored(target) + " in the " + getItemColored(destinationContainer);
                 }else {
-                    response = getEntityColored(actor,(Entity)viewer,getWorldModel()) + getMessageInColor( " drops up a ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(), ITEM);
+                    response = getEntityColored(actor,viewer,getWorldModel()) + getMessageInColor( " drops up a ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(), ITEM);
                 }
             }
             return response;

@@ -15,9 +15,9 @@ public class DyingNotification extends Notification {
     }
 
     @Override
-    public String getAsMessage(NotificationSubscriber viewer) {
+    public String getAsMessage(Entity viewer) {
         String response;
-        if (viewer.getID().equals(dyingEntity.getID()) && viewer.getDatabaseName().equals(dyingEntity.getDatabaseName()))
+        if (viewer.equals(dyingEntity) && viewer.getDatabaseName().equals(dyingEntity.getDatabaseName()))
             response = ColorTheme.getMessageInColor( "You are now dying.", ColorTheme.FAILURE) + " Stabilize yourself or seek aid, for you will soon pass on";
 
         else

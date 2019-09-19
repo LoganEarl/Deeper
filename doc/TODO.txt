@@ -1,13 +1,9 @@
-- make equip command
-- test armor
-- finish the AttackResult change. This will come in VERY handy later
-- make the PoolContainer recalculate max pools based on stats every now and then
-
-- make a command for the evasive stance
 - make a defensive stance
 - make a command for the defensive stance
 
 - test the new hp scale
+
+- fix the skill display command to do some sort of breadth first traversal and not display skills more than once
 
 - add ability to look at entities/items in room
 

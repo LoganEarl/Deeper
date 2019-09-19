@@ -4,6 +4,7 @@ import client.Client;
 import client.ClientRegistry;
 import client.commands.DisconnectCommand;
 import network.CommandExecutor;
+import world.entity.Entity;
 
 import java.util.*;
 
@@ -93,7 +94,7 @@ public class NotificationService {
         }
 
         @Override
-        public String getAsMessage(NotificationSubscriber viewer) {
+        public String getAsMessage(Entity viewer) {
             return "You have been inactive for " + TIMEOUT_INTERVAL/1000/60 + " minutes and have been disconnected";
         }
     }

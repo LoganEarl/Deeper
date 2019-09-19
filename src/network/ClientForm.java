@@ -43,6 +43,10 @@ public class ClientForm {
             sessionLog +=convertedText + "<br>";
 
             outputText.setText(sessionLog);
+
+            String curText = outputText.getText();
+            if(curText.length() > 10000)
+                outputText.setText(curText.substring(curText.length() -10000));
         });
     }
 

@@ -138,6 +138,8 @@ public class AttackCommand extends EntityCommand {
 
             attack = target.receiveAttack(attack);
 
+            target.getPools().damage(attack.getDamageDealt());
+
             AttackNotification notification = new AttackNotification(attack, registry);
             service.notify(notification, new RoomNotificationScope(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName()));
             staminaUsed += staminaNeeded;
@@ -159,9 +161,7 @@ public class AttackCommand extends EntityCommand {
         }
 
         @Override
-        public String getAsMessage(NotificationSubscriber viewer) {
-            Entity viewerEntity = (Entity) viewer;
-
+        public String getAsMessage(Entity viewer) {
             Entity attackEntity = attack.getAggressor();
             Entity defenceEntity = attack.getDefender();
             Weapon attackWeapon = attack.getAttackWeapon();
@@ -170,15 +170,14 @@ public class AttackCommand extends EntityCommand {
 
             String hitType = attack.getDidDeflect() ? "glancing" : "direct";
 
-
-            if (viewer.getID().equals(attackEntity.getID())) {
+            if (viewer.equals(attackEntity)) {
                 if (netRoll >= 0)
                     return String.format("You score a %s hit(%d) on " + getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " with your " + getItemColored(attackWeapon) + " for " + getMessageInColor("%d damage", OUTGOING_DAMAGE), hitType, netRoll, damage);
                 else if (attack.getDidDodge())
                     return String.format(getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " dodges(%d) your " + getItemColored(attackWeapon), netRoll);
                 else
                     return String.format("You miss(%d) " + getEntityColored(defenceEntity, attackEntity, getWorldModel()) + " with your " + getItemColored(attackWeapon), netRoll);
-            } else if (viewer.getID().equals(defenceEntity.getID())) {
+            } else if (viewer.equals(defenceEntity)) {
                 if (netRoll >= 0)
                     return String.format(getEntityColored(attackEntity, defenceEntity, getWorldModel()) + " attacks you. You are hit(%d) with a %s blow with %s " + getItemColored(attackWeapon) + " for " + getMessageInColor("%d damage", INCOMING_DAMAGE), netRoll, hitType, attackEntity.getPossessivePronoun(), damage);
                 else if (attack.getDidDodge())
@@ -186,8 +185,8 @@ public class AttackCommand extends EntityCommand {
                 else
                     return String.format(getMessageInColor(getEntityColored(attackEntity, defenceEntity, getWorldModel()) + " misses(%d) you with %s " + getItemColored(attackWeapon), WARNING), netRoll, attackEntity.getPossessivePronoun());
             } else {
-                return getMessageInColor(getEntityColored(attackEntity, viewerEntity, getWorldModel()) + " is attacking " +
-                        getEntityColored(defenceEntity, viewerEntity, getWorldModel()), INFORMATIVE);
+                return getMessageInColor(getEntityColored(attackEntity, viewer, getWorldModel()) + " is attacking " +
+                        getEntityColored(defenceEntity, viewer, getWorldModel()), INFORMATIVE);
             }
         }
 

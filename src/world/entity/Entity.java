@@ -10,7 +10,6 @@ import world.entity.progression.ProgressionContainer;
 import world.entity.race.Race;
 import world.entity.skill.Skill;
 import world.entity.skill.SkillContainer;
-import world.entity.skill.SkillTable;
 import world.entity.stance.BaseStance;
 import world.entity.stance.Stance;
 import world.meta.World;
@@ -26,6 +25,7 @@ import java.util.stream.Stream;
 
 import static world.entity.EntityTable.*;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscriber, Attack.AttackReceiver {
     private static Map<String,Entity> entityCache = new HashMap<>();
 
@@ -147,7 +147,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
     public static Entity getEntityByDisplayName(String displayName, String roomName, WorldModel model, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL = null;
+        PreparedStatement getSQL;
         Entity toReturn;
         if(c == null)
             return null;
@@ -185,7 +185,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             return entityCache.get(tag);
 
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL = null;
+        PreparedStatement getSQL;
         Entity toReturn;
         if(c == null)
             return null;
@@ -453,6 +453,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         return "<!ID!>"+entityID+"<!LOCATION!>" + databaseName;
     }
 
+    @SuppressWarnings({"unused", "UnusedReturnValue"})
     public static class EntityBuilder{
         private String entityID = "";
         private String displayName = "";
@@ -612,7 +613,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
          * @return this builder
          */
         public EntityBuilder setControllerType(String controllerType){
-            if(controllerType != null && controllerType.equals(CONTROLLER_TYPE_PLAYER) || controllerType.equals(CONTROLLER_TYPE_STATIC))
+            if(controllerType != null && (controllerType.equals(CONTROLLER_TYPE_PLAYER) || controllerType.equals(CONTROLLER_TYPE_STATIC)))
                 this.controllerType = controllerType;
             else
                 throw new IllegalArgumentException("Cannot assign a controller type that is not one of the EntityTable.CONTROLLER_TYPE_* constants");
@@ -633,10 +634,25 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if(obj == null)
+            return false;
+        if(obj == this)
+            return true;
+        if(obj instanceof Entity){
+            Entity that = (Entity) obj;
+            return that.getID().equals(this.getID()) && that.getDatabaseName().equals(this.getDatabaseName());
+        }
+        return false;
+    }
+
+    @Override
     public void notify(Notification notification) {
         if(EntityTable.CONTROLLER_TYPE_PLAYER.equals(getControllerType())) {
             Client toNotify = notification.getClientRegistry().getClient(entityID);
-            toNotify.sendMessage(notification.getAsMessage(this));
+            String message = notification.getAsMessage(this);
+            if(message != null && !message.isEmpty())
+                toNotify.sendMessage(message);
         }
     }
 

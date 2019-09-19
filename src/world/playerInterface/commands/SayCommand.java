@@ -54,12 +54,12 @@ public class SayCommand extends EntityCommand {
         }
 
         @Override
-        public String getAsMessage(NotificationSubscriber viewer) {
+        public String getAsMessage(Entity viewer) {
             String message;
-            if(viewer.getID().equals(sourceEntity.getID()))
+            if(viewer.equals(sourceEntity))
                 message = getMessageInColor( "You say " + toSay, INFORMATIVE);
             else
-                message = getEntityColored((Entity)viewer,sourceEntity,getWorldModel()) + getMessageInColor( " says " + toSay, INFORMATIVE);
+                message = getEntityColored(viewer,sourceEntity,getWorldModel()) + getMessageInColor( " says " + toSay, INFORMATIVE);
 
             return message;
         }

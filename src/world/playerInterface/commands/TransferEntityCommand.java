@@ -101,18 +101,18 @@ public class TransferEntityCommand extends EntityCommand {
         }
 
         @Override
-        public String getAsMessage(NotificationSubscriber viewer) {
+        public String getAsMessage(Entity viewer) {
             String message;
-            if (viewer.getID().equals(sourceEntity.getID())) {
+            if (viewer.equals(sourceEntity)) {
                 if (didAppear)
                     message = getMessageInColor("You arrive at your destination", INFORMATIVE);
                 else
                     message = "Harnessing eldritch powers you bore a hole through the fabric of reality. Concentrated energies give way and you feel yourself warped and pulled through the space between.";
             } else {
                 if(didAppear)
-                    message = getMessageInColor("Reality shudders. " + getEntityColored(sourceEntity, (Entity) viewer, getWorldModel()) + " emerges from a place between", INFORMATIVE);
+                    message = getMessageInColor("Reality shudders. " + getEntityColored(sourceEntity,  viewer, getWorldModel()) + " emerges from a place between", INFORMATIVE);
                 else
-                    message = getMessageInColor("Reality shudders. " + getEntityColored(sourceEntity, (Entity) viewer, getWorldModel()) + " disappears into a place between", INFORMATIVE);
+                    message = getMessageInColor("Reality shudders. " + getEntityColored(sourceEntity,  viewer, getWorldModel()) + " disappears into a place between", INFORMATIVE);
             }
 
             return message;

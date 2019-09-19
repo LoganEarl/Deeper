@@ -22,6 +22,51 @@ public enum Skill {
             new StatContainer(0, 0, 0, 38, 0, 0), hiddenUntilSkills,
             stabilize2),
 
+    //Perception========================
+    perception1("Perception",0,250, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 10, 0, 0), visible),
+    perception2("Perception",1,1000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 15, 0, 0), visible,
+            perception1),
+    perception3("Perception",2,2000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 25, 0, 0), hiddenUntilStats,
+            perception2),
+    perception4("Perception",3,4000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 45, 0, 0), hiddenUntilStats,
+            perception3),
+    perception5("Perception",4,8000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 60, 0, 0), hiddenUntilLearnable,
+            perception4),
+    perception6("Perception",5,12000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 100, 0, 0), hiddenUntilLearnable,
+            perception5),
+    perception7("Perception",6,16000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 150, 0, 0), hiddenUntilLearnable,
+            perception6),
+
+    //Obscure Intent====================
+    obscureIntent1("Obscure Intent",0,250,EntityTable.WIS,
+            new StatContainer(0, 0, 0, 10, 0, 0), visible,
+            perception1),
+    obscureIntent2("Obscure Intent",1,1000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 15, 0, 0), visible,
+            obscureIntent1, perception2),
+    obscureIntent3("Obscure Intent",2,2000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 25, 0, 0), hiddenUntilStats,
+            obscureIntent2, perception3),
+    obscureIntent4("Obscure Intent",3,4000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 45, 0, 0), hiddenUntilStats,
+            obscureIntent3, perception4),
+    obscureIntent5("Obscure Intent",4,8000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 60, 0, 0), hiddenUntilLearnable,
+            obscureIntent4, perception5),
+    obscureIntent6("Obscure Intent",5,12000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 100, 0, 0), hiddenUntilLearnable,
+            obscureIntent5, perception6),
+    obscureIntent7("Obscure Intent",6,16000, EntityTable.WIS,
+            new StatContainer(0, 0, 0, 150, 0, 0), hiddenUntilLearnable,
+            obscureIntent6, perception7),
+
     //Recover===========================
     recover1("Recover", 0, 250, EntityTable.TOUGH,
             new StatContainer(0, 0, 0, 0, 14, 10), visible),
@@ -61,7 +106,7 @@ public enum Skill {
             new StatContainer(120, 0, 0, 0, 0, 0), hiddenUntilLearnable,
             deflect3);
 
-    public static final String[] modifiers = {"", "Improved", "Refined", "Masterful", "Perfected"};
+    public static final String[] modifiers = {"", "Improved", "Refined", "Masterful", "Perfected", "Unnatural","Godlike"};
 
     private String savableName;
     private int ipCost;

@@ -5,6 +5,7 @@ import network.CommandExecutor;
 import network.messaging.MessagePipeline;
 import world.diplomacy.DiplomacyManager;
 import world.entity.EntityCollection;
+import world.entity.pool.EntityPoolRecalcCommand;
 import world.entity.pool.EntityRegenCommand;
 import world.item.ItemCollection;
 import world.item.ItemFactory;
@@ -44,6 +45,7 @@ public class WorldModel {
 
     public void startDefaultTasks(){
         executor.scheduleCommand(new EntityRegenCommand(registry, notificationService));
+        executor.scheduleCommand(new EntityPoolRecalcCommand());
     }
 
     public void loadDefaultCommands(MessagePipeline messagePipeline){

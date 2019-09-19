@@ -123,21 +123,19 @@ public class StabilizeCommand extends EntityCommand {
         }
 
         @Override
-        public String getAsMessage(NotificationSubscriber viewer) {
-            Entity viewerEnt = (Entity) viewer;
-
+        public String getAsMessage(Entity viewer) {
             String response;
-            String stabilizerName = getEntityColored(stabilizer, viewerEnt, getWorldModel());
-            String stabilizedName = getEntityColored(stabilized, viewerEnt, getWorldModel());
+            String stabilizerName = getEntityColored(stabilizer, viewer, getWorldModel());
+            String stabilizedName = getEntityColored(stabilized, viewer, getWorldModel());
             String attempt = attemptScore >= 0 ? "succeed" : "fail";
             Color attemptColor = attemptScore >= 0 ? SUCCESS : FAILURE;
 
-            if (viewerEnt.equals(stabilizer)) {
+            if (viewer.equals(stabilizer)) {
                 if (stabilizer == stabilized)
                     response = getMessageInColor("You " + attempt + " in stabilizing yourself", attemptColor);
                 else
                     response = getMessageInColor("You " + attempt + " in stabilizing " + stabilizedName, attemptColor);
-            } else if (viewerEnt.equals(stabilized))
+            } else if (viewer.equals(stabilized))
                 response = getMessageInColor(stabilizerName + " " + attempt + "s in stabilizing you", INFORMATIVE);
             else {
                 if (stabilizer == stabilized)

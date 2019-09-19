@@ -80,14 +80,13 @@ public class EquipCommand extends EntityCommand {
         }
 
         @Override
-        public String getAsMessage(NotificationSubscriber viewer) {
+        public String getAsMessage(Entity viewer) {
             String putsOn = wasPutOn ? "equip" : "remove";
-            Entity viewerEnt = (Entity) viewer;
 
             if (viewer == sourceEntity)
                 return getMessageInColor("You " + putsOn + " the " + getItemColored(armor), SUCCESS);
             else
-                return getMessageInColor(getEntityColored(sourceEntity, viewerEnt, getWorldModel()) + " " + putsOn + "s a " + getItemColored(armor), INFORMATIVE);
+                return getMessageInColor(getEntityColored(sourceEntity, viewer, getWorldModel()) + " " + putsOn + "s a " + getItemColored(armor), INFORMATIVE);
         }
     }
 }

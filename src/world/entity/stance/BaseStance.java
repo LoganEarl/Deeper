@@ -6,12 +6,12 @@ import world.entity.StatContainer;
 import world.entity.skill.Skill;
 
 public class BaseStance extends Stance{
-    private static final double BASE_HP_PER_TOUGH_PER_SEC = 0.02;
-    private static final double BASE_STAM_PER_FIT_PER_SEC = 0.02;
-    private static final double MP_PER_INT_PER_SEC = 0.013;
-    private static final double MP_PER_WIS_PER_SEC = 0.007;
-    private static final double BURN_PER_WIS_PER_SEC = 0.013;
-    private static final double BURN_PER_INT_PER_SEC = 0.007;
+    private static final double BASE_HP_PER_TOUGH_PER_SEC = 0.04;
+    private static final double BASE_STAM_PER_FIT_PER_SEC = 0.04;
+    private static final double MP_PER_INT_PER_SEC = 0.026;
+    private static final double MP_PER_WIS_PER_SEC = 0.014;
+    private static final double BURN_PER_WIS_PER_SEC = 0.026;
+    private static final double BURN_PER_INT_PER_SEC = 0.014;
 
     public int onDamageIncoming(int baseDamage, Entity aggressor, int hitRoll){
         return baseDamage;
