@@ -19,6 +19,6 @@
 - add an analyze skill to get hp of other entities
 
 -query issues
-    - add a tab-to-autocomplete feature. Send a list of nearby (visible) entities and items to the client, which it can reference.
-        - make item substitutions client side!! Use full entity/item IDs to avoid issues with spaces in names. Send nearby shit in a JSON chunk
+    - add a tab-to-autocomplete feature. Send a list of nearby (visible) entities and items to the main.java.client, which it can reference.
+        - make item substitutions main.java.client side!! Use full entity/item IDs to avoid issues with spaces in names. Send nearby shit in a JSON chunk
     - add an entity target field so subsequent attacks/queries from an entity yield the same result

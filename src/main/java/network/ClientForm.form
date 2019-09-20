@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="main.java.network.ClientForm">
+  <grid id="27dc6" binding="clientView" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties>
+      <background color="-16777216"/>
+      <preferredSize width="800" height="600"/>
+    </properties>
+    <border type="none"/>
+    <children>
+      <scrollpane id="de124">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="5" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <autoscrolls value="true"/>
+          <opaque value="false"/>
+          <verticalScrollBarPolicy value="20"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="7fb7f" class="javax.swing.JTextPane" binding="outputText">
+            <constraints/>
+            <properties>
+              <background color="-16777216"/>
+              <caretColor color="-1"/>
+              <contentType value="text/html"/>
+              <disabledTextColor color="-3217409"/>
+              <editable value="false"/>
+              <enabled value="true"/>
+              <font name="DialogInput" size="18"/>
+              <foreground color="-1"/>
+              <opaque value="true"/>
+              <requestFocusEnabled value="false"/>
+              <selectedTextColor color="-1"/>
+              <selectionColor color="-9592065"/>
+              <text value="&lt;html&gt;&#10;  &lt;head&gt;&#10;    &#10;  &lt;/head&gt;&#10;  &lt;body&gt;&#10;    Just waiting on you&#10;  &lt;/body&gt;&#10;&lt;/html&gt;&#10;"/>
+            </properties>
+          </component>
+        </children>
+      </scrollpane>
+      <component id="f804d" class="javax.swing.JTextField" binding="inputText">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="150" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-16777216"/>
+          <font name="DialogInput" size="18"/>
+          <foreground color="-2824472"/>
+          <opaque value="true"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>
