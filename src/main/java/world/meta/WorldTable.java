@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class WorldTable implements DatabaseManager.DatabaseTable {
-    public static final String TABLE_NAME = "main/java/world";
+    public static final String TABLE_NAME = "world";
 
     public static final String WORLD_ID = "worldID";
     public static final String WORLD_NAME = "worldName";

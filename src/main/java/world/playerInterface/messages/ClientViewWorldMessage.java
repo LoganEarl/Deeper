@@ -29,7 +29,7 @@ public class ClientViewWorldMessage extends ClientMessage {
         if (args.length == 1 && args[0].equals("worlds")) {
             return true;
         }
-        if (args.length == 2 && args[0].equals("main/java/world") && !args[1].isEmpty()) {
+        if (args.length == 2 && args[0].equals("world") && !args[1].isEmpty()) {
             viewArg = args[1];
             return true;
         }
