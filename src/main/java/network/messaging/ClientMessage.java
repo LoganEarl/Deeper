@@ -1,7 +1,6 @@
 package main.java.network.messaging;
 
 import main.java.client.Client;
-import com.sun.istack.internal.Nullable;
 import main.java.network.CommandExecutor;
 import main.java.world.WorldModel;
 
@@ -13,10 +12,10 @@ public abstract class ClientMessage {
     private MessagePipeline messagePipeline;
     private WorldModel worldModel;
 
-    public ClientMessage(@Nullable String messageSignifier,
-                            @Nullable Client sourceClient,
-                            @Nullable MessagePipeline messagePipeline,
-                            @Nullable WorldModel worldModel){
+    public ClientMessage(String messageSignifier,
+                            Client sourceClient,
+                            MessagePipeline messagePipeline,
+                            WorldModel worldModel){
         this.signifier = messageSignifier;
         this.sourceClient = sourceClient;
         this.messagePipeline = messagePipeline;

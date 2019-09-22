@@ -69,6 +69,7 @@ public class WorldModel {
         messagePipeline.loadMessage(ClientSkillsMessage.class);
         messagePipeline.loadMessage(ClientStabilizeMessage.class);
         messagePipeline.loadMessage(ClientLearnMessage.class);
+        messagePipeline.loadMessage(ClientEvadeMessage.class);
 
     }
 

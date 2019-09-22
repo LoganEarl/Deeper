@@ -67,7 +67,7 @@ public class EvasiveStance extends Stance {
     }
 
     private double getRatioIfDodge() {
-        return sum(hitHistory, 0) / (hitHistory.size() + 1.0);
+        return sum(hitHistory, 1) / (hitHistory.size() + 1.0);
     }
 
     private int sum(List<Integer> ints, int addition) {
@@ -86,7 +86,7 @@ public class EvasiveStance extends Stance {
     }
 
     private double getRatioIfNoDodge() {
-        return sum(hitHistory, 1) / (hitHistory.size() + 1.0);
+        return sum(hitHistory, 0) / (hitHistory.size() + 1.0);
     }
 
     @Override

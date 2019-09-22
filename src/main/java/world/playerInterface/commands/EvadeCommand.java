@@ -5,6 +5,7 @@ import main.java.client.ClientRegistry;
 import main.java.world.WorldModel;
 import main.java.world.entity.Entity;
 import main.java.world.entity.skill.Skill;
+import main.java.world.entity.stance.BaseStance;
 import main.java.world.entity.stance.EvasiveStance;
 import main.java.world.notification.Notification;
 
@@ -43,12 +44,13 @@ public class EvadeCommand extends EntityCommand {
             int evasion = Integer.parseInt(rawEvasion);
 
             if (evasion == 0) {
-                //go to base stance
+                notifyEntityRoom(new EvasionNotification(getSourceEntity(),evasion,getWorldModel().getRegistry()));
+                getSourceEntity().setStance(new BaseStance());
             } else if (evasion > 10) {
-                //tell them to fuck off
+                getSourceClient().sendMessage(getMessageInColor(rawEvasion + " is not an evasion level", FAILURE));
             } else {
                 getSourceEntity().setStance(new EvasiveStance(getSourceEntity(), evasion));
-                //TODO notification
+                notifyEntityRoom(new EvasionNotification(getSourceEntity(),evasion,getWorldModel().getRegistry()));
             }
         } catch (NumberFormatException e) {
             getSourceClient().sendMessage(getMessageInColor(rawEvasion + " is not an evasion level", FAILURE));

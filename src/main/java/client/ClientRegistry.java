@@ -25,7 +25,7 @@ public class ClientRegistry {
      *
      * @param commandExecutor     executor used to send message commands
      * @param localServer         the server the clients are connected too
-     * @param accountDatabaseName the name of the main.java.database file containing account info
+     * @param accountDatabaseName the name of the database file containing account info
      */
     public ClientRegistry(CommandExecutor commandExecutor, WebServer localServer, String accountDatabaseName) {
         this.commandExecutor = commandExecutor;
@@ -124,7 +124,7 @@ public class ClientRegistry {
     }
 
     /**
-     * get the name of the main.java.database file containing account info
+     * get the name of the database file containing account info
      *
      * @return the name of the file with account info
      */

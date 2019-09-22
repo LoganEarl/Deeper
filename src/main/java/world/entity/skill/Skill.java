@@ -1,6 +1,5 @@
 package main.java.world.entity.skill;
 
-import com.sun.istack.internal.Nullable;
 import main.java.world.entity.Entity;
 import main.java.world.entity.EntityTable;
 import main.java.world.entity.StatContainer;
@@ -118,7 +117,7 @@ public enum Skill {
 
     private String associatedStat;
 
-    Skill(String savableName, int elevationLevel, int ipCost, String associatedStat, @Nullable StatContainer requiredStats, VisibilityType visibilityType, Skill... requiredSkills) {
+    Skill(String savableName, int elevationLevel, int ipCost, String associatedStat, StatContainer requiredStats, VisibilityType visibilityType, Skill... requiredSkills) {
         this.elevationLevel = elevationLevel;
         this.savableName = savableName;
         this.ipCost = ipCost;
