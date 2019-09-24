@@ -4,7 +4,7 @@ import main.java.client.Client;
 import main.java.client.ClientRegistry;
 import main.java.world.WorldModel;
 import main.java.world.entity.Entity;
-import main.java.world.notification.Notification;
+import main.java.world.notification.ConcreteNotification;
 
 import static main.java.world.playerInterface.ColorTheme.*;
 
@@ -41,7 +41,7 @@ public class SayCommand extends EntityCommand {
         return complete;
     }
 
-    public class SpeechNotification extends Notification{
+    public class SpeechNotification extends ConcreteNotification {
         private Entity sourceEntity;
         private String toSay;
 

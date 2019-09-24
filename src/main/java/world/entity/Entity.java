@@ -13,6 +13,7 @@ import main.java.world.entity.skill.SkillContainer;
 import main.java.world.entity.stance.BaseStance;
 import main.java.world.entity.stance.Stance;
 import main.java.world.meta.World;
+import main.java.world.notification.ConcreteNotification;
 import main.java.world.notification.Notification;
 import main.java.world.notification.NotificationSubscriber;
 import main.java.world.room.Room;

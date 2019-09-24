@@ -8,7 +8,7 @@ import main.java.world.WorldModel;
 import main.java.world.WorldUtils;
 import main.java.world.entity.Entity;
 import main.java.world.meta.World;
-import main.java.world.notification.Notification;
+import main.java.world.notification.ConcreteNotification;
 import main.java.world.notification.NotificationScope;
 import main.java.world.room.RoomNotificationScope;
 
@@ -88,7 +88,7 @@ public class TransferEntityCommand extends EntityCommand {
         return true;
     }
 
-    public class TransferEntityNotification extends Notification {
+    public class TransferEntityNotification extends ConcreteNotification {
         private Entity sourceEntity;
         private boolean didAppear;
 

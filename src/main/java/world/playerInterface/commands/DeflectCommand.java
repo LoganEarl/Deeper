@@ -8,21 +8,21 @@ import main.java.world.entity.skill.Skill;
 import main.java.world.entity.stance.BaseStance;
 import main.java.world.entity.stance.EvasiveStance;
 import main.java.world.entity.stance.Stance;
-import main.java.world.notification.ConcreteNotification;
 import main.java.world.notification.HiddenCheckNotification;
 
 import java.util.Locale;
 
 import static main.java.world.playerInterface.ColorTheme.*;
+import static main.java.world.playerInterface.ColorTheme.INFORMATIVE;
 
-public class EvadeCommand extends EntityCommand {
+public class DeflectCommand extends EntityCommand {
     private boolean complete = false;
-    private String rawEvasion;
+    private String rawDeflection;
 
-    public EvadeCommand(String rawEvasion, Client sourceClient, WorldModel model) {
+    public DeflectCommand(String rawDeflection, Client sourceClient, WorldModel model) {
         super(sourceClient, model);
 
-        this.rawEvasion = rawEvasion;
+        this.rawDeflection = rawDeflection;
     }
 
     @Override
@@ -37,37 +37,37 @@ public class EvadeCommand extends EntityCommand {
 
     @Override
     protected Skill getRequiredSkill() {
-        return Skill.dodge1;
+        return Skill.deflect1;
     }
 
     @Override
     protected void executeEntityCommand() {
         try {
-            int evasion = Integer.parseInt(rawEvasion);
+            int evasion = Integer.parseInt(rawDeflection);
 
             if (evasion == 0) {
-                notifyEntityRoom(new EvasionNotification(getSourceEntity(),evasion,getWorldModel().getRegistry()));
+                notifyEntityRoom(new DeflectionNotification(getSourceEntity(),evasion,getWorldModel().getRegistry()));
                 getSourceEntity().setStance(new BaseStance());
             } else if (evasion > 10) {
-                getSourceClient().sendMessage(getMessageInColor(rawEvasion + " is not an evasion level", FAILURE));
+                getSourceClient().sendMessage(getMessageInColor(rawDeflection + " is not an deflection level", FAILURE));
             } else {
                 getSourceEntity().setStance(new EvasiveStance(getSourceEntity(), evasion));
-                notifyEntityRoom(new EvasionNotification(getSourceEntity(),evasion,getWorldModel().getRegistry()));
+                notifyEntityRoom(new DeflectionNotification(getSourceEntity(),evasion,getWorldModel().getRegistry()));
             }
         } catch (NumberFormatException e) {
-            getSourceClient().sendMessage(getMessageInColor(rawEvasion + " is not an evasion level", FAILURE));
+            getSourceClient().sendMessage(getMessageInColor(rawDeflection + " is not an deflection level", FAILURE));
         }
         complete = true;
     }
 
-    public class EvasionNotification extends HiddenCheckNotification {
-        private int evasion;
+    public class DeflectionNotification extends HiddenCheckNotification {
+        private int deflection;
         private Entity sourceEntity;
 
-        public EvasionNotification(Entity sourceEntity, int evasion, ClientRegistry registry) {
+        public DeflectionNotification(Entity sourceEntity, int deflection, ClientRegistry registry) {
             super(10,Skill.perception1,0,Skill.obscureIntent1,sourceEntity,registry);
 
-            this.evasion = evasion;
+            this.deflection = deflection;
             this.sourceEntity = sourceEntity;
         }
 
@@ -75,22 +75,22 @@ public class EvadeCommand extends EntityCommand {
         public String getAsMessage(int relativeSuccess, Entity viewer) {
             String result;
             if (sourceEntity.equals(viewer)) {
-                if (evasion == 0)
-                    result = getMessageInColor("You relax out of your evasive stance", INFORMATIVE);
+                if (deflection == 0)
+                    result = getMessageInColor("You relax out of your deflective stance", INFORMATIVE);
                 else
-                    result = getMessageInColor("You rise onto the balls of your feet", INFORMATIVE);
+                    result = getMessageInColor("You plant your feet and square your shoulders", INFORMATIVE);
             } else {
                 if (relativeSuccess < 0)
                     result = "";
-                else if (evasion == 0)
+                else if (deflection == 0)
                     result = getMessageInColor("\n" + getEntityColored(sourceEntity,viewer,getWorldModel()) + " relaxes out of any stance",INFORMATIVE);
                 else if (relativeSuccess >= 20)
-                    result = getMessageInColor(String.format(Locale.US, "%s seems %s(%d) evasive",
+                    result = getMessageInColor(String.format(Locale.US, "%s seems %s(%d) defencive",
                             getEntityColored(sourceEntity, viewer, getWorldModel()),
-                            Stance.getDegreeDescriptor(evasion),
-                            evasion), INFORMATIVE);
+                            Stance.getDegreeDescriptor(deflection),
+                            deflection), INFORMATIVE);
                 else
-                    result = getMessageInColor(String.format(Locale.US, "\n%s seems to want to evade",
+                    result = getMessageInColor(String.format(Locale.US, "\n%s seems to want to defend",
                             getEntityColored(sourceEntity, viewer, getWorldModel())), INFORMATIVE);
             }
 

@@ -9,6 +9,7 @@ import main.java.world.item.Item;
 import main.java.world.item.ItemType;
 import main.java.world.item.armor.ArmorSlot;
 import main.java.world.item.container.Container;
+import main.java.world.notification.ConcreteNotification;
 import main.java.world.notification.Notification;
 import main.java.world.notification.NotificationScope;
 import main.java.world.room.RoomNotificationScope;
@@ -165,7 +166,7 @@ public class GrabDropCommand extends EntityCommand {
         }
     }
 
-    public class ItemAcquiredNotification extends Notification{
+    public class ItemAcquiredNotification extends ConcreteNotification {
         private Entity actor;
         private Item target;
         private Item sourceContainer;

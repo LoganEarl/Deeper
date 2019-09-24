@@ -1,6 +1,7 @@
 package main.java.world.entity.stance;
 
 import main.java.world.entity.Attack;
+import main.java.world.entity.Entity;
 import main.java.world.entity.skill.Skill;
 
 public class DefensiveStance extends Stance{
@@ -11,11 +12,25 @@ public class DefensiveStance extends Stance{
     private static final double BURN_PER_WIS_PER_SEC = 0.026;
     private static final double BURN_PER_INT_PER_SEC = 0.014;
 
+    private int degree;
+    private Entity sourceEntity;
+
+    public DefensiveStance(int degree, Entity sourceEntity){
+        this.degree = degree;
+        this.sourceEntity = sourceEntity;
+    }
+
     @Override
     public Attack modifyAttack(Attack in) {
+        int learnLevel = sourceEntity.getSkills().getLearnLevel(Skill.deflect1);
 
-
-
+        int damageReduction = (int)(degree/10.0 * in.getAttemptedDamage());
+        int staminaUsed = (int)(damageReduction * learnLevel/10.0);
+        if(sourceEntity.getPools().getStamina() >= staminaUsed){
+            in.setDamageDealt(in.getAttemptedDamage() - damageReduction);
+            sourceEntity.getPools().expendStamina(staminaUsed);
+            in.setDidDeflect(true);
+        }
         return in;
     }
 

@@ -7,7 +7,7 @@ import main.java.world.entity.Entity;
 import main.java.world.item.Item;
 import main.java.world.item.ItemType;
 import main.java.world.item.armor.Armor;
-import main.java.world.notification.Notification;
+import main.java.world.notification.ConcreteNotification;
 
 import static main.java.world.playerInterface.ColorTheme.*;
 
@@ -66,7 +66,7 @@ public class EquipCommand extends EntityCommand {
         }
         complete = true;
     }
-    class EquipNotification extends Notification {
+    class EquipNotification extends ConcreteNotification {
         private Armor armor;
         private boolean wasPutOn;
         private Entity sourceEntity;

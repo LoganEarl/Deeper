@@ -8,7 +8,7 @@ import main.java.world.WorldModel;
 import main.java.world.entity.Entity;
 import main.java.world.entity.progression.ProgressionContainer;
 import main.java.world.entity.skill.Skill;
-import main.java.world.notification.Notification;
+import main.java.world.notification.ConcreteNotification;
 
 import static main.java.world.playerInterface.ColorTheme.*;
 
@@ -139,7 +139,7 @@ public class LearnSkillCommand extends EntityCommand {
         }
     }
 
-    public class LearningNotification extends Notification {
+    public class LearningNotification extends ConcreteNotification {
         private Skill toLearn;
         private Entity learning;
         private double learnPercentage;

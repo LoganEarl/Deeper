@@ -15,20 +15,6 @@ public class EvasiveStance extends Stance {
     private static final double BURN_PER_WIS_PER_SEC = 0.026;
     private static final double BURN_PER_INT_PER_SEC = 0.014;
 
-    private static final String[] evasionDescriptors = {
-            "not evasive",          //0
-            "minorly evasive",      //1
-            "slightly evasive",     //2
-            "a little evasive",     //3
-            "kind of evasive",      //4
-            "evasive",              //5
-            "fairly evasive",       //6
-            "pretty evasive",       //7
-            "very evasive",         //8
-            "majorly evasive",        //9
-            "completely evasive"    //10
-    };
-
     private Entity sourceEntity;
     //1 to 10, being the number of attacks per 10 attacks that will result in a dodge attempt
     private double targetEvasivenessPercent;
@@ -51,14 +37,16 @@ public class EvasiveStance extends Stance {
             hitHistory.add(1);
             int learnLevel = sourceEntity.getSkills().getLearnLevel(getRequiredSkill());
             int staminaUsed = 10 - 2 * learnLevel;
-            sourceEntity.getPools().expendStamina(staminaUsed);
+            if(sourceEntity.getPools().getStamina() >= staminaUsed) {
+                sourceEntity.getPools().expendStamina(staminaUsed);
 
-            int associatedStat = sourceEntity.getStats().getStat(getRequiredSkill().getAssociatedStat());
-            int roll = sourceEntity.getSkills().performSkillCheck(getRequiredSkill(), 0, associatedStat);
-            if (in.getBaseRoll() <= roll)
-                in.setDamageDealt(0).setDidDodge(true);
-            else
-                in.setDamageDealt(in.getAttemptedDamage());
+                int associatedStat = sourceEntity.getStats().getStat(getRequiredSkill().getAssociatedStat());
+                int roll = sourceEntity.getSkills().performSkillCheck(getRequiredSkill(), 0, associatedStat);
+                if (in.getBaseRoll() <= roll)
+                    in.setDamageDealt(0).setDidDodge(true);
+                else
+                    in.setDamageDealt(in.getAttemptedDamage());
+            }
         } else {
             hitHistory.add(0);
             in.setDamageDealt(in.getAttemptedDamage());
@@ -75,14 +63,6 @@ public class EvasiveStance extends Stance {
         for (int i : ints)
             total += i;
         return total;
-    }
-
-    public static final String getEvasionDescriptor(int level) {
-        if(level < 0)
-            return evasionDescriptors[0];
-        if(level > 10)
-            return evasionDescriptors[10];
-        return evasionDescriptors[level];
     }
 
     private double getRatioIfNoDodge() {

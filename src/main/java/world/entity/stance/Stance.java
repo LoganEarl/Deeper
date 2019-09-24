@@ -99,4 +99,26 @@ public abstract class Stance implements Attack.AttackModifier {
             return burnout;
         }
     }
+
+    private static final String[] degreeDescriptors = {
+            "not",          //0
+            "minorly",      //1
+            "slightly",     //2
+            "a little",     //3
+            "kind of",      //4
+            "",             //5
+            "fairly",       //6
+            "pretty",       //7
+            "very",         //8
+            "majorly",      //9
+            "completely"    //10
+    };
+
+    public static final String getDegreeDescriptor(int degree) {
+        if(degree < 0)
+            return degreeDescriptors[0];
+        if(degree > 10)
+            return degreeDescriptors[10];
+        return degreeDescriptors[degree];
+    }
 }

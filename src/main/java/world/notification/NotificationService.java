@@ -88,7 +88,7 @@ public class NotificationService {
         executor.scheduleCommand(new TimeoutCheckerCommand(this));
     }
 
-    public class TimeoutNotification extends Notification{
+    public class TimeoutNotification extends ConcreteNotification {
         public TimeoutNotification(ClientRegistry registry) {
             super(registry);
         }

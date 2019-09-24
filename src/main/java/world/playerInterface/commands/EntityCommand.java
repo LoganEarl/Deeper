@@ -7,6 +7,7 @@ import main.java.world.WorldUtils;
 import main.java.world.entity.Entity;
 import main.java.world.entity.skill.Skill;
 import main.java.world.entity.skill.SkillContainer;
+import main.java.world.notification.ConcreteNotification;
 import main.java.world.notification.Notification;
 import main.java.world.room.RoomNotificationScope;
 

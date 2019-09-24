@@ -4,7 +4,7 @@ import main.java.client.Client;
 import main.java.client.ClientRegistry;
 import main.java.world.WorldModel;
 import main.java.world.entity.Entity;
-import main.java.world.notification.Notification;
+import main.java.world.notification.ConcreteNotification;
 import main.java.world.room.Room;
 
 import java.util.Arrays;
@@ -72,7 +72,7 @@ public class MoveCommand extends EntityCommand {
         return complete;
     }
 
-    public class TransferRoomNotification extends Notification{
+    public class TransferRoomNotification extends ConcreteNotification {
         private Entity sourceEntity;
         private String direction;
         private boolean didEnter;

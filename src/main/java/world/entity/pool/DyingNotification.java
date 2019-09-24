@@ -2,10 +2,10 @@ package main.java.world.entity.pool;
 
 import main.java.client.ClientRegistry;
 import main.java.world.entity.Entity;
-import main.java.world.notification.Notification;
+import main.java.world.notification.ConcreteNotification;
 import main.java.world.playerInterface.ColorTheme;
 
-public class DyingNotification extends Notification {
+public class DyingNotification extends ConcreteNotification {
     private Entity dyingEntity;
 
     public DyingNotification(Entity dyingEntity, ClientRegistry registry) {

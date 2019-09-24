@@ -11,7 +11,7 @@ import main.java.world.item.Item;
 import main.java.world.item.ItemType;
 import main.java.world.item.armor.ArmorSlot;
 import main.java.world.item.weapon.Weapon;
-import main.java.world.notification.Notification;
+import main.java.world.notification.ConcreteNotification;
 import main.java.world.notification.NotificationService;
 import main.java.world.room.RoomNotificationScope;
 
@@ -151,7 +151,7 @@ public class AttackCommand extends EntityCommand {
             getSourceEntity().setBalanceTime(cooldownMs, getSourceClient());
     }
 
-    public class AttackNotification extends Notification {
+    public class AttackNotification extends ConcreteNotification {
         private Attack attack;
 
         AttackNotification(Attack attack, ClientRegistry registry) {

@@ -6,7 +6,7 @@ import main.java.world.WorldModel;
 import main.java.world.entity.Entity;
 import main.java.world.entity.skill.Skill;
 import main.java.world.entity.stance.StabilizedStance;
-import main.java.world.notification.Notification;
+import main.java.world.notification.ConcreteNotification;
 
 import java.awt.*;
 
@@ -107,7 +107,7 @@ public class StabilizeCommand extends EntityCommand {
         complete = true;
     }
 
-    public class StabilizeNotification extends Notification {
+    public class StabilizeNotification extends ConcreteNotification {
         private Entity stabilizer;
         private Entity stabilized;
 

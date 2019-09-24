@@ -7,6 +7,7 @@ import main.java.world.entity.Entity;
 import main.java.world.item.Item;
 import main.java.world.item.ItemType;
 import main.java.world.item.container.Container;
+import main.java.world.notification.ConcreteNotification;
 import main.java.world.notification.Notification;
 import main.java.world.notification.NotificationScope;
 import main.java.world.room.RoomNotificationScope;
@@ -94,7 +95,7 @@ public class LockContainerCommand extends EntityCommand {
         }
     }
 
-    public class ContainerLockedNotification extends Notification {
+    public class ContainerLockedNotification extends ConcreteNotification {
         private Entity sourceEntity;
         private Container targetContainer;
         private Item targetKey;
