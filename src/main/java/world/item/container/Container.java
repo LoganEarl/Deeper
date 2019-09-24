@@ -94,6 +94,7 @@ public class Container extends Item {
      * @param i the item to check against the storage constraints
      * @return true if the item fits in the container
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canHoldItem(Item i) {
         double totalKgs = 0, totalLiters = 0;
         List<Item> heldItems = getStoredItems();

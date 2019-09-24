@@ -6,6 +6,7 @@ public class ServerTester {
         SimulationManager simManager = new SimulationManager(5555, executor);
         simManager.init();
 
+        //noinspection InfiniteLoopStatement
         while(true){
             executor.step();
             try{

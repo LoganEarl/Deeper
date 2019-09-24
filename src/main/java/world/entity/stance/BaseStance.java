@@ -66,7 +66,9 @@ public class BaseStance extends Stance{
 
     @Override
     public Attack modifyAttack(Attack in) {
-        return in.setDamageDealt(in.getAttemptedDamage());
+        if(in.getBaseRoll() >= 0)
+            in.setDamageDealt(in.getAttemptedDamage());
+        return in;
     }
 
     public boolean isLearnable(){

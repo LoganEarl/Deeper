@@ -37,7 +37,7 @@ public class DatabaseManager {
            if (conn != null) {
                DatabaseMetaData meta = conn.getMetaData();
                System.out.println("The driver name is " + meta.getDriverName());
-               System.out.println("A new main.java.database has been created.");
+               System.out.println("A new database has been created.");
            }
        }catch (SQLException e){
            e.printStackTrace();
@@ -53,6 +53,12 @@ public class DatabaseManager {
     }
 
     public static Connection getDatabaseConnection(String fileName) {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         String url = "jdbc:sqlite:" + DATA_DIRECTORY + fileName;
 
         if(databaseConnections.containsKey(url)) {
@@ -73,6 +79,7 @@ public class DatabaseManager {
                 databaseConnections.put(url,c);
             return c;
         } catch (SQLException e) {
+            e.printStackTrace();
             return null;
         }
     }

@@ -1,5 +1,6 @@
 package main.java.world.entity;
 
+import main.java.world.item.DamageType;
 import main.java.world.item.weapon.Weapon;
 
 public class Attack {
@@ -13,6 +14,7 @@ public class Attack {
 
     private int attemptedDamage = 0;
     private int damageDealt = 0;
+    private DamageType damageType = DamageType.crush;
     private Weapon attackWeapon = null;
     private int baseRoll = 0;
     private Entity aggressor;
@@ -79,6 +81,16 @@ public class Attack {
 
     public Entity getDefender() {
         return defender;
+    }
+
+    public DamageType getDamageType(){
+        return damageType;
+    }
+
+    public Attack setDamageType(DamageType type){
+        if(!isLocked)
+            this.damageType = type;
+        return this;
     }
 
     public Attack setDamageDealt(int damageDealt) {

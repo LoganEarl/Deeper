@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: main.java.network.ServerForm
+Class-Path: sql/mysql-connector-java-5.1.48.jar sql/sqlite-jdbc-3.28.0.jar
+

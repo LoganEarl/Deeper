@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Contains the main.java.database schema for the table that holds the story arcs.
+ * Contains the database schema for the table that holds the story arcs.
  * @author Logan Earl
  */
 public class StoryArcTable implements DatabaseManager.DatabaseTable {

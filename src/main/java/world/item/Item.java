@@ -69,7 +69,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     /**
      * constructor for a new item. !Automatically persists itself! to avoid the possibility of more than one item with the same id
      * @param itemName the name of the item, used to get the item's stats
-     * @param databaseName the name of the main.java.database containing the item's stats. item is stored in that main.java.database
+     * @param databaseName the name of the database containing the item's stats. item is stored in that database
      */
     public Item(String itemName, ItemFactory factory, String databaseName){
         this(itemName, "",factory, databaseName);
@@ -79,7 +79,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
      * constructor for a new item. !Automatically persists itself! to avoid the possibility of more than one item with the same id
      * @param itemName the name of the item, used to get the item's stats
      * @param displayName the custom displayed name for the item
-     * @param databaseName the name of the main.java.database containing the item's stats. item is stored in that main.java.database
+     * @param databaseName the name of the database containing the item's stats. item is stored in that database
      */
     protected Item(String itemName, String displayName, ItemFactory factory, String databaseName){
         int id = Long.valueOf(System.currentTimeMillis()).hashCode();
@@ -91,7 +91,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
             this.displayName = "";
         this.itemStats = ItemStatTable.getStatsForItem(itemName,databaseName);
         if(itemStats == null)
-            throw new IllegalArgumentException("No stats exists for item name (" + itemName + ") in main.java.database (" + databaseName + ")");
+            throw new IllegalArgumentException("No stats exists for item name (" + itemName + ") in database (" + databaseName + ")");
         saveToDatabase(databaseName);
     }
 
@@ -120,7 +120,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
      * used to get the first item in the given room with the given item name
      * @param itemName the name of the item
      * @param roomName the name of the room to search
-     * @param databaseName the name of the main.java.database containing the item
+     * @param databaseName the name of the database containing the item
      * @return an Item instance or null if not found
      */
     public static Item getItemByNameRoom(String itemName, String roomName, ItemFactory itemFactory, String databaseName){
@@ -152,7 +152,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     /**
      * gets all the items in the given room
      * @param roomName the room name to check for items
-     * @param databaseName the main.java.database containing the items
+     * @param databaseName the database containing the items
      * @return a list of all items in the room
      */
     public static List<Item> getItemsInRoom(String roomName, ItemFactory itemFactory, String databaseName){
@@ -181,7 +181,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     /**
      * gets an item by the item ID
      * @param itemID the unique identifier of the item
-     * @param databaseName the main.java.database containing the item
+     * @param databaseName the database containing the item
      * @return the instantiated item or null if not found
      */
     public static Item getItemByID(int itemID, ItemFactory itemFactory, String databaseName){
@@ -211,7 +211,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
     /**
      * gets all items that are contained by the given container id
      * @param containerID the unique identifier of the container
-     * @param databaseName the name of the main.java.database containing the data being searched for
+     * @param databaseName the name of the database containing the data being searched for
      * @return a list of all items in the container
      */
     public static List<Item> getItemsOfContainerID(int containerID, ItemFactory itemFactory, String databaseName){

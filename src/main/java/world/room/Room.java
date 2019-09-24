@@ -60,9 +60,9 @@ public class Room implements DatabaseManager.DatabaseEntry {
     }
 
     /**
-     * How rooms are instantiated initially. Creates one from the given main.java.database
+     * How rooms are instantiated initially. Creates one from the given database
      * @param roomName the name of the room to look up
-     * @param databaseName the name of the main.java.database file to search for the room
+     * @param databaseName the name of the database file to search for the room
      * @return the room if it was found. null otherwise
      */
     public static Room getRoomByRoomName(String roomName, String databaseName){

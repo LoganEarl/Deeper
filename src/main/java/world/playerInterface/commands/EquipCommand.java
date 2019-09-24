@@ -83,7 +83,7 @@ public class EquipCommand extends EntityCommand {
             String putsOn = wasPutOn ? "equip" : "remove";
 
             if (viewer == sourceEntity)
-                return getMessageInColor("You " + putsOn + " the " + getItemColored(armor), SUCCESS);
+                return getMessageInColor("You " + putsOn + " the " + getItemColored(armor), INFORMATIVE);
             else
                 return getMessageInColor(getEntityColored(sourceEntity, viewer, getWorldModel()) + " " + putsOn + "s a " + getItemColored(armor), INFORMATIVE);
         }

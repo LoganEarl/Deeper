@@ -20,12 +20,11 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
     private Map<String, String> helpMessages = new HashMap<>();
     private Map<Client, List<MessageContext>> specificContexts = new HashMap<>();
     private ClientRegistry registry;
-    private CommandExecutor executor;
     private WorldModel model;
 
     public MessagePipeline(ClientRegistry registry, CommandExecutor executor, WorldModel model) {
         this.registry = registry;
-        this.executor = executor;
+        CommandExecutor executor1 = executor;
         this.model = model;
     }
 

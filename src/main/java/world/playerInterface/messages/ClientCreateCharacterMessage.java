@@ -20,10 +20,7 @@ public class ClientCreateCharacterMessage extends ClientMessage {
     @Override
     public boolean constructFromString(String rawMessageBody) {
         String[] args = rawMessageBody.toLowerCase().split("\n");
-        if(args.length == 2 && args[0].equals("new") && args[1].equals("character")){
-            return true;
-        }
-        return false;
+        return args.length == 2 && args[0].equals("new") && args[1].equals("character");
     }
 
     @Override

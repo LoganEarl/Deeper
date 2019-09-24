@@ -14,6 +14,7 @@ public class ProgressionContainer implements Entity.SqlExtender {
 
     private static final String[] HEADERS = new String[]{IP};
 
+    @SuppressWarnings("FieldCanBeLocal")
     private Entity sourceEntity;
 
     public ProgressionContainer(Entity sourceEntity){

@@ -1,6 +1,4 @@
-- test deflective stance
-- make a command for the defensive stance
-
+- make sure every stance only applies damage if it actually hits
 - test the new hp scale
 
 - fix the skill display command to do some sort of breadth first traversal and not display skills more than once

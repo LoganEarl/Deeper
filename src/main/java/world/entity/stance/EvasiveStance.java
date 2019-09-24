@@ -36,7 +36,7 @@ public class EvasiveStance extends Stance {
         if (dodgeCloseness <= takeCloseness) {
             hitHistory.add(1);
             int learnLevel = sourceEntity.getSkills().getLearnLevel(getRequiredSkill());
-            int staminaUsed = 10 - 2 * learnLevel;
+            int staminaUsed = 40 - 3 * learnLevel;
             if(sourceEntity.getPools().getStamina() >= staminaUsed) {
                 sourceEntity.getPools().expendStamina(staminaUsed);
 

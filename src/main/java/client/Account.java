@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.Locale;
 
 /**
- * This class is used to persist and store account information to the main.java.database. An "account"
+ * This class is used to persist and store account information to the database. An "account"
  * is independent of a main.java.client, as an account can be accessed from different clients
  */
 public class Account implements DatabaseManager.DatabaseEntry {
@@ -72,9 +72,9 @@ public class Account implements DatabaseManager.DatabaseEntry {
     }
 
     /**
-     * will attempt to get the account with the given username from the given main.java.database
+     * will attempt to get the account with the given username from the given database
      * @param userName the userName of the account
-     * @param databaseName the name of the main.java.database file containing the account
+     * @param databaseName the name of the database file containing the account
      * @return the Account object or null if failed to find account or some sort of exception
      */
     public static Account getAccountByUsername(String userName, String databaseName){

@@ -112,7 +112,7 @@ public class LookCommand extends EntityCommand {
         roomName = getSourceEntity().getRoomName();
         Room r = Room.getRoomByRoomName(roomName,getSourceEntity().getDatabaseName());
         if(r == null){
-            System.out.println("Failed to get room info for look command sourced by entityID:" + getSourceEntity().getID() + " in main.java.database " + getSourceEntity().getDatabaseName());
+            System.out.println("Failed to get room info for look command sourced by entityID:" + getSourceEntity().getID() + " in database " + getSourceEntity().getDatabaseName());
             return getMessageInColor("An error has occurred. Unable to get room info for you at this time",FAILURE);
         }
         roomDesc = r.getRoomDescription();

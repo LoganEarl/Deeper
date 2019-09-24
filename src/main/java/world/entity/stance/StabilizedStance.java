@@ -78,6 +78,6 @@ public class StabilizedStance extends Stance {
 
     @Override
     public Attack modifyAttack(Attack in) {
-        return in.setDamageDealt((int)(in.getAttemptedDamage() * 1.5));
+        return in.setDamageDealt((int)(in.getAttemptedDamage() * 1.25));
     }
 }

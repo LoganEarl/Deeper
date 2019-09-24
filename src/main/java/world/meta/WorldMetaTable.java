@@ -7,7 +7,7 @@ import java.util.*;
 
 /**
  * Each main.java.world template needs a bit of extra info when instantiating the main.java.world. Templates have these tables, but they are removed from
- * the instantiated worlds during construction. The information stored in this table is stored in the Global meta main.java.database instead of
+ * the instantiated worlds during construction. The information stored in this table is stored in the Global meta database instead of
  * in the individual databases, so that the data can be accessed once the simulated main.java.world is over.
  */
 public class WorldMetaTable implements DatabaseManager.DatabaseTable {

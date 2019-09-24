@@ -131,8 +131,7 @@ public class ClientForm {
     }
 
     private void setupSocket(String address, int port) throws Exception{
-        Socket socket = new Socket("localhost", 5555);
-        //Socket socket = new Socket(InetAddress.getByName("67.110.214.100"), 25560);
+        Socket socket = new Socket(address, port);
         in = new BufferedInputStream(socket.getInputStream());
         new Thread(() -> {
             boolean quit = false;
@@ -141,6 +140,7 @@ public class ClientForm {
                     int available = in.available();
                     if (available > 0) {
                         byte[] message = new byte[available];
+                        //noinspection ResultOfMethodCallIgnored
                         in.read(message, 0, available);
                         String rawMessages = new String(message);
                         rawMessages = rawMessages.replace("SERVER_PROMPT_MESSAGE\n", "");

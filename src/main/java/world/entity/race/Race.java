@@ -134,8 +134,8 @@ public class Race {
     }
 
     /**
-     * gets the name of the race as it would be stored in the main.java.database.
-     * @return the string value of the race as it would be stored in the main.java.database.
+     * gets the name of the race as it would be stored in the database.
+     * @return the string value of the race as it would be stored in the database.
      */
     public String getRaceID() {
         return identifier;

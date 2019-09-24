@@ -7,7 +7,7 @@ import main.java.world.room.RoomTable;
 import java.util.*;
 
 /**
- * Holds the main.java.database schema for a table containing all the information relevant to a player or npc entity.
+ * Holds the database schema for a table containing all the information relevant to a player or npc entity.
  * @author Logan Earl
  */
 public class EntityTable implements DatabaseManager.DatabaseTable {

@@ -114,7 +114,7 @@ public abstract class Stance implements Attack.AttackModifier {
             "completely"    //10
     };
 
-    public static final String getDegreeDescriptor(int degree) {
+    public static String getDegreeDescriptor(int degree) {
         if(degree < 0)
             return degreeDescriptors[0];
         if(degree > 10)

@@ -27,7 +27,7 @@ import java.util.Locale;
 import static main.java.world.meta.WorldTable.*;
 
 /**
- * An instantiation of a main.java.world. Each main.java.world is stored as a main.java.database file in the following format. [main.java.world id].db where the main.java.world id is a
+ * An instantiation of a main.java.world. Each main.java.world is stored as a database file in the following format. [main.java.world id].db where the main.java.world id is a
  * parsable integer. The main.java.world id must be unique. World templates on the other hand are file that are stored in the format [main.java.world name].db.
  * When creating a new main.java.world, the main.java.world template file is copied and renamed to have the main.java.world instantiation format. This is the file
  * that players will be interacting with, not the template files
@@ -254,8 +254,8 @@ public class World implements DatabaseManager.DatabaseEntry {
     }
 
     /**
-     * gets an instantiated main.java.world by the name of the main.java.database file it is stored in.
-     * @param databaseName the name of the main.java.database file. The only file extension supported is .db
+     * gets an instantiated main.java.world by the name of the database file it is stored in.
+     * @param databaseName the name of the database file. The only file extension supported is .db
      * @return the instantiated main.java.world or null if it could not be found
      */
     public static World getWorldByDatabaseName(String databaseName){
@@ -419,7 +419,7 @@ public class World implements DatabaseManager.DatabaseEntry {
     }
 
     /**
-     * saves the main.java.world to the meta main.java.database.
+     * saves the main.java.world to the meta database.
      * @param ignored not used in the current implementation
      * @return true if it was saved successfully. False otherwise
      */
@@ -435,7 +435,7 @@ public class World implements DatabaseManager.DatabaseEntry {
     }
 
     /**
-     * removes the main.java.world from the meta main.java.database.
+     * removes the main.java.world from the meta database.
      * @param ignored ignored in current implementation, as there is only one meta table
      * @return true if the entry was deleted
      */
@@ -445,7 +445,7 @@ public class World implements DatabaseManager.DatabaseEntry {
     }
 
     /**
-     * updates the main.java.world in the meta main.java.database
+     * updates the main.java.world in the meta database
      * @param ignored ignored in current implementation, as there is only one meta table
      * @return true if the entry was updated
      */
@@ -456,9 +456,9 @@ public class World implements DatabaseManager.DatabaseEntry {
     }
 
     /**
-     * Determine if this main.java.world already exists in the meta main.java.database
+     * Determine if this main.java.world already exists in the meta database
      * @param ignored ignored in current implementation, as there is only one meta table
-     * @return true if the main.java.world exists in the meta main.java.database
+     * @return true if the main.java.world exists in the meta database
      */
     @Override
     public boolean existsInDatabase(String ignored) {

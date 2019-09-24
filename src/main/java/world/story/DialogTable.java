@@ -5,7 +5,7 @@ import main.java.database.DatabaseManager;
 import java.util.*;
 
 /**
- * Contains the schema for a main.java.database table used to contain dialog options
+ * Contains the schema for a database table used to contain dialog options
  * @author Logan Earl
  */
 public class DialogTable implements DatabaseManager.DatabaseTable {

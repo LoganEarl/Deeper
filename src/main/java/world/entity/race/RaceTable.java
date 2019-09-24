@@ -12,10 +12,10 @@ import java.util.Set;
  * @author Logan Earl
  */
 public class RaceTable implements DatabaseManager.DatabaseTable {
-    /**The name of the main.java.database table*/
+    /**The name of the database table*/
     public static final String TABLE_NAME = "race";
 
-    /**The unique identifier of the race as written in the main.java.database. EG "human"*/
+    /**The unique identifier of the race as written in the database. EG "human"*/
     public static final String RACE_ID = "raceID";
     /**The displayed value of the race. Works like the DisplayName of an entity*/
     public static final String DISPLAY_NAME = "displayName";

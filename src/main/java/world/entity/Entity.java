@@ -13,7 +13,6 @@ import main.java.world.entity.skill.SkillContainer;
 import main.java.world.entity.stance.BaseStance;
 import main.java.world.entity.stance.Stance;
 import main.java.world.meta.World;
-import main.java.world.notification.ConcreteNotification;
 import main.java.world.notification.Notification;
 import main.java.world.notification.NotificationSubscriber;
 import main.java.world.room.Room;
@@ -56,7 +55,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     public static final int CODE_TRANSFER_COMPLETE = 0;
     /**Code returned when an entity could not be transferred to the new main.java.world because there already exists an entity by that id in the target main.java.world*/
     public static final int CODE_ALREADY_EXISTS_AT_DESTINATION = -1;
-    /**Code returned when an entity could not be transferred to the new main.java.world because of an unspecified main.java.database/file io error*/
+    /**Code returned when an entity could not be transferred to the new main.java.world because of an unspecified database/file io error*/
     public static final int CODE_TRANSFER_FAILED = -2;
 
     private Entity() {
@@ -216,7 +215,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     /**
      * gets all the entities in the given room
      * @param roomName the room name to check for items
-     * @param databaseName the main.java.database containing the items
+     * @param databaseName the database containing the items
      * @return a list of all items in the room
      */
     public static List<Entity> getEntitiesInRoom(String roomName, String databaseName, WorldModel model, String... excludedEntityIDs){
@@ -352,8 +351,14 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     @Override
     public Attack receiveAttack(Attack attack) {
         attack = currentStance.modifyAttack(attack);
+        attack = getEquipment().modifyAttack(attack);
 
-        return attack.complete();
+        attack.complete();
+
+        getPools().damage(attack.getDamageDealt());
+        saveToDatabase(databaseName);
+
+        return attack;
     }
 
     public void setStance(Stance stance){
@@ -504,6 +509,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
             e.databaseName = databaseName;
 
             e.getPools().calculatePoolMaxes(e.getStats());
+            e.getPools().fill();
             //TODO remove this
             e.getProgression().setIP(100000);
 

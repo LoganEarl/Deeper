@@ -55,7 +55,7 @@ public class TemplateTester {
             return;
         }
 
-        System.out.println("Attempting to save entity to main.java.database");
+        System.out.println("Attempting to save entity to database");
         Entity newEntity = new Entity.EntityBuilder()
                 .setID("Cart")
                 .setControllerType(EntityTable.CONTROLLER_TYPE_PLAYER)

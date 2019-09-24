@@ -66,9 +66,9 @@ public class Armor extends Item {
      * @param damageType the type of damage to check
      * @return the percentage of damage to subtract
      */
-    public float getDefenceForDamageType(DamageType damageType){
+    public double getDefenceForDamageType(DamageType damageType){
         initStats();
-        return getCastFloat(defenceColumnBindings.get(damageType));
+        return getCastDouble(defenceColumnBindings.get(damageType));
     }
 
     public ArmorType getType(){

@@ -22,8 +22,6 @@ import java.util.List;
 public class SimulationManager {
     private WebServer server;
     private MessagePipeline messagePipeline;
-    private CommandExecutor commandExecutor;
-    private ClientRegistry clientRegistry;
     private WorldModel worldModel;
 
     private static final String DB_NAME = "account.db";
@@ -34,11 +32,11 @@ public class SimulationManager {
      * @param executor an executor for the server to attach to
      */
     public SimulationManager(int port, CommandExecutor executor) {
-        this.commandExecutor = executor;
+        CommandExecutor commandExecutor = executor;
 
         server = new WebServer(port);
-        clientRegistry = new ClientRegistry(executor, server,DB_NAME);
-        worldModel = new WorldModel(executor,clientRegistry);
+        ClientRegistry clientRegistry = new ClientRegistry(executor, server, DB_NAME);
+        worldModel = new WorldModel(executor, clientRegistry);
         messagePipeline = new MessagePipeline(clientRegistry,executor, worldModel);
 
         server.setMessageReceivedListener(messagePipeline);
@@ -80,8 +78,8 @@ public class SimulationManager {
     }
 
     /**
-     * gets the name of the main.java.database used to store main.java.client accounts
-     * @return the string value of the main.java.database name including the file extension.
+     * gets the name of the database used to store main.java.client accounts
+     * @return the string value of the database name including the file extension.
      */
     public String getDatabaseName(){
         return DB_NAME;

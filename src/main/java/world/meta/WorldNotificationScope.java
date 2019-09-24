@@ -16,4 +16,8 @@ public class WorldNotificationScope implements NotificationScope {
     public Collection<NotificationSubscriber> filterSubscribers(Collection<NotificationSubscriber> allSubscribers) {
         return null;
     }
+
+    public String getWorldDatabaseName() {
+        return worldDatabaseName;
+    }
 }

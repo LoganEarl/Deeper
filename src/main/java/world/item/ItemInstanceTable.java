@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  * Table definition for a SQL table that holds all the specific instances of items.<br>
- * Note for retrieving items from the main.java.database, item locations follow a hierarchy.<br>
+ * Note for retrieving items from the database, item locations follow a hierarchy.<br>
  *     1. Check the {@value CONTAINER_ID} , if it is there ignore all other values
  *     This means the item is in that container and the container's location should be used instead<br>
  *     2. Check the value stored under {@value ENTITY_ID}, if it is there ignore all other values.
@@ -19,7 +19,7 @@ import java.util.*;
  * @author Logan Earl
  */
 public class ItemInstanceTable implements DatabaseTable {
-    /**The name of the main.java.database table containing item instances*/
+    /**The name of the database table containing item instances*/
     public static final String TABLE_NAME =  "itemInstance";
 
     /**The unique identifier of this item. stored as an int*/

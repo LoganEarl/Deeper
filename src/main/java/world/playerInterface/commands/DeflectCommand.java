@@ -6,6 +6,7 @@ import main.java.world.WorldModel;
 import main.java.world.entity.Entity;
 import main.java.world.entity.skill.Skill;
 import main.java.world.entity.stance.BaseStance;
+import main.java.world.entity.stance.DeflectiveStance;
 import main.java.world.entity.stance.EvasiveStance;
 import main.java.world.entity.stance.Stance;
 import main.java.world.notification.HiddenCheckNotification;
@@ -51,7 +52,7 @@ public class DeflectCommand extends EntityCommand {
             } else if (evasion > 10) {
                 getSourceClient().sendMessage(getMessageInColor(rawDeflection + " is not an deflection level", FAILURE));
             } else {
-                getSourceEntity().setStance(new EvasiveStance(getSourceEntity(), evasion));
+                getSourceEntity().setStance(new DeflectiveStance(evasion, getSourceEntity()));
                 notifyEntityRoom(new DeflectionNotification(getSourceEntity(),evasion,getWorldModel().getRegistry()));
             }
         } catch (NumberFormatException e) {

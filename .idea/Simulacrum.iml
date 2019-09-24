@@ -7,7 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="sqlite-jdbc-3.23.1" level="project" />
-    <orderEntry type="library" name="mysql-connector-java-5.1.47-bin" level="project" />
+    <orderEntry type="library" exported="" scope="RUNTIME" name="mysql:mysql-connector-java:5.1.48" level="project" />
+    <orderEntry type="library" exported="" scope="RUNTIME" name="org.xerial:sqlite-jdbc:3.28.0" level="project" />
   </component>
 </module>

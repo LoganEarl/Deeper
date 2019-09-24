@@ -11,6 +11,7 @@
       <w>respawned</w>
       <w>unequip</w>
       <w>unequipps</w>
+      <w>vals</w>
     </words>
   </dictionary>
 </component>
