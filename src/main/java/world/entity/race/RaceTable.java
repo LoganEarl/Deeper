@@ -33,6 +33,8 @@ public class RaceTable implements DatabaseManager.DatabaseTable {
     public static final String BASE_TOUGH = "baseTough";
     /**Base fitness value for the race. 0-100 scale with an average human citizen being 10*/
     public static final String BASE_FIT = "baseFit";
+    /**The starting traits for the species. Must be a comma-separated list where every entry has a corresponding definition in the Trait enum*/
+    public static final String TRAITS = "traits";
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
     public static final Map<String,String> COLUMN_DEFINITIONS = new LinkedHashMap<>();
@@ -47,6 +49,7 @@ public class RaceTable implements DatabaseManager.DatabaseTable {
         COLUMN_DEFINITIONS.put(BASE_DEX, "INT");
         COLUMN_DEFINITIONS.put(BASE_TOUGH, "INT");
         COLUMN_DEFINITIONS.put(BASE_FIT, "INT");
+        COLUMN_DEFINITIONS.put(TRAITS,"TEXT");
     }
 
     @Override

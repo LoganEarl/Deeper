@@ -1,4 +1,5 @@
 - trait system
+    - figure out how item traits are going to work
     - add a system for entities/items to bestow traits on each other.
     - traits can be bound to an item, or can be bestowed by an item
     - Traits can modify incoming damage, but are also just useful to have

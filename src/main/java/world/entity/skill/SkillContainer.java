@@ -1,12 +1,12 @@
 package main.java.world.entity.skill;
 
 import main.java.world.entity.Entity;
+import main.java.world.trait.Trait;
+import main.java.world.trait.TraitBestower;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
-public class SkillContainer implements Entity.SqlExtender {
+public class SkillContainer implements Entity.SqlExtender, TraitBestower {
     public static final String SIGNIFIER = "skills";
 
     public static final int UNLEARNED = -1;
@@ -64,6 +64,15 @@ public class SkillContainer implements Entity.SqlExtender {
         if(baseRoll == 0) return baseNumber > 0? 100 + baseNumber: 100;
 
         return baseNumber + (statLevel - baseRoll) + skillBonus;
+    }
+
+    @Override
+    public Set<Trait> getBestowedTraits() {
+        Set<Trait> traits = new HashSet<>();
+        for(Skill skill: SkillTable.getEntitySkills(sourceEntity))
+            traits.addAll(skill.getBestowedTraits());
+
+        return traits;
     }
 
     @Override

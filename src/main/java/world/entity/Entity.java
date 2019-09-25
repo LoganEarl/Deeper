@@ -136,12 +136,19 @@ public class Entity implements
 
     @Override
     public Set<Trait> getInherentTraits() {
-        return Collections.emptySet();
+        HashSet<Trait> inherent = new HashSet<>();
+        inherent.addAll(getSkills().getBestowedTraits());
+        inherent.addAll(getRace().getBestowedTraits());
+
+        return inherent;
     }
 
     @Override
     public Set<Trait> getTransitiveTraits() {
-        return Collections.emptySet();
+        Set<Trait> transitive = getInherentTraits();
+        transitive.addAll(getEquipment().getBestowedTraits());
+
+        return transitive;
     }
 
     public static Collection<Entity> getAllLoadedEntities(){

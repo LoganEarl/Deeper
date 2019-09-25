@@ -12,6 +12,12 @@ public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceM
     extraPlanar;
 
     //Information
+    public static Trait getTraitFromSavable(String rawTrait){
+        try {
+            return valueOf(rawTrait);
+        }catch (Exception ignored){}
+        return null;
+    }
 
     @Override
     public Attack modifyIncomingAttack(Attack in) {

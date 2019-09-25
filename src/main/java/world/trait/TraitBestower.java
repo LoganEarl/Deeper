@@ -1,5 +1,7 @@
 package main.java.world.trait;
 
+import java.util.Set;
+
 public interface TraitBestower {
-    Trait[] getBestowedTraits();
+    Set<Trait> getBestowedTraits();
 }

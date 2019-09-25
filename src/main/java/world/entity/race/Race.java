@@ -1,6 +1,8 @@
 package main.java.world.entity.race;
 
 import main.java.database.DatabaseManager;
+import main.java.world.trait.Trait;
+import main.java.world.trait.TraitBestower;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -14,12 +16,12 @@ import java.util.*;
  * instantiated from of a race. Note, all playable races are stored as constants of this class. When a new main.java.world is instantiated, these playable races need to be replaced into the new file to ensure that players migrating to the main.java.world do not fail their foreign key restraints.
  * @author Logan Earl
  */
-public class Race {
+public class Race implements TraitBestower {
     //TODO i copied the desc from dnd so make sure to change that later
     public static final Race HUMAN = new Race(
             "Human",
             "human",
-            "Humans are the most adaptable and ambitious people among the common races. They have widely varying tastes, morals, and customs in the many different lands where they have settled. When they settle, though, they stay: they build cities to last for the ages, and great kingdoms that can persist for long centuries. An individual human might have a relatively short life span, but a human nation or culture preserves traditions with origins far beyond the reach of any single human’s memory. They live fully in the present—making them well suited to the adventuring life—but also plan for the future, striving to leave a lasting legacy. Individually and as a group, humans are adaptable opportunists, and they stay alert to changing political and social dynamics.",
+            "An adaptable and ambitious race capable of almost anything given time and motivation",
             10,
             10,
             10,
@@ -43,8 +45,9 @@ public class Race {
     private int baseWis;
     private int baseTough;
     private int baseFit;
+    private Set<Trait> inherentTraits;
 
-    private Race(String displayName, String identifier, String description, int baseStr, int baseDex, int baseInt, int baseWis, int baseTough, int baseFit){
+    private Race(String displayName, String identifier, String description, int baseStr, int baseDex, int baseInt, int baseWis, int baseTough, int baseFit, Trait... bestowedTraits){
         this.displayName = displayName;
         this.identifier = identifier;
         this.description = description;
@@ -54,6 +57,8 @@ public class Race {
         this.baseWis = baseWis;
         this.baseTough = baseTough;
         this.baseFit = baseFit;
+        inherentTraits = new HashSet<>();
+        inherentTraits.addAll(Arrays.asList(bestowedTraits));
     }
 
     private Race(ResultSet entry, String databaseName) throws SQLException {
@@ -66,7 +71,20 @@ public class Race {
         baseWis = entry.getInt(RaceTable.BASE_WIS);
         baseTough = entry.getInt(RaceTable.BASE_TOUGH);
         baseFit = entry.getInt(RaceTable.BASE_FIT);
+        String[] rawTraits = entry.getString(RaceTable.TRAITS).split(",");
+        if(rawTraits.length == 1 && rawTraits[0].isEmpty()) rawTraits = new String[0];
+        inherentTraits = new HashSet<>();
+        for(String rawTrait: rawTraits){
+            Trait t = Trait.getTraitFromSavable(rawTrait);
+            if(t != null)
+                inherentTraits.add(t);
+        }
+
         this.databaseName = databaseName;
+    }
+
+    public Set<Trait> getBestowedTraits(){
+        return inherentTraits;
     }
 
     public static List<Race> defaultRaces(){

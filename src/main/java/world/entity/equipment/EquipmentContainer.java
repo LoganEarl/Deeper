@@ -10,6 +10,8 @@ import main.java.world.item.armor.Armor;
 import main.java.world.item.armor.ArmorSlot;
 import main.java.world.item.container.Container;
 import main.java.world.meta.World;
+import main.java.world.trait.Trait;
+import main.java.world.trait.TraitBestower;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +20,7 @@ import java.util.*;
 import static main.java.world.entity.EntityTable.*;
 import static main.java.world.item.armor.ArmorSlot.*;
 
-public class EquipmentContainer implements Entity.SqlExtender, Attack.AttackDefenceModifier {
+public class EquipmentContainer implements Entity.SqlExtender, Attack.AttackDefenceModifier, TraitBestower {
     public static final String SIGNIFIER = "items";
 
     private Map<ArmorSlot, Integer> slots = new HashMap<>();
@@ -85,6 +87,26 @@ public class EquipmentContainer implements Entity.SqlExtender, Attack.AttackDefe
             }
         }
         return total;
+    }
+
+    @Override
+    public Set<Trait> getBestowedTraits() {
+        Set<Trait> total = new HashSet<>();
+        for (ArmorSlot slot : slots.keySet()) {
+            Integer i = slots.get(slot);
+            Item item;
+            if (!empty(i) && (item = itemCollection.getItemByID(i, entity.getDatabaseName())) != null) {
+                //kek, no holding a breastplate to get the bonuses from it
+                ArmorSlot itemSlot;
+                if (item.getItemType() == ItemType.armor &&
+                        ((itemSlot = ((Armor) item).getSlot()) == slot ||
+                                itemSlot == leftHand || itemSlot == rightHand)) {
+                    total.addAll(item.getBestowedTraits());
+                }
+            }
+        }
+        return total;
+        return null;
     }
 
     private boolean empty(Integer i) {

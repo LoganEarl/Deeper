@@ -6,9 +6,7 @@ import main.java.world.entity.StatContainer;
 import main.java.world.trait.Trait;
 import main.java.world.trait.TraitBestower;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static main.java.world.entity.skill.Skill.VisibilityType.*;
 
@@ -117,8 +115,8 @@ public enum Skill implements TraitBestower {
     private String savableName;
     private int ipCost;
     private Skill[] requiredSkills;
-    private Trait[] requiredTraits;
-    private Trait[] bestowedTraits;
+    private Set<Trait> requiredTraits;
+    private Set<Trait> bestowedTraits;
     private StatContainer requiredStats;
     private VisibilityType visibilityType;
 
@@ -138,8 +136,10 @@ public enum Skill implements TraitBestower {
         this.requiredStats = requiredStats;
         this.visibilityType = visibilityType;
         this.associatedStat = associatedStat;
-        this.requiredTraits = requiredTraits;
-        this.bestowedTraits = bestowedTraits;
+        Set<Trait> tempSet = new HashSet<>(Arrays.asList(requiredTraits));
+        this.requiredTraits = tempSet;
+        tempSet = new HashSet<>(Arrays.asList(bestowedTraits));
+        this.bestowedTraits = tempSet;
     }
 
     public String getSavableName() {
@@ -176,11 +176,11 @@ public enum Skill implements TraitBestower {
         return requiredSkills;
     }
 
-    public Trait[] getRequiredTraits(){
+    public Set<Trait> getRequiredTraits(){
         return requiredTraits;
     }
 
-    public Trait[] getBestowedTraits(){
+    public Set<Trait> getBestowedTraits(){
         return bestowedTraits;
     }
 

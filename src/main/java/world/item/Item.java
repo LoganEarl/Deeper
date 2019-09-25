@@ -3,6 +3,9 @@ package main.java.world.item;
 import main.java.database.DatabaseManager;
 import main.java.world.entity.Entity;
 import main.java.world.meta.World;
+import main.java.world.trait.Trait;
+import main.java.world.trait.TraitBestower;
+import main.java.world.trait.Traited;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +20,7 @@ import static main.java.world.item.ItemInstanceTable.*;
  * the same stats.
  * @author Logan Earl
  */
-public abstract class Item implements DatabaseManager.DatabaseEntry {
+public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestower, Traited {
     private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
             TABLE_NAME, ITEM_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, STATE);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?",
@@ -93,6 +96,21 @@ public abstract class Item implements DatabaseManager.DatabaseEntry {
         if(itemStats == null)
             throw new IllegalArgumentException("No stats exists for item name (" + itemName + ") in database (" + databaseName + ")");
         saveToDatabase(databaseName);
+    }
+
+    @Override
+    public Set<Trait> getBestowedTraits() {
+        return null;
+    }
+
+    @Override
+    public Set<Trait> getInherentTraits() {
+        return null;
+    }
+
+    @Override
+    public Set<Trait> getTransitiveTraits() {
+        return getInherentTraits();
     }
 
     /**
