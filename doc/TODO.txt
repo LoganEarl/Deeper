@@ -1,21 +1,40 @@
-- make sure every stance only applies damage if it actually hits
-- test the new hp scale
+- room refactor
+    - room domain system
+        - integrating this with existing interaction commands (no attacking flying dudes with a sword)
+        - add different traits that allow attacking between domains
+            - reach: land-air air-water water-land
+        - items need to have a domain as well as a roomName ugh
+    - room environmental effects. Can apply visibility modifiers to a room
+        - different modifiers applied to 1 or more domains. Poison Cloud, Earthquake, Lightning Storm, High winds, etc
+        - damage can be done to users by their environment
+        - rooms have a desired state as far as environmental effects go, as well as an inertia toward that state
+    - room visibility status.
+        - domains each have a visibility status.
+        - the visibility status of domains is effected by environmental conditions
+    - room connections
+        - rooms are connected to each other, and connections cn be made dynamically
+        - connections are one-way, but you can have duplicate connections going the other way
+        - connections can require skill checks to find. Skill checks must have a cooldown so you cant just spam it
+            - Entity-Bound cooldown system. Similar to balance, but without notifications
+                - Cooldowns are simply a start timestamp, a length timestamp, and a string tag
+                - Specific to each entity. Probably a CooldownContainer. Things can post and check on cooldowns already posted
+
+- trait system
+    - add a system for entities/items to bestow traits on each other.
+    - traits can be bound to an item, or can be bestowed by an item
+    - make a Traited interface. It will have methods for accessing both direct and transitive traits
+    - Traits can modify incoming damage, but are also just useful to have
+    - trait examples might be
+        - DarkVision (entity)
+        - Reach      (weapon/entity)
+        - Flight     (entity)
+        you get the idea
+
 
 - fix the skill display command to do some sort of breadth first traversal and not display skills more than once
-
 - add ability to look at entities/items in room
-
-- add some basic skills
-    - skills to implement
-        - dodge and a deflect skill
-        - stealth and perception
-
 - add ability to buy new stat points
-
-- think about adding DR to armor?
-
 - add an analyze skill to get hp of other entities
-
 -query issues
     - add a tab-to-autocomplete feature. Send a list of nearby (visible) entities and items to the main.java.client, which it can reference.
         - make item substitutions main.java.client side!! Use full entity/item IDs to avoid issues with spaces in names. Send nearby shit in a JSON chunk
