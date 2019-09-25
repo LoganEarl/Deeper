@@ -27,7 +27,7 @@ public class EvasiveStance extends Stance {
     }
 
     @Override
-    public Attack modifyAttack(Attack in) {
+    public Attack modifyIncomingAttack(Attack in) {
         if (hitHistory.size() > 10) hitHistory.clear();
 
         double dodgeCloseness = Math.abs(getRatioIfDodge() - targetEvasivenessPercent);
@@ -37,20 +37,19 @@ public class EvasiveStance extends Stance {
             hitHistory.add(1);
             int learnLevel = sourceEntity.getSkills().getLearnLevel(getRequiredSkill());
             int staminaUsed = 40 - 3 * learnLevel;
+
             if(sourceEntity.getPools().getStamina() >= staminaUsed) {
                 sourceEntity.getPools().expendStamina(staminaUsed);
 
                 int associatedStat = sourceEntity.getStats().getStat(getRequiredSkill().getAssociatedStat());
                 int roll = sourceEntity.getSkills().performSkillCheck(getRequiredSkill(), 0, associatedStat);
-                if (in.getBaseRoll() <= roll)
-                    in.setDamageDealt(0).setDidDodge(true);
-                else
-                    in.setDamageDealt(in.getAttemptedDamage());
+                in.setBaseRoll(in.getBaseRoll() - roll);
+                if (in.getBaseRoll() <= 0)
+                    in.setAttemptedDamage(0).setDidDodge(true);
             }
-        } else {
+        } else
             hitHistory.add(0);
-            in.setDamageDealt(in.getAttemptedDamage());
-        }
+
         return in;
     }
 

@@ -118,23 +118,16 @@ public class AttackCommand extends EntityCommand {
         if (staminaNeeded > getSourceEntity().getPools().getStamina())
             getSourceClient().sendMessage("You are " + getMessageInColor("exhausted", STAMINA_COLOR) + " and cannot wield the " + selectWeapon.getDisplayableName());
         else {
-            int roll = selectWeapon.rollHit(
-                    stats.getStrength(),
-                    stats.getDexterity(),
-                    stats.getIntelligence(),
-                    stats.getWisdom());
-            roll = roll - target.getEquipment().getEquipmentAC();
-            roll = roll + bonus;
+            Attack attack = getSourceEntity().produceAttackWithWeapon(selectWeapon, bonus);
 
-            int damage = selectWeapon.rollDamage(stats.getStrength(), stats.getDexterity(), stats.getIntelligence(), stats.getWisdom());
-
-            Attack attack = new Attack()
-                    .setAttemptedDamage(damage)
-                    .setBaseRoll(roll)
+            attack
                     .setAggressor(getSourceEntity())
                     .setAttackWeapon(selectWeapon)
                     .setDamageType(selectWeapon.getDamageType())
                     .setDefender(target);
+
+            attack = getSourceEntity().modifyOutgoingAttack(attack);
+            attack = target.modifyIncomingAttack(attack);
 
             attack = target.receiveAttack(attack);
 

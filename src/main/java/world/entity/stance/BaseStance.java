@@ -4,17 +4,13 @@ import main.java.world.entity.Attack;
 import main.java.world.entity.Entity;
 import main.java.world.entity.skill.Skill;
 
-public class BaseStance extends Stance{
+public class BaseStance extends Stance {
     private static final double BASE_HP_PER_TOUGH_PER_SEC = 0.04;
     private static final double BASE_STAM_PER_FIT_PER_SEC = 0.04;
     private static final double MP_PER_INT_PER_SEC = 0.026;
     private static final double MP_PER_WIS_PER_SEC = 0.014;
     private static final double BURN_PER_WIS_PER_SEC = 0.026;
     private static final double BURN_PER_INT_PER_SEC = 0.014;
-
-    public int onDamageIncoming(int baseDamage, Entity aggressor, int hitRoll){
-        return baseDamage;
-    }
 
     public int getIPGained(int baseIP){
         return baseIP;
@@ -62,13 +58,6 @@ public class BaseStance extends Stance{
 
     public Skill getRequiredSkill(){
         return null;
-    }
-
-    @Override
-    public Attack modifyAttack(Attack in) {
-        if(in.getBaseRoll() >= 0)
-            in.setDamageDealt(in.getAttemptedDamage());
-        return in;
     }
 
     public boolean isLearnable(){

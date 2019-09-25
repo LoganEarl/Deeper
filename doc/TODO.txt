@@ -1,3 +1,13 @@
+- trait system
+    - add a system for entities/items to bestow traits on each other.
+    - traits can be bound to an item, or can be bestowed by an item
+    - Traits can modify incoming damage, but are also just useful to have
+    - trait examples might be
+        - DarkVision (entity)
+        - Reach      (weapon/entity)
+        - Flight     (entity)
+        you get the idea
+
 - room refactor
     - room domain system
         - integrating this with existing interaction commands (no attacking flying dudes with a sword)
@@ -18,18 +28,6 @@
             - Entity-Bound cooldown system. Similar to balance, but without notifications
                 - Cooldowns are simply a start timestamp, a length timestamp, and a string tag
                 - Specific to each entity. Probably a CooldownContainer. Things can post and check on cooldowns already posted
-
-- trait system
-    - add a system for entities/items to bestow traits on each other.
-    - traits can be bound to an item, or can be bestowed by an item
-    - make a Traited interface. It will have methods for accessing both direct and transitive traits
-    - Traits can modify incoming damage, but are also just useful to have
-    - trait examples might be
-        - DarkVision (entity)
-        - Reach      (weapon/entity)
-        - Flight     (entity)
-        you get the idea
-
 
 - fix the skill display command to do some sort of breadth first traversal and not display skills more than once
 - add ability to look at entities/items in room

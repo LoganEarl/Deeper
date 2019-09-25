@@ -4,12 +4,18 @@ import main.java.world.item.DamageType;
 import main.java.world.item.weapon.Weapon;
 
 public class Attack {
-    public interface AttackModifier {
-        Attack modifyAttack(Attack in);
+    public interface AttackDefenceModifier {
+        Attack modifyIncomingAttack(Attack in);
     }
 
-    public interface AttackReceiver {
-        Attack receiveAttack(Attack attack);
+    public interface AttackOffenceModifier {
+        Attack modifyOutgoingAttack(Attack in);
+    }
+
+    public interface Attackable {
+        /**The starting point for the attack chain*/
+        Attack produceAttackWithWeapon(Weapon weapon, int situationalHitBonus);
+        Attack receiveAttack(Attack in);
     }
 
     private int attemptedDamage = 0;
@@ -21,6 +27,7 @@ public class Attack {
     private Entity defender;
     private boolean didDeflect = false;
     private boolean didDodge = false;
+    private boolean didLand = false;
     private boolean didEnterDyingState = false;
     private boolean didDie = false;
 
@@ -85,6 +92,16 @@ public class Attack {
 
     public DamageType getDamageType(){
         return damageType;
+    }
+
+    public boolean getDidLand(){
+        return didLand;
+    }
+
+    public Attack setDidLand(boolean didLand){
+        if(!isLocked)
+            this.didLand = didLand;
+        return this;
     }
 
     public Attack setDamageType(DamageType type){

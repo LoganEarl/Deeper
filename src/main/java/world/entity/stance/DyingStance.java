@@ -72,7 +72,14 @@ public class DyingStance extends Stance {
     }
 
     @Override
-    public Attack modifyAttack(Attack in) {
-        return in.setDamageDealt((int)(in.getAttemptedDamage() * 1.5));
+    public Attack modifyIncomingAttack(Attack in) {
+        in.setAttemptedDamage((int)(in.getAttemptedDamage() * 1.25));
+        return in;
+    }
+
+    @Override
+    public Attack modifyOutgoingAttack(Attack in) {
+        in.setAttemptedDamage((int)(in.getAttemptedDamage() * 0.75));
+        return in;
     }
 }
