@@ -12,10 +12,14 @@ import main.java.world.entity.skill.Skill;
 import main.java.world.entity.skill.SkillContainer;
 import main.java.world.entity.stance.BaseStance;
 import main.java.world.entity.stance.Stance;
+import main.java.world.item.weapon.Weapon;
 import main.java.world.meta.World;
 import main.java.world.notification.Notification;
 import main.java.world.notification.NotificationSubscriber;
 import main.java.world.room.Room;
+import main.java.world.trait.Trait;
+import main.java.world.trait.TraitBestower;
+import main.java.world.trait.Traited;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,7 +30,11 @@ import java.util.stream.Stream;
 import static main.java.world.entity.EntityTable.*;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscriber, Attack.AttackReceiver {
+public class Entity implements
+        DatabaseManager.DatabaseEntry,
+        NotificationSubscriber,
+        Attack.Attackable, Attack.AttackOffenceModifier, Attack.AttackDefenceModifier,
+        Traited {
     private static Map<String,Entity> entityCache = new HashMap<>();
 
     private String entityID;
@@ -124,6 +132,16 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
         entityCache.put(tag,this);
         updateInDatabase(databaseName);
         return CODE_TRANSFER_COMPLETE;
+    }
+
+    @Override
+    public Set<Trait> getInherentTraits() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<Trait> getTransitiveTraits() {
+        return Collections.emptySet();
     }
 
     public static Collection<Entity> getAllLoadedEntities(){
@@ -261,14 +279,14 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     @Override
     public boolean saveToDatabase(String databaseName) {
         Entity entity = getEntityByEntityID(entityID, model, databaseName);
-        if(entity == null){
-            boolean success =  DatabaseManager.executeStatement(makeInsertSQL(extenders,
-                    ENTITY_ID,DISPLAY_NAME,CONTROLLER_TYPE,ROOM_NAME,RACE_ID), databaseName, appendData(extenders,
-                    entityID,displayName,controllerType,roomName,raceID)) > 0;
-            if(success)
-                entityCache.put(getEntityTag(entityID,databaseName),this);
+        if (entity == null) {
+            boolean success = DatabaseManager.executeStatement(makeInsertSQL(extenders,
+                    ENTITY_ID, DISPLAY_NAME, CONTROLLER_TYPE, ROOM_NAME, RACE_ID), databaseName, appendData(extenders,
+                    entityID, displayName, controllerType, roomName, raceID)) > 0;
+            if (success)
+                entityCache.put(getEntityTag(entityID, databaseName), this);
             return success;
-        }else{
+        } else {
             return updateInDatabase(databaseName);
         }
     }
@@ -350,15 +368,59 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
 
     @Override
     public Attack receiveAttack(Attack attack) {
-        attack = currentStance.modifyAttack(attack);
-        attack = getEquipment().modifyAttack(attack);
+        attack.setDidLand(attack.getBaseRoll() >= 0);
+        if(attack.getDidLand()) {
+            boolean isDying = getPools().isDying();
+            boolean isDead = getPools().isDead();
 
-        attack.complete();
+            getPools().damage(attack.getDamageDealt());
+            attack.setDamageDealt(attack.getDamageDealt());
 
-        getPools().damage(attack.getDamageDealt());
+            if(getPools().isDying() != isDying)
+                attack.setDidEnterDyingState(getPools().isDying());
+            if(getPools().isDead() != isDead)
+                attack.setDidDie(getPools().isDead());
+
+            attack.complete();
+        }
         saveToDatabase(databaseName);
 
         return attack;
+    }
+
+    @Override
+    public Attack produceAttackWithWeapon(Weapon weapon, int situationalHitBonus) {
+        StatContainer myStats = getStats();
+
+        int roll = weapon.rollHit(
+                myStats.getStrength(),
+                myStats.getDexterity(),
+                myStats.getIntelligence(),
+                myStats.getWisdom()) + situationalHitBonus;
+        int damage = weapon.rollDamage(
+                myStats.getStrength(),
+                myStats.getDexterity(),
+                myStats.getIntelligence(),
+                myStats.getWisdom());
+
+        return new Attack()
+                .setBaseRoll(roll)
+                .setAttemptedDamage(damage);
+    }
+
+    @Override
+    public Attack modifyIncomingAttack(Attack in) {
+        in = getEquipment().modifyIncomingAttack(in);
+        in = currentStance.modifyIncomingAttack(in);
+
+        return in;
+    }
+
+    @Override
+    public Attack modifyOutgoingAttack(Attack in) {
+        in = currentStance.modifyOutgoingAttack(in);
+
+        return in;
     }
 
     public void setStance(Stance stance){

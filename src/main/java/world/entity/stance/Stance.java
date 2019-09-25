@@ -4,12 +4,17 @@ import main.java.world.entity.Attack;
 import main.java.world.entity.StatContainer;
 import main.java.world.entity.skill.Skill;
 
-public abstract class Stance implements Attack.AttackModifier {
+public abstract class Stance implements Attack.AttackOffenceModifier, Attack.AttackDefenceModifier {
     private long lastUpdateTime = 0;
     private double carryoverHP = 0, carryOverMP = 0, carryOverStam = 0, carryOverBurn = 0;
 
     @Override
-    public Attack modifyAttack(Attack in) {
+    public Attack modifyIncomingAttack(Attack in) {
+        return in;
+    }
+
+    @Override
+    public Attack modifyOutgoingAttack(Attack in) {
         return in;
     }
 

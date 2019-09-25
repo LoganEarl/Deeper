@@ -21,17 +21,15 @@ public class DeflectiveStance extends Stance{
     }
 
     @Override
-    public Attack modifyAttack(Attack in) {
-        if(in.getBaseRoll() >= 0) {
-            int learnLevel = sourceEntity.getSkills().getLearnLevel(Skill.deflect1);
+    public Attack modifyIncomingAttack(Attack in) {
+        int learnLevel = sourceEntity.getSkills().getLearnLevel(Skill.deflect1);
 
-            int damageReduction = (int) (degree / 10.0 * in.getAttemptedDamage());
-            int staminaUsed = (int) (damageReduction * (10 - learnLevel) / 10.0);
-            if (sourceEntity.getPools().getStamina() >= staminaUsed) {
-                in.setDamageDealt(in.getAttemptedDamage() - damageReduction);
-                sourceEntity.getPools().expendStamina(staminaUsed);
-                in.setDidDeflect(true);
-            }
+        int damageReduction = (int) (degree / 10.0 * in.getAttemptedDamage());
+        int staminaUsed = (int) (damageReduction * (10 - learnLevel) / 10.0);
+        if (sourceEntity.getPools().getStamina() >= staminaUsed) {
+            in.setAttemptedDamage(in.getAttemptedDamage() - damageReduction);
+            sourceEntity.getPools().expendStamina(staminaUsed);
+            in.setDidDeflect(true);
         }
         return in;
     }

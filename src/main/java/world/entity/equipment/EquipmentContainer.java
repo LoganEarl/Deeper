@@ -18,7 +18,7 @@ import java.util.*;
 import static main.java.world.entity.EntityTable.*;
 import static main.java.world.item.armor.ArmorSlot.*;
 
-public class EquipmentContainer implements Entity.SqlExtender, Attack.AttackModifier {
+public class EquipmentContainer implements Entity.SqlExtender, Attack.AttackDefenceModifier {
     public static final String SIGNIFIER = "items";
 
     private Map<ArmorSlot, Integer> slots = new HashMap<>();
@@ -289,12 +289,12 @@ public class EquipmentContainer implements Entity.SqlExtender, Attack.AttackModi
     }
 
     @Override
-    public Attack modifyAttack(Attack in) {
+    public Attack modifyIncomingAttack(Attack in) {
         DamageType type = in.getDamageType();
         double resistance = getEquipmentDamageResistance(type);
         if(resistance > 1) resistance = 1;
-        int reduction = (int)(in.getDamageDealt() * resistance);
-        in.setDamageDealt(in.getDamageDealt() - reduction);
+        int reduction = (int)(in.getAttemptedDamage() * resistance);
+        in.setAttemptedDamage(in.getAttemptedDamage() - reduction);
         return in;
     }
 
