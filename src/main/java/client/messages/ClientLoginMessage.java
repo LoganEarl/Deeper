@@ -7,7 +7,7 @@ import main.java.world.WorldModel;
 import main.java.world.entity.Entity;
 
 /**
- * Instantiated form of a main.java.client's attempt to login. Still needs to be verified but contains all the info to do so.<br>
+ * Instantiated form of a client's attempt to login. Still needs to be verified but contains all the info to do so.<br>
  *     Message format is as follows<br><br>
  *
  *     [ServerMessageType.CLIENT_LOGIN_MESSAGE]\n<br>
@@ -17,9 +17,9 @@ import main.java.world.entity.Entity;
  */
 
 public class ClientLoginMessage extends ClientMessage {
-    /**the userName entered by the main.java.client trying to log in*/
+    /**the userName entered by the client trying to log in*/
     private String userName;
-    /**the hashed form of the password entered by the main.java.client trying to log in*/
+    /**the hashed form of the password entered by the client trying to log in*/
     private String hashedPassword;
 
     public static final String HEADER = "login";

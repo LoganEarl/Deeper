@@ -34,14 +34,14 @@ public class ClientRegistry {
     }
 
     /**
-     * gets the main.java.client with the given username if they are currently logged in
+     * gets the client with the given username if they are currently logged in
      *
-     * @param username the username of the main.java.client
-     * @return the main.java.client if found, null otherwise
+     * @param username the username of the client
+     * @return the client if found, null otherwise
      */
     public Client getClient(String username) {
         if (username == null)
-            throw new NullPointerException("Cannot get main.java.client with null username");
+            throw new NullPointerException("Cannot get client with null username");
         for (Client client : clients.values()) {
             if (client.getAssociatedAccount() != null &&
                     client.getAssociatedAccount().getUserName().equals(username))
@@ -51,14 +51,14 @@ public class ClientRegistry {
     }
 
     /**
-     * gets the main.java.client with the given account if they are currently logged in
+     * gets the client with the given account if they are currently logged in
      *
-     * @param account the account of the main.java.client
-     * @return the main.java.client if found, null otherwise
+     * @param account the account of the client
+     * @return the client if found, null otherwise
      */
     public Client getClient(Account account){
         if(account == null)
-            throw new NullPointerException("Cannot get main.java.client with null account");
+            throw new NullPointerException("Cannot get client with null account");
         for(Client client:clients.values()) {
             if(account.equals(client.getAssociatedAccount()))
                 return client;
@@ -69,7 +69,7 @@ public class ClientRegistry {
     /**
      * gets all clients mapped by their internet addresses
      *
-     * @return a Map of the clients where the key is their ip address and the value is the main.java.client
+     * @return a Map of the clients where the key is their ip address and the value is the client
      */
     public Map<Long, Client> getClients() {
         return clients;
@@ -88,10 +88,10 @@ public class ClientRegistry {
     }
 
     /**
-     * gets the main.java.client with the given internet address
+     * gets the client with the given internet address
      *
-     * @param id the identifier of the main.java.client
-     * @return either the main.java.client or null if not found
+     * @param id the identifier of the client
+     * @return either the client or null if not found
      */
     public Client getClient(long id) {
         return clients.get(id);
@@ -101,7 +101,7 @@ public class ClientRegistry {
      * sends the given message in the form of a {@link PromptCommand} to all the given clients
      *
      * @param message         the message to send
-     * @param clients the main.java.client(s) to receive the message
+     * @param clients the client(s) to receive the message
      */
     public void sendMessage(String message, Client... clients) {
         commandExecutor.scheduleCommand(new PromptCommand(message, localServer, clients));

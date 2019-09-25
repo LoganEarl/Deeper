@@ -6,7 +6,7 @@ import main.java.network.messaging.MessagePipeline;
 import main.java.world.WorldModel;
 
 /**
- * A debugging tool the main.java.client can use to cause printouts on the server's System.out. Just initiate with debug [any text]
+ * A debugging tool the client can use to cause printouts on the server's System.out. Just initiate with debug [any text]
  * @author Logan Earl
  */
 public class ClientDebugMessage extends ClientMessage {
@@ -36,6 +36,6 @@ public class ClientDebugMessage extends ClientMessage {
 
     @Override
     public String getHelpText() {
-        return "This is a utility command that can be used on the main.java.client to print out messages in the server's System.out: quite useless in most cases.";
+        return "This is a utility command that can be used on the client to print out messages in the server's System.out: quite useless in most cases.";
     }
 }

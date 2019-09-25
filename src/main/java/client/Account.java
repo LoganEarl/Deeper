@@ -10,7 +10,7 @@ import java.util.Locale;
 
 /**
  * This class is used to persist and store account information to the database. An "account"
- * is independent of a main.java.client, as an account can be accessed from different clients
+ * is independent of a client, as an account can be accessed from different clients
  */
 public class Account implements DatabaseManager.DatabaseEntry {
     private static final String DB_NAME = "account.db";
@@ -63,7 +63,7 @@ public class Account implements DatabaseManager.DatabaseEntry {
      * constructor for accounts including an email.
      * @param userName the username of the account
      * @param hashedPassword the hashed form of the password to store and use to authenticate
-     * @param email the email address of the main.java.client. Form www.*@*
+     * @param email the email address of the client. Form www.*@*
      * @param type the level/privileges of the account to create
      */
     public Account(String userName, String hashedPassword, String email, AccountType type){

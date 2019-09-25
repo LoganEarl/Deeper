@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="SimulacrumServer">
+  <artifact type="jar" build-on-make="true" name="SimulacrumServer">
     <output-path>$PROJECT_DIR$/bin/artifacts/SimulacrumServer</output-path>
     <root id="archive" name="SimulacrumServer.jar">
       <element id="directory" name="META-INF">

@@ -15,14 +15,14 @@ public class PromptCommand implements CommandExecutor.Command, WebServer.ServerM
     private WebServer server;
     private long messageTimestamp;
 
-    /**The header of this message. That way the main.java.client can tell what kind of message was sent*/
+    /**The header of this message. That way the client can tell what kind of message was sent*/
     public static final String HEADER = "SERVER_PROMPT_MESSAGE";
 
     /**
      * Constructor to send command immediately
      * @param message the message to deliver
      * @param server the server used to send the message
-     * @param clients the main.java.client(s) to receive the message
+     * @param clients the client(s) to receive the message
      */
     public PromptCommand(String message, WebServer server, Client... clients){
         this(message, 0, server, clients);
@@ -33,7 +33,7 @@ public class PromptCommand implements CommandExecutor.Command, WebServer.ServerM
      * @param message the message to deliver
      * @param messageTimestamp the unix timestamp to send the message after
      * @param server the server used to send the message
-     * @param clients the main.java.client(s) to receive the message
+     * @param clients the client(s) to receive the message
      */
     public PromptCommand(String message, long messageTimestamp, WebServer server, Client... clients){
         toSend = message;

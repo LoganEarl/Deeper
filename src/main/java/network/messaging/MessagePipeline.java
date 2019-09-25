@@ -141,7 +141,7 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
         /**
          * called when a message is received from the associated entity
          *
-         * @param sourceClient the main.java.client that sent the message
+         * @param sourceClient the client that sent the message
          * @param messageArgs  the message that was sent
          * @return true to consume the message, false if the message should continue on to other contexts
          */

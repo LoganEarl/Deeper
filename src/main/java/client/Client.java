@@ -4,7 +4,7 @@ import java.util.Locale;
 import static main.java.world.playerInterface.ColorTheme.*;
 
 /**
- * Class that provides the link between an account and a main.java.client connection
+ * Class that provides the link between an account and a client connection
  *
  * @author Logan Earl
  */
@@ -47,21 +47,24 @@ public class Client {
             associatedAccount = myAccount;
             status = ClientStatus.ACTIVE;
             clientRegistry.sendMessage(getMessageInColor("Success, welcome " + associatedAccount.getUserName(),SUCCESS), sourceClient);
+            System.out.println(associatedAccount.getUserName() + " has logged in");
         }
     }
 
     public void tryLogOut(Client sourceClient, String targetUsername) {
         if (targetUsername.isEmpty()) {
+            System.out.println(associatedAccount.getUserName() + " has logged out");
             status = ClientStatus.UNAUTHENTICATED;
             associatedAccount = null;
             clientRegistry.sendMessage(getMessageInColor("You have been logged out",INFORMATIVE), sourceClient);
         } else {
             Client targetedClient = clientRegistry.getClient(targetUsername);
             if (targetedClient == null) {
-                clientRegistry.sendMessage(getMessageInColor("There is no main.java.client logged in with that name",FAILURE), sourceClient);
+                clientRegistry.sendMessage(getMessageInColor("There is no client logged in with that name",FAILURE), sourceClient);
             } else if (associatedAccount.getAccountType().compareToAcountType(targetedClient.associatedAccount.getAccountType()) <= 0) {
                 clientRegistry.sendMessage(getMessageInColor("You cannot kick " + associatedAccount.getUserName() + " as they have greater or equal privileges to yourself",FAILURE), sourceClient);
             } else {
+                System.out.println(targetedClient.associatedAccount.getUserName() + " has been kicked by " + associatedAccount.getUserName());
                 clientRegistry.sendMessage(getMessageInColor("Got em', you have kicked " + targetedClient.associatedAccount.getUserName() + " from the server",SUCCESS), sourceClient);
                 clientRegistry.sendMessage(getMessageInColor("Oof, you have been kicked by " + associatedAccount.getUserName(),FAILURE), targetedClient);
                 targetedClient.status = ClientStatus.UNAUTHENTICATED;
@@ -80,6 +83,7 @@ public class Client {
             newAccount.saveToDatabase(clientRegistry.getDatabaseName());
             associatedAccount = newAccount;
             clientRegistry.sendMessage(getMessageInColor("Success, new account created",SUCCESS), sourceClient);
+            System.out.println("A new account has been created: " + associatedAccount.getUserName());
             //they are not logged in
         } else if (associatedAccount == null || status == ClientStatus.INACTIVE || status == ClientStatus.UNAUTHENTICATED) {
             clientRegistry.sendMessage(getMessageInColor("Unknown Username/Password. Please try again",FAILURE),
@@ -97,6 +101,7 @@ public class Client {
             associatedAccount.updateInDatabase(clientRegistry.getDatabaseName());
             clientRegistry.sendMessage(getMessageInColor("Success. Account information has been updated",SUCCESS),
                     sourceClient);
+            System.out.println("Account info of " + associatedAccount.getUserName() + " has been updated");
         } else {
             clientRegistry.sendMessage(getMessageInColor("Unable to update info, old UserName/Password combination does not match any users",FAILURE),
                     sourceClient);
@@ -128,6 +133,7 @@ public class Client {
                 clientRegistry.sendMessage(String.format(Locale.US, getMessageInColor("You have changed %s's permission level to %d",SUCCESS),
                         targetUserName, newAccountType.getSavableForm()),
                         sourceClient);
+                System.out.println("Account of " + targetUserName + " has been elevated to " + newAccountType.getSavableForm());
             }
         }
     }
@@ -159,19 +165,19 @@ public class Client {
     }
 
     /**
-     * Enumeration of possible main.java.client states
+     * Enumeration of possible client states
      */
     public enum ClientStatus {
         /**
-         * main.java.client has either logged out or was kicked at some point. Has no open connections associated with main.java.client account
+         * client has either logged out or was kicked at some point. Has no open connections associated with client account
          */
         INACTIVE,
         /**
-         * main.java.client has just connected. We have an internet address but main.java.client has not yet provided any login info so we don't know who it is yet
+         * client has just connected. We have an internet address but client has not yet provided any login info so we don't know who it is yet
          */
         UNAUTHENTICATED,
         /**
-         * main.java.client is both logged in and active, free to interact with the system normally
+         * client is both logged in and active, free to interact with the system normally
          */
         ACTIVE
     }

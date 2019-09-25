@@ -6,7 +6,7 @@ import main.java.network.messaging.MessagePipeline;
 import main.java.world.WorldModel;
 
 /**
- * Instantiated form of a main.java.client's attempt to update account information. Still needs to be verified but contains all the info to do so.<br>
+ * Instantiated form of a client's attempt to update account information. Still needs to be verified but contains all the info to do so.<br>
  *     Message format is as follows<br><br>
  *
  *     [ServerMessageType.CLIENT_ACCOUNT_UPDATE_MESSAGE]\n<br>

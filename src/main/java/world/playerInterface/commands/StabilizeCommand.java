@@ -22,8 +22,8 @@ public class StabilizeCommand extends EntityCommand {
     /**
      * sole constructor
      *
-     * @param sourceClient the main.java.client attempting the command
-     * @param targetID     the target to stabilize. If empty or null, the main.java.client is assumed to be stabilizing themself.
+     * @param sourceClient the client attempting the command
+     * @param targetID     the target to stabilize. If empty or null, the client is assumed to be stabilizing themself.
      * @param model        the main.java.world model
      */
     public StabilizeCommand(Client sourceClient, String targetID, WorldModel model) {

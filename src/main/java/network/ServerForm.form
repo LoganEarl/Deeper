@@ -7,21 +7,30 @@
     </constraints>
     <properties>
       <background color="-16777216"/>
+      <preferredSize width="300" height="150"/>
     </properties>
     <border type="none"/>
     <children>
-      <component id="b66f3" class="javax.swing.JTextArea" binding="mainTextArea">
+      <scrollpane id="c333">
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="3" use-parent-layout="false">
-            <preferred-size width="150" height="50"/>
-          </grid>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <background color="-16777216"/>
-          <foreground color="-1"/>
-          <text value="Booting..."/>
+          <autoscrolls value="true"/>
         </properties>
-      </component>
+        <border type="none"/>
+        <children>
+          <component id="5538f" class="javax.swing.JTextPane" binding="mainTextArea">
+            <constraints/>
+            <properties>
+              <background color="-16777216"/>
+              <foreground color="-1"/>
+              <selectedTextColor color="-8669740"/>
+              <text value="Booting..."/>
+            </properties>
+          </component>
+        </children>
+      </scrollpane>
     </children>
   </grid>
 </form>

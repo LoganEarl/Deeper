@@ -7,7 +7,7 @@ import main.java.network.messaging.MessagePipeline;
 import main.java.world.WorldModel;
 
 /**
- * Instantiated form of a main.java.client's attempt to update another account's permission level. Client must already be logged in and have a permission
+ * Instantiated form of a client's attempt to update another account's permission level. Client must already be logged in and have a permission
  * level greater than that being dispensed, and greater than the current level of the target.<br>
  *     Message format as follows<br><br>
  *

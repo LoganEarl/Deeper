@@ -33,9 +33,11 @@ public class SimulationManager {
      */
     public SimulationManager(int port, CommandExecutor executor) {
         CommandExecutor commandExecutor = executor;
-
+        System.out.println("Starting Server");
         server = new WebServer(port);
+        System.out.println("Initializing Client Registry");
         ClientRegistry clientRegistry = new ClientRegistry(executor, server, DB_NAME);
+        System.out.println("Constructing WorldModel");
         worldModel = new WorldModel(executor, clientRegistry);
         messagePipeline = new MessagePipeline(clientRegistry,executor, worldModel);
 
@@ -45,6 +47,7 @@ public class SimulationManager {
 
     /**Starts the server and ensures the directory system and main.java.world system is all in place*/
     public void init() {
+        System.out.println("Creating account tables");
         List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
         tables.add(new AccountTable());
 
@@ -53,8 +56,11 @@ public class SimulationManager {
         DatabaseManager.createWorldTables(DB_NAME, tables);
 
         DatabaseManager.createDirectories();
+
+        System.out.println("Initializing World System");
         World.initWorldSystem();
 
+        System.out.println("Loading account commands");
         messagePipeline.loadMessage(ClientHelpMessage.class);
         messagePipeline.loadMessage(ClientLoginMessage.class);
         messagePipeline.loadMessage(ClientAccountUpdateMessage.class);
@@ -63,14 +69,18 @@ public class SimulationManager {
         messagePipeline.loadMessage(ClientLogoutMessage.class);
         messagePipeline.loadMessage(ClientRegisterMessage.class);
 
+        System.out.println("Loading world commands");
         worldModel.loadDefaultCommands(messagePipeline);
+
+        System.out.println("Starting periodic tasks");
         worldModel.startDefaultTasks();
 
+        System.out.println("Opening server for connections");
         server.startServer();
     }
 
     /**
-     * gets the WebServer used to maintain main.java.client connections
+     * gets the WebServer used to maintain client connections
      * @return the WebServer object
      */
     public WebServer getServer() {
@@ -78,7 +88,7 @@ public class SimulationManager {
     }
 
     /**
-     * gets the name of the database used to store main.java.client accounts
+     * gets the name of the database used to store client accounts
      * @return the string value of the database name including the file extension.
      */
     public String getDatabaseName(){

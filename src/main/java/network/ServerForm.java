@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 public class ServerForm {
-    private JTextArea mainTextArea;
+    private JTextPane mainTextArea;
     private JPanel panel1;
 
     public static void main(String[] args) {
@@ -26,12 +26,11 @@ public class ServerForm {
 
         }
 
-        System.out.println("Hello world");
-        System.out.flush();
-
         CommandExecutor executor = new CommandExecutor();
         SimulationManager simManager = new SimulationManager(5555, executor);
         simManager.init();
+
+        String lastText = "";
 
         //noinspection InfiniteLoopStatement
         while(true){
@@ -39,8 +38,13 @@ public class ServerForm {
             try{
                 Thread.sleep(100);
                 System.out.flush();
-                if(out != null)
-                    mForm.mainTextArea.setText(out.toString("UTF8"));
+                if(out != null) {
+                    String newText = out.toString("UTF8");
+                    if(!newText.equals(lastText)) {
+                        mForm.mainTextArea.setText(newText);
+                        lastText = newText;
+                    }
+                }
             }catch (Exception ignored){}
         }
     }

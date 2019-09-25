@@ -34,7 +34,7 @@ public class CommandExecutor {
     }
 
     /**
-     * Interface for a command that a main.java.client wants executed, such as a login attempt
+     * Interface for a command that a client wants executed, such as a login attempt
      */
     public interface Command {
         /**Called by the server thread when executing the command.*/

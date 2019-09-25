@@ -444,7 +444,7 @@ public class Entity implements DatabaseManager.DatabaseEntry, NotificationSubscr
     /**
      * puts the entity on cool-down, Allowing them to act once they have recovered their balance from an action
      * @param waitMs how long they should remain imbalanced before recovering
-     * @param attachedClient an optional main.java.client to notify once balance is restored
+     * @param attachedClient an optional client to notify once balance is restored
      */
     public void setBalanceTime(long waitMs, Client attachedClient){
         if(waitMs > 0) {
