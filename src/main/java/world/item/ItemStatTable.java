@@ -28,6 +28,10 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     public static final String WEIGHT = "weightKgs";
     /**The size of the item in Liters*/
     public static final String VOLUME = "volume";
+    /**The traits that the item (and all items of this type) have. Must be a semi-colon separated list*/
+    public static final String GLOBAL_INHERENT_TRAITS = "globalInherentTraits";
+    /**The traits the item (and all items of this type) bestow on their user. Must be a semi-colon separated list*/
+    public static final String GLOBAL_BESTOWED_TRAITS = "globalBestowedTraits";
 
     /**The type of the item. Must be one of the TYPE_* constants defined in this class*/
     public static final String ITEM_TYPE = "itemType";
@@ -45,6 +49,8 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(WEIGHT,"DECIMAL");
         TABLE_DEFINITION.put(VOLUME,"DECIMAL");
         TABLE_DEFINITION.put(ITEM_TYPE,"VARCHAR(16)");
+        TABLE_DEFINITION.put(GLOBAL_INHERENT_TRAITS, "TEXT");
+        TABLE_DEFINITION.put(GLOBAL_BESTOWED_TRAITS, "TEXT");
     }
 
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);

@@ -36,6 +36,10 @@ public class ItemInstanceTable implements DatabaseTable {
     public static final String DISPLAY_NAME = "displayName";
     /**The code this item can unlock. If attempting to unlock a container, this will be compared to the lock number of the container. If they match, the item can serve as a key to it. If 0 or NULL it is not a key*/
     public static final String LOCK_NUMBER = "lockNumber";
+    /**The traits that the item (and all items of this type) have. Must be a semi-colon separated list*/
+    public static final String INHERENT_TRAITS = "inherentTraits";
+    /**The traits the item (and all items of this type) bestow on their user. Must be a semi-colon separated list*/
+    public static final String BESTOWED_TRAITS = "bestowedTraits";
 
     public static final String STATE = "state";
 
@@ -51,6 +55,8 @@ public class ItemInstanceTable implements DatabaseTable {
         TABLE_DEFINITION.put(DISPLAY_NAME,"VARCHAR(32) COLLATE NOCASE");
         TABLE_DEFINITION.put(STATE, "VARCHAR(16)");
         TABLE_DEFINITION.put(LOCK_NUMBER, "INT");
+        TABLE_DEFINITION.put(INHERENT_TRAITS, "TEXT");
+        TABLE_DEFINITION.put(BESTOWED_TRAITS, "TEXT");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME));

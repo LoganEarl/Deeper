@@ -15,8 +15,6 @@ import main.java.world.notification.ConcreteNotification;
 import main.java.world.notification.NotificationService;
 import main.java.world.room.RoomNotificationScope;
 
-import java.util.List;
-
 import static main.java.world.playerInterface.ColorTheme.*;
 
 public class AttackCommand extends EntityCommand {
@@ -93,23 +91,6 @@ public class AttackCommand extends EntityCommand {
     @Override
     protected int getStaminaUsed() {
         return staminaUsed;
-    }
-
-    private void notifyTarget(String message, Entity target) {
-        Client targetClient = registry.getClient(target.getID());
-        if (targetClient != null) {
-            targetClient.sendMessage(message);
-        }
-    }
-
-    private void notifyRoom(String message, String... excludedEntityIDs) {
-        List<Entity> inRoom = getWorldModel().getEntityCollection().getEntitiesInRoom(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName(), excludedEntityIDs);
-        for (Entity ent : inRoom) {
-            Client attachedClient = registry.getClient(ent.getID());
-            if (attachedClient != null) {
-                attachedClient.sendMessage(message);
-            }
-        }
     }
 
     private void singleAttack(Weapon selectWeapon, Entity target, StatContainer stats, int bonus, double staminaMultiplier) {

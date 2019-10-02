@@ -21,12 +21,12 @@ import static main.java.world.item.ItemInstanceTable.*;
  * @author Logan Earl
  */
 public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestower, Traited {
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
-            TABLE_NAME, ITEM_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, STATE);
+    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            TABLE_NAME, ITEM_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, STATE,INHERENT_TRAITS, BESTOWED_TRAITS);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
-    private final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
-            TABLE_NAME, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, STATE, ITEM_ID);
+    private final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
+            TABLE_NAME, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, STATE, INHERENT_TRAITS, BESTOWED_TRAITS, ITEM_ID);
     private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE %s=?",
             TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, ITEM_ID);
     private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE ((%s.%s=? OR %s=?) AND %s=?)",
@@ -46,6 +46,9 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
     private int lockNumber;
     private Map<String,String> itemStats;
     private ItemFactory itemFactory;
+
+    private Set<Trait> inherentTraits = new HashSet<>();
+    private Set<Trait> bestowedTraits = new HashSet<>();
 
     public static final String NULL_ITEM_NAME = "!nullItemName!";
 
@@ -67,6 +70,9 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
         lockNumber = entry.getInt(LOCK_NUMBER);
         this.databaseName = databaseName;
         this.itemFactory = factory;
+
+        initStats();
+        //TODO here is the part. populate inherent and bestowed with both the item instance traits and the global traits from ItemStatTable
     }
 
     /**
@@ -100,11 +106,15 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
 
     @Override
     public Set<Trait> getBestowedTraits() {
+        initStats();
+
         return null;
     }
 
     @Override
     public Set<Trait> getInherentTraits() {
+        initStats();
+
         return null;
     }
 
