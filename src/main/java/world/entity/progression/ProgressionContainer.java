@@ -6,13 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static main.java.world.entity.EntityTable.IP;
+import static main.java.world.entity.EntityTable.TOTAL_IP;
 
 public class ProgressionContainer implements Entity.SqlExtender {
     public static final String SIGNIFIER = "progression";
 
     private int ip = 0;
+    private int totalIp = 0;
 
-    private static final String[] HEADERS = new String[]{IP};
+    private static final String[] HEADERS = new String[]{IP, TOTAL_IP};
 
     @SuppressWarnings("FieldCanBeLocal")
     private Entity sourceEntity;
@@ -23,18 +25,20 @@ public class ProgressionContainer implements Entity.SqlExtender {
 
     public ProgressionContainer(ResultSet readEntry) throws SQLException {
         ip = readEntry.getInt(IP);
+        totalIp = readEntry.getInt(TOTAL_IP);
     }
 
     public int getIP() {
         return ip;
     }
 
-    public void setIP(int ip) {
-        this.ip = ip;
+    public int getTotalIP(){
+        return totalIp;
     }
 
     public void addIP(int ip){
         this.ip += ip;
+        this.totalIp += ip;
     }
 
     public int getIPCostForNextStat(int newStatVal, int curStatVal, int racialBaseStat){
@@ -55,7 +59,7 @@ public class ProgressionContainer implements Entity.SqlExtender {
 
     @Override
     public Object[] getInsertSqlValues() {
-        return new Object[]{ip};
+        return new Object[]{ip, totalIp};
     }
 
     @Override

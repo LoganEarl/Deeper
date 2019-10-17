@@ -32,14 +32,13 @@ public class SimulationManager {
      * @param executor an executor for the server to attach to
      */
     public SimulationManager(int port, CommandExecutor executor) {
-        CommandExecutor commandExecutor = executor;
         System.out.println("Starting Server");
         server = new WebServer(port);
         System.out.println("Initializing Client Registry");
         ClientRegistry clientRegistry = new ClientRegistry(executor, server, DB_NAME);
         System.out.println("Constructing WorldModel");
         worldModel = new WorldModel(executor, clientRegistry);
-        messagePipeline = new MessagePipeline(clientRegistry,executor, worldModel);
+        messagePipeline = new MessagePipeline(clientRegistry, worldModel);
 
         server.setMessageReceivedListener(messagePipeline);
         server.setClientRegistry(clientRegistry);

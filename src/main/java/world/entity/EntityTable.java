@@ -74,8 +74,10 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
 
     public static final String SLOT_BELT_UTIL = "slotBeltUtil";
 
-    /**Information potential. Equivalent to XP in most games*/
+    /**Unspent information potential. Equivalent to XP in most games*/
     public static final String IP = "ip";
+    /**Amount of ip gained overall. Different from the usable amount of ip*/
+    public static final String TOTAL_IP = "total_ip";
 
     public static final String FACTION_ID = "factionID";
 
@@ -128,6 +130,7 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(SLOT_BELT_UTIL, "INT");
 
         TABLE_DEFINITION.put(IP,"INT");
+        TABLE_DEFINITION.put(TOTAL_IP,"INT");
         TABLE_DEFINITION.put(FACTION_ID, "INT");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",

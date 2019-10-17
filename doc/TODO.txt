@@ -1,14 +1,5 @@
-- trait system
-    - figure out how traits will work. Item-Specific? Instance Specific? Both?
-        -Both. Go to the Item class constructor and finish the TODO
-    - add a system for entities/items to bestow traits on each other.
-    - traits can be bound to an item, or can be bestowed by an item
-    - Traits can modify incoming damage, but are also just useful to have
-    - trait examples might be
-        - DarkVision (entity)
-        - Reach      (weapon/entity)
-        - Flight     (entity)
-        you get the idea
+- add ability to look at entities/items in room
+- add an analyze skill to get hp/stats of other entities (display traits too)
 
 - room refactor
     - room domain system
@@ -32,9 +23,7 @@
                 - Specific to each entity. Probably a CooldownContainer. Things can post and check on cooldowns already posted
 
 - fix the skill display command to do some sort of breadth first traversal and not display skills more than once
-- add ability to look at entities/items in room
 - add ability to buy new stat points
-- add an analyze skill to get hp of other entities
 -query issues
     - add a tab-to-autocomplete feature. Send a list of nearby (visible) entities and items to the main.java.client, which it can reference.
         - make item substitutions main.java.client side!! Use full entity/item IDs to avoid issues with spaces in names. Send nearby shit in a JSON chunk

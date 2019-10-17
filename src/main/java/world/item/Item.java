@@ -20,6 +20,7 @@ import static main.java.world.item.ItemInstanceTable.*;
  * the same stats.
  * @author Logan Earl
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestower, Traited {
     private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?)",
             TABLE_NAME, ITEM_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, STATE,INHERENT_TRAITS, BESTOWED_TRAITS);
@@ -72,7 +73,11 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
         this.itemFactory = factory;
 
         initStats();
-        //TODO here is the part. populate inherent and bestowed with both the item instance traits and the global traits from ItemStatTable
+        inherentTraits = Trait.getTraitsFromSavable(entry.getString(ItemStatTable.GLOBAL_INHERENT_TRAITS));
+        inherentTraits.addAll(Trait.getTraitsFromSavable(entry.getString(INHERENT_TRAITS)));
+
+        bestowedTraits = Trait.getTraitsFromSavable(entry.getString(ItemStatTable.GLOBAL_BESTOWED_TRAITS));
+        bestowedTraits.addAll(Trait.getTraitsFromSavable(entry.getString(BESTOWED_TRAITS)));
     }
 
     /**
@@ -108,14 +113,14 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
     public Set<Trait> getBestowedTraits() {
         initStats();
 
-        return null;
+        return bestowedTraits;
     }
 
     @Override
     public Set<Trait> getInherentTraits() {
         initStats();
 
-        return null;
+        return inherentTraits;
     }
 
     @Override
@@ -153,7 +158,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
      */
     public static Item getItemByNameRoom(String itemName, String roomName, ItemFactory itemFactory, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL = null;
+        PreparedStatement getSQL;
         Item toReturn;
         if(c == null)
             return null;
@@ -273,7 +278,9 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
             stateString = state.toString();
         if(item == null)
             return DatabaseManager.executeStatement(CREATE_SQL, databaseName,
-                    itemID, roomName, itemName, displayName, stateString) > 0;
+                    itemID, roomName, itemName, displayName, stateString,
+                    Trait.getSavableForm(inherentTraits),
+                    Trait.getSavableForm(bestowedTraits)) > 0;
         else
             return updateInDatabase(databaseName);
     }
@@ -290,7 +297,9 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
             stateString = state.toString();
 
         return DatabaseManager.executeStatement(UPDATE_SQL,databaseName,
-                roomName, itemName, displayName, containerID, stateString, itemID) > 0;
+                roomName, itemName, displayName, containerID, stateString, itemID,
+                Trait.getSavableForm(inherentTraits),
+                Trait.getSavableForm(bestowedTraits)) > 0;
     }
 
     @Override
@@ -315,6 +324,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
     public final String getItemName(){
         return itemName;
     }
+
 
     protected final void initStats(){
         if(itemStats == null)
@@ -449,7 +459,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
 
     public final void transferToWorld(World newWorld){
         if(!newWorld.getDatabaseName().equals(databaseName)) {
-            boolean canWrite = false;
+            boolean canWrite;
             if (!statsExistInWorld(newWorld))
                 canWrite = writeStatsToWorld(newWorld);
             else

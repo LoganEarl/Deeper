@@ -106,7 +106,6 @@ public class EquipmentContainer implements Entity.SqlExtender, Attack.AttackDefe
             }
         }
         return total;
-        return null;
     }
 
     private boolean empty(Integer i) {

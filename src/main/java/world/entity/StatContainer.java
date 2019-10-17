@@ -2,6 +2,7 @@ package main.java.world.entity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 import java.util.Random;
 
 import static main.java.world.entity.EntityTable.*;
@@ -108,6 +109,12 @@ public class StatContainer implements Entity.SqlExtender {
     @Override
     public String[] getSqlColumnHeaders() {
         return HEADERS;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(Locale.US, "[STR:%d] [DEX:%d] [INT:%d] [WIS:%d] [FIT:%d] [TOUGH:%d]",
+                strength, dexterity, intelligence, wisdom,fitness,toughness);
     }
 
     public int getStrength() {

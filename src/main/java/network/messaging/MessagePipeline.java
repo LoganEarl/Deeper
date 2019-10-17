@@ -22,9 +22,8 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
     private ClientRegistry registry;
     private WorldModel model;
 
-    public MessagePipeline(ClientRegistry registry, CommandExecutor executor, WorldModel model) {
+    public MessagePipeline(ClientRegistry registry, WorldModel model) {
         this.registry = registry;
-        CommandExecutor executor1 = executor;
         this.model = model;
     }
 
