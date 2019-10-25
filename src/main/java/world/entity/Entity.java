@@ -580,7 +580,7 @@ public class Entity implements
             e.getPools().calculatePoolMaxes(e.getStats());
             e.getPools().fill();
             //TODO remove this
-            e.getProgression().setIP(100000);
+            e.getProgression().addIP(100000);
 
             e.setStance(new BaseStance());
 
