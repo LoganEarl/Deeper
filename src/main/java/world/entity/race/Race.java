@@ -17,7 +17,6 @@ import java.util.*;
  * @author Logan Earl
  */
 public class Race implements TraitBestower {
-    //TODO i copied the desc from dnd so make sure to change that later
     public static final Race HUMAN = new Race(
             "Human",
             "human",
