@@ -22,11 +22,6 @@ public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceM
             return in;
         }
     }
-
-
-
-
-
     ;
 
     /**

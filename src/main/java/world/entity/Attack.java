@@ -3,6 +3,7 @@ package main.java.world.entity;
 import main.java.world.item.DamageType;
 import main.java.world.item.weapon.Weapon;
 
+@SuppressWarnings("UnusedReturnValue")
 public class Attack {
     public interface AttackDefenceModifier {
         Attack modifyIncomingAttack(Attack in);
