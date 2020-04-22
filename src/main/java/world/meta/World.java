@@ -13,6 +13,7 @@ import main.java.world.item.armor.ArmorStatTable;
 import main.java.world.item.consumable.ConsumableStatTable;
 import main.java.world.item.container.ContainerStatTable;
 import main.java.world.item.weapon.WeaponStatTable;
+import main.java.world.room.RoomConnectionTable;
 import main.java.world.room.RoomTable;
 import main.java.world.story.StoryArcTable;
 
@@ -134,6 +135,7 @@ public class World implements DatabaseManager.DatabaseEntry {
         tables.add(new SkillTable());
 
         tables.add(new RoomTable());
+        tables.add(new RoomConnectionTable());
         tables.add(new RaceTable());
         tables.add(new EntityTable());
         tables.add(new StoryArcTable());
@@ -233,6 +235,7 @@ public class World implements DatabaseManager.DatabaseEntry {
             tables.add(new WeaponStatTable());
             tables.add(new SkillTable());
             tables.add(new RoomTable());
+            tables.add(new RoomConnectionTable());
             tables.add(new RaceTable());
             tables.add(new EntityTable());
             tables.add(new StoryArcTable());
