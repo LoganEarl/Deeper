@@ -34,6 +34,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
 
     private int visibilityCode;
 
+    //<editor-fold desc="SQL Operations">
     private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,ROOM_NAME);
     private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             TABLE_NAME, ROOM_NAME, ROOM_DESCRIPTION, ROOM_VISIBILITY, ROOM_UP_NAME, ROOM_DOWN_NAME, ROOM_NORTH_NAME, ROOM_SOUTH_NAME, ROOM_EAST_NAME, ROOM_WEST_NAME);
@@ -42,6 +43,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
             TABLE_NAME, ROOM_DESCRIPTION, ROOM_VISIBILITY, ROOM_UP_NAME, ROOM_DOWN_NAME, ROOM_NORTH_NAME, ROOM_SOUTH_NAME, ROOM_EAST_NAME, ROOM_WEST_NAME, ROOM_NAME);
 
     public static final List<String> directions = Arrays.asList("up", "north", "east", "south", "west", "down");
+
 
     private Room(ResultSet readEntry, String databaseName) throws SQLException{
         roomName = readEntry.getString(ROOM_NAME);
@@ -67,7 +69,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
      */
     public static Room getRoomByRoomName(String roomName, String databaseName){
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL = null;
+        PreparedStatement getSQL;
         Room toReturn;
         if(c == null)
             return null;
@@ -115,6 +117,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
     public boolean existsInDatabase(String databaseName) {
         return getRoomByRoomName(roomName,databaseName) != null;
     }
+    //</editor-fold>
 
     public String displayRoom(WorldModel worldModel, String databaseName){
         String itemSlot = "";
@@ -124,6 +127,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
                 "%s\n%s\n\n",roomName, roomDescription);
     }
 
+    //<editor-fold desc="Getters">
     public String getRoomName() {
         return roomName;
     }
@@ -190,4 +194,5 @@ public class Room implements DatabaseManager.DatabaseEntry {
     public String getDatabaseName() {
         return databaseName;
     }
+    //</editor-fold>
 }

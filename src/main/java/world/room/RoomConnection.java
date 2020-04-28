@@ -1,17 +1,20 @@
 package main.java.world.room;
 
 import main.java.database.DatabaseManager;
+import main.java.world.cache.WorldSpecificCache;
 import main.java.world.entity.Entity;
-import main.java.world.trait.Effect;
 import main.java.world.trait.EffectArchetype;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.*;
 
 import static main.java.world.room.RoomConnectionTable.*;
+import static main.java.world.room.RoomConnectionTable.TABLE_NAME;
 
-public class RoomConnection implements DatabaseManager.DatabaseEntry {
+public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable<RoomConnection> {
     private String connectionID;
     private String displayName;
 
@@ -37,6 +40,16 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry {
     private List<Domain> sourceDomains;
     private List<Domain> destinationDomains;
 
+    private static Map<String, WorldSpecificCache<String, RoomConnection>> roomConnectionCache = new HashMap<>();
+
+    //<editor-fold desc="SQL Operations">
+    private static final String GET_SOURCE_SQL = String.format(Locale.US,"SELECT %s FROM %s WHERE %s=?",CONNECTION_ID, TABLE_NAME,SOURCE_ROOM_NAME);
+    private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,CONNECTION_ID);
+    private static final String REPLACE_SQL = String.format(Locale.US,"REPLACE INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            TABLE_NAME, CONNECTION_ID, NAME, SUCCESS_MESSAGE, FAILURE_MESSAGE, SOURCE_ROOM_NAME, DEST_ROOM_NAME, SOURCE_DOMAINS, DESTINATION_DOMAINS, TRAVERSE_DIFFICULTY, TRAVERSE_SKILL_NAME, DETECT_DIFFICULTY, DETECT_DOMAINS, DETECT_WORD, FAILURE_EFFECT_NAME, FAILURE_ROOM_NAME, FAILURE_DESTINATION_DOMAINS, SUCCESS_EFFECT_NAME, STAMINA_COST, KEY_CODE);
+    private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,CONNECTION_ID);
+
+
     private RoomConnection(ResultSet readEntry, String databaseName) throws SQLException {
         connectionID = readEntry.getString(CONNECTION_ID);
         displayName = readEntry.getString(NAME);
@@ -47,7 +60,6 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry {
         traverseDifficulty = readEntry.getInt(TRAVERSE_DIFFICULTY);
         traverseSkillName = readEntry.getString(TRAVERSE_SKILL_NAME);
         detectDifficulty = readEntry.getInt(DETECT_DIFFICULTY);
-
 
         String raw = "";
         try {
@@ -63,12 +75,129 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry {
             successEffect = raw != null? EffectArchetype.valueOf(raw): null;
         }catch (IllegalArgumentException e){
             System.out.printf("Failed to load success effect for room connection:%s:%s\n",connectionID,raw);
-            failureEffect = null;
+            successEffect = null;
         }
+
+        failureRoomName = readEntry.getString(FAILURE_ROOM_NAME);
+
+        failureDestinationDomains = Domain.decodeDomains(readEntry.getString(FAILURE_DESTINATION_DOMAINS));
+        sourceDomains = Domain.decodeDomains(readEntry.getString(SOURCE_DOMAINS));
+        destinationDomains = Domain.decodeDomains(readEntry.getString(DESTINATION_DOMAINS));
+        detectDomains = Domain.decodeDomains(readEntry.getString(DETECT_DOMAINS));
+
+        detectWord = readEntry.getString(DETECT_WORD);
+        staminaCost = readEntry.getInt(STAMINA_COST);
+        keyCode = readEntry.getInt(KEY_CODE);
 
         this.databaseName = databaseName;
     }
 
+    @Override
+    public boolean saveToDatabase(String databaseName) {
+        //Kinda wish i knew about hibernate when i started this.
+        int result = DatabaseManager.executeStatement(REPLACE_SQL, databaseName,
+                connectionID,
+                displayName,
+                successMessage,
+                failureMessage,
+                sourceRoomName,
+                destRoomName,
+                Domain.encodeDomains(sourceDomains),
+                Domain.encodeDomains(destinationDomains),
+                traverseDifficulty,
+                traverseSkillName,
+                detectDifficulty,
+                Domain.encodeDomains(detectDomains),
+                detectWord,
+                failureEffect.name(),
+                failureRoomName,
+                Domain.encodeDomains(failureDestinationDomains),
+                successEffect.name(),
+                staminaCost,
+                keyCode);
+        if(result > 0) addToCache(this);
+
+        return result > 0;
+    }
+
+    public static RoomConnection getConnectionByID(String id, String databaseName){
+        RoomConnection toReturn = null;
+        WorldSpecificCache<String, RoomConnection> worldCache = roomConnectionCache.get(databaseName);
+        if(worldCache == null)
+            roomConnectionCache.put(databaseName, new WorldSpecificCache<>(databaseName));
+        else
+            toReturn = worldCache.getValue(id);
+        if(toReturn != null) return toReturn;
+
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+        PreparedStatement getSQL;
+        if(c == null)
+            return null;
+        else{
+            try {
+                getSQL = c.prepareStatement(GET_ID_SQL);
+                getSQL.setString(1,id);
+                ResultSet resultSet = getSQL.executeQuery();
+                if(resultSet.next())
+                    toReturn = new RoomConnection(resultSet,databaseName);
+                else
+                    toReturn = null;
+                getSQL.close();
+            }catch (SQLException e){
+                toReturn = null;
+            }
+        }
+        if(toReturn != null) addToCache(toReturn);
+        return toReturn;
+    }
+
+    public static List<RoomConnection> getConnectionsBySourceRoom(String sourceRoomName, String databaseName){
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
+        PreparedStatement getSQL;
+        List<String> connectionIDs = new ArrayList<>();
+        if(c == null)
+            return Collections.emptyList();
+        else{
+            try {
+                getSQL = c.prepareStatement(GET_SOURCE_SQL);
+                getSQL.setString(1,sourceRoomName);
+                ResultSet resultSet = getSQL.executeQuery();
+                while(resultSet.next())
+                    connectionIDs.add(resultSet.getString(CONNECTION_ID));
+                getSQL.close();
+            }catch (SQLException e){
+                System.out.println("Failed to retrieve connections with source: " + sourceRoomName);
+                e.printStackTrace();
+            }
+        }
+
+        //this is done so that if they have a room object, they can guarantee its the only room object with that ID
+        List<RoomConnection> connections = new ArrayList<>();
+        for(String id: connectionIDs)
+            connections.add(getConnectionByID(id, databaseName));
+
+        return connections;
+    }
+
+    @Override
+    public boolean removeFromDatabase(String databaseName) {
+        int result = DatabaseManager.executeStatement(DELETE_SQL,databaseName, connectionID);
+        if(result >= 0) removeFromCache(this);
+        return result > 0;
+    }
+
+    @Override
+    public boolean updateInDatabase(String databaseName) {
+        return saveToDatabase(databaseName);
+    }
+
+    @Override
+    public boolean existsInDatabase(String databaseName) {
+        return getConnectionByID(connectionID, databaseName) != null;
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Utility">
     public boolean isVisibleTo(Entity entity){
         if(!entity.getDatabaseName().equals(databaseName))
             return false;
@@ -78,23 +207,105 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry {
         return RoomConnectionDiscoveryTable.connectionIsVisible(connectionID, entity.getID(), databaseName);
     }
 
-    @Override
-    public boolean saveToDatabase(String databaseName) {
-        return false;
+    private static void addToCache(RoomConnection connection){
+        WorldSpecificCache<String, RoomConnection> worldCache = roomConnectionCache.get(connection.databaseName);
+        if(worldCache == null)
+            roomConnectionCache.put(connection.databaseName, worldCache = new WorldSpecificCache<>(connection.databaseName));
+        worldCache.putValue(connection.connectionID, connection);
+    }
+
+    private static void removeFromCache(RoomConnection connection){
+        WorldSpecificCache<String, RoomConnection> worldCache;
+        if((worldCache = roomConnectionCache.get(connection.databaseName)) != null)
+            worldCache.remove(connection.connectionID);
     }
 
     @Override
-    public boolean removeFromDatabase(String databaseName) {
-        return false;
+    public int compareTo(RoomConnection o) {
+        return this.connectionID.compareTo(o.connectionID);
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Getters">
+    public String getConnectionID() {
+        return connectionID;
     }
 
-    @Override
-    public boolean updateInDatabase(String databaseName) {
-        return false;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    @Override
-    public boolean existsInDatabase(String databaseName) {
-        return false;
+    public String getDatabaseName() {
+        return databaseName;
     }
+
+    public String getSuccessMessage() {
+        return successMessage;
+    }
+
+    public String getFailureMessage() {
+        return failureMessage;
+    }
+
+    public String getSourceRoomName() {
+        return sourceRoomName;
+    }
+
+    public String getDestRoomName() {
+        return destRoomName;
+    }
+
+    public int getTraverseDifficulty() {
+        return traverseDifficulty;
+    }
+
+    public String getTraverseSkillName() {
+        return traverseSkillName;
+    }
+
+    public int getDetectDifficulty() {
+        return detectDifficulty;
+    }
+
+    public EffectArchetype getFailureEffect() {
+        return failureEffect;
+    }
+
+    public EffectArchetype getSuccessEffect() {
+        return successEffect;
+    }
+
+    public String getFailureRoomName() {
+        return failureRoomName;
+    }
+
+    public List<Domain> getFailureDestinationDomains() {
+        return failureDestinationDomains;
+    }
+
+    public List<Domain> getDetectDomains() {
+        return detectDomains;
+    }
+
+    public String getDetectWord() {
+        return detectWord;
+    }
+
+    public int getStaminaCost() {
+        return staminaCost;
+    }
+
+    public int getKeyCode() {
+        return keyCode;
+    }
+
+    public List<Domain> getSourceDomains() {
+        return sourceDomains;
+    }
+
+    public List<Domain> getDestinationDomains() {
+        return destinationDomains;
+    }
+
+    //</editor-fold>
 }

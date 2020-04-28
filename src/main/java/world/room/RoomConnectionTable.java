@@ -20,7 +20,7 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
     public static final String DEST_ROOM_NAME = "destRoomName";
     /**The domains the user must be in to go through connection. Must be semicolon-separated list. Leave blank to assume all domains*/
     public static final String SOURCE_DOMAINS = "sourceDomains";
-    /**Semicolon seperated list of domains the user can enter the destination in. If no destDomain matches the domain user is currently in or none specified, they are placed in first available domain.*/
+    /**Semicolon separated list of domains the user can enter the destination in. If no destDomain matches the domain user is currently in or none specified, they are placed in first available domain.*/
     public static final String DESTINATION_DOMAINS = "destinationDomains";
     /**The difficulty of the skill check to traverse the connection. Is a positive int, user must roll higher than this int in a skill check. If value is 0 no skill check is needed*/
     public static final String TRAVERSE_DIFFICULTY = "traverseDifficulty";
