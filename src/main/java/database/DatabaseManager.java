@@ -12,7 +12,6 @@ public class DatabaseManager {
     public static final String TEMPLATE_FOLDER = "template/";
     public static final String TEMPLATE_DIRECTORY = DATA_DIRECTORY + TEMPLATE_FOLDER;
 
-
     private static Map<String, Connection> databaseConnections = new HashMap<>();
 
     public static void createDirectories() {

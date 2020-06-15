@@ -1,90 +1,176 @@
 package main.java.world.room;
 
 import main.java.database.DatabaseManager;
-import main.java.world.WorldModel;
-import main.java.world.item.Item;
+import main.java.world.entity.Entity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static main.java.world.room.RoomTable.*;
 
 /**
  * This class is used to persist and store information on a single game room.
+ *
  * @author Logan Earl
  */
 public class Room implements DatabaseManager.DatabaseEntry {
     private String roomName;
     private String roomDescription;
 
+    private List<Domain> domains;
+
     private String databaseName;
 
-    private String upRoomID;
-    private String downRoomID;
-    private String northRoomID;
-    private String southRoomID;
-    private String eastRoomID;
-    private String westRoomID;
+    private Map<EnvironmentType, EnvironmentLevelContainer> environmentalLevels = new LinkedHashMap<>();
 
-    private int visibilityCode;
+    private enum EnvironmentType {
+        wind(0, 0.1, 0, 100, WIND_LEVEL, WIND_EQUILIBRIUM, WIND_CONDUCTIVITY),
+        rain(0, .05, 0, 100, RAIN_LEVEL, RAIN_EQUILIBRIUM, WIND_CONDUCTIVITY),
+        temperature(0, 0.2, -100, 100, TEMP_LEVEL, TEMP_EQUILIBRIUM, TEMP_CONDUCTIVITY),
+        toxic(0, .1, 0, 100, TOXIC_LEVEL, TOXIC_EQUILIBRIUM, TOXIC_CONDUCTIVITY),
+        acid(0, .2, 0, 100, ACID_LEVEL, ACID_EQUILIBRIUM, ACID_CONDUCTIVITY),
+        electricity(0, .1, 0, 100, ELECTRICITY_LEVEL, ELECTRICITY_EQUILIBRIUM, ELECTRICITY_CONDUCTIVITY), //depletes all at once. No conductivity
+        information(100, .1, 0, 100, INFO_LEVEL, INFO_EQUILIBRIUM, INFO_CONDUCTIVITY),
+        quake(0, .1, 0, 100, QUAKE_LEVEL, QUAKE_EQUILIBRIUM, QUAKE_CONDUCTIVITY),
+        oil(0, .05, 0, 100, OIL_LEVEL, OIL_EQUILIBRIUM, OIL_CONDUCTIVITY);
 
-    //<editor-fold desc="SQL Operations">
-    private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,ROOM_NAME);
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            TABLE_NAME, ROOM_NAME, ROOM_DESCRIPTION, ROOM_VISIBILITY, ROOM_UP_NAME, ROOM_DOWN_NAME, ROOM_NORTH_NAME, ROOM_SOUTH_NAME, ROOM_EAST_NAME, ROOM_WEST_NAME);
-    private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,ROOM_NAME);
-    private static final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
-            TABLE_NAME, ROOM_DESCRIPTION, ROOM_VISIBILITY, ROOM_UP_NAME, ROOM_DOWN_NAME, ROOM_NORTH_NAME, ROOM_SOUTH_NAME, ROOM_EAST_NAME, ROOM_WEST_NAME, ROOM_NAME);
+        private final String TAG_LEVEL;
+        private final String TAG_EQUILIBRIUM;
+        private final String TAG_CONDUCTIVITY;
+        private double defaultEquilibrium;
+        private double defaultConductivity;
+        private double maxLevel;
+        private double minLevel;
 
-    public static final List<String> directions = Arrays.asList("up", "north", "east", "south", "west", "down");
+        EnvironmentType(double defaultEquilibrium, double defaultConductivity, double minLevel, double maxLevel, String levelTag, String equalTag, String condTag) {
+            this.defaultEquilibrium = defaultEquilibrium;
+            this.defaultConductivity = defaultConductivity;
+            this.minLevel = minLevel;
+            this.maxLevel = maxLevel;
+            this.TAG_LEVEL = levelTag;
+            this.TAG_EQUILIBRIUM = equalTag;
+            this.TAG_CONDUCTIVITY = condTag;
+        }
 
+        private double clampLevel(double level) {
+            if (level < minLevel) level = minLevel;
+            if (level > maxLevel) level = maxLevel;
+            return level;
+        }
+    }
 
-    private Room(ResultSet readEntry, String databaseName) throws SQLException{
+    private static class EnvironmentLevelContainer {
+        private double level;
+        private double equilibrium;
+        private double conductivity;
+        private EnvironmentType type;
+
+        public EnvironmentLevelContainer(EnvironmentType type) {
+            level = type.defaultEquilibrium;
+            equilibrium = type.defaultEquilibrium;
+            conductivity = type.defaultConductivity;
+        }
+
+        public EnvironmentLevelContainer(ResultSet parseFrom, EnvironmentType type) throws SQLException {
+            this.level = parseFrom.getDouble(type.TAG_LEVEL);
+            if (parseFrom.wasNull()) this.level = type.defaultEquilibrium;
+
+            this.equilibrium = parseFrom.getDouble(type.TAG_EQUILIBRIUM);
+            if (parseFrom.wasNull()) this.equilibrium = type.defaultEquilibrium;
+
+            this.conductivity = parseFrom.getDouble(type.TAG_CONDUCTIVITY);
+            if (parseFrom.wasNull()) this.conductivity = type.defaultConductivity;
+
+            if (this.conductivity < 0.001) this.conductivity = 0.001;
+            level = type.clampLevel(level);
+
+        }
+
+        public double getLevel() {
+            return level;
+        }
+
+        public double getEquilibrium() {
+            return equilibrium;
+        }
+
+        public double getConductivity() {
+            return conductivity;
+        }
+    }
+
+    //<editor-fold desc="SQL Operations/Constructor">
+    private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ROOM_NAME);
+    private static final String CREATE_SQL = String.format(Locale.US, "INSERT INTO %s " +
+                    "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" +
+                    " VALUES " +
+                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            TABLE_NAME, ROOM_NAME, ROOM_DESCRIPTION, DOMAINS,
+            WIND_LEVEL, WIND_EQUILIBRIUM, WIND_CONDUCTIVITY,
+            RAIN_LEVEL, RAIN_EQUILIBRIUM, RAIN_CONDUCTIVITY,
+            TEMP_LEVEL, TEMP_EQUILIBRIUM, TEMP_CONDUCTIVITY,
+            TOXIC_LEVEL, TOXIC_EQUILIBRIUM, TEMP_CONDUCTIVITY,
+            ACID_LEVEL, ACID_EQUILIBRIUM, ACID_CONDUCTIVITY,
+            INFO_LEVEL, INFO_CONDUCTIVITY, INFO_EQUILIBRIUM,
+            QUAKE_LEVEL, QUAKE_EQUILIBRIUM, QUAKE_CONDUCTIVITY,
+            OIL_LEVEL, OIL_EQUILIBRIUM, OIL_CONDUCTIVITY);
+    private static final String DELETE_SQL = String.format(Locale.US, "DELETE FROM %s WHERE %s=?", TABLE_NAME, ROOM_NAME);
+    private static final String UPDATE_SQL = String.format(Locale.US, "UPDATE %s SET " +
+                    "%s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?," +
+                    "%s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?," +
+                    "%s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
+            TABLE_NAME, ROOM_DESCRIPTION, DOMAINS,
+            WIND_LEVEL, WIND_EQUILIBRIUM, WIND_CONDUCTIVITY,
+            RAIN_LEVEL, RAIN_EQUILIBRIUM, RAIN_CONDUCTIVITY,
+            TEMP_LEVEL, TEMP_EQUILIBRIUM, TEMP_CONDUCTIVITY,
+            TOXIC_LEVEL, TOXIC_EQUILIBRIUM, TEMP_CONDUCTIVITY,
+            ACID_LEVEL, ACID_EQUILIBRIUM, ACID_CONDUCTIVITY,
+            INFO_LEVEL, INFO_CONDUCTIVITY, INFO_EQUILIBRIUM,
+            QUAKE_LEVEL, QUAKE_EQUILIBRIUM, QUAKE_CONDUCTIVITY,
+            OIL_LEVEL, OIL_EQUILIBRIUM, OIL_CONDUCTIVITY, ROOM_NAME);
+
+    private Room(ResultSet readEntry, String databaseName) throws SQLException {
         roomName = readEntry.getString(ROOM_NAME);
         roomDescription = readEntry.getString(ROOM_DESCRIPTION);
 
-        upRoomID = readEntry.getString(ROOM_UP_NAME);
-        downRoomID = readEntry.getString(ROOM_DOWN_NAME);
-        northRoomID = readEntry.getString(ROOM_NORTH_NAME);
-        southRoomID = readEntry.getString(ROOM_SOUTH_NAME);
-        eastRoomID = readEntry.getString(ROOM_EAST_NAME);
-        westRoomID = readEntry.getString(ROOM_WEST_NAME);
+        domains = Domain.decodeDomains(readEntry.getString(DOMAINS));
+        if(domains.isEmpty())domains.add(Domain.grey);
 
-        visibilityCode = readEntry.getInt(ROOM_VISIBILITY);
+        for (EnvironmentType type : EnvironmentType.values()) {
+            environmentalLevels.put(type, new EnvironmentLevelContainer(readEntry, type));
+        }
 
         this.databaseName = databaseName;
     }
 
     /**
      * How rooms are instantiated initially. Creates one from the given database
-     * @param roomName the name of the room to look up
+     *
+     * @param roomName     the name of the room to look up
      * @param databaseName the name of the database file to search for the room
      * @return the room if it was found. null otherwise
      */
-    public static Room getRoomByRoomName(String roomName, String databaseName){
+    public static Room getByRoomName(String roomName, String databaseName) {
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
         Room toReturn;
-        if(c == null)
+        if (c == null)
             return null;
-        else{
+        else {
             try {
                 getSQL = c.prepareStatement(GET_SQL);
-                getSQL.setString(1,roomName);
+                getSQL.setString(1, roomName);
                 ResultSet accountSet = getSQL.executeQuery();
-                if(accountSet.next())
-                    toReturn = new Room(accountSet,databaseName);
+                if (accountSet.next())
+                    toReturn = new Room(accountSet, databaseName);
                 else
                     toReturn = null;
                 getSQL.close();
                 //c.close();
-            }catch (SQLException e){
+            } catch (SQLException e) {
                 toReturn = null;
             }
         }
@@ -93,39 +179,53 @@ public class Room implements DatabaseManager.DatabaseEntry {
 
     @Override
     public boolean saveToDatabase(String databaseName) {
-        Room room = getRoomByRoomName(roomName,databaseName);
-        if(room == null){
-            return DatabaseManager.executeStatement(CREATE_SQL,databaseName,
-                    roomName,roomDescription,visibilityCode,upRoomID,downRoomID,northRoomID,southRoomID,eastRoomID,westRoomID) > 0;
-        }else{
+        Room room = getByRoomName(roomName, databaseName);
+        if (room == null) {
+            Object[] args = new Object[3 + environmentalLevels.size() * 3];
+            args[0] = roomName;
+            args[1] = roomDescription;
+            args[2] = Domain.encodeDomains(domains);
+            int count = 3;
+            for (EnvironmentLevelContainer container : environmentalLevels.values()) {
+                args[count] = container.getLevel();
+                args[count + 1] = container.getEquilibrium();
+                args[count + 2] = container.getConductivity();
+                count += 3;
+            }
+
+            return DatabaseManager.executeStatement(CREATE_SQL, databaseName, args) > 0;
+        } else {
             return updateInDatabase(databaseName);
         }
     }
 
     @Override
     public boolean removeFromDatabase(String databaseName) {
-        return DatabaseManager.executeStatement(DELETE_SQL,databaseName, roomName) > 0;
+        return DatabaseManager.executeStatement(DELETE_SQL, databaseName, roomName) > 0;
     }
 
     @Override
     public boolean updateInDatabase(String databaseName) {
-        return DatabaseManager.executeStatement(UPDATE_SQL,databaseName,
-                roomDescription,visibilityCode,upRoomID,downRoomID,northRoomID,southRoomID,eastRoomID,westRoomID) > 0;
+        Object[] args = new Object[2 + environmentalLevels.size() * 3];
+        args[0] = roomDescription;
+        args[1] = Domain.encodeDomains(domains);
+        int count = 2;
+        for (EnvironmentLevelContainer container : environmentalLevels.values()) {
+            args[count] = container.getLevel();
+            args[count + 1] = container.getEquilibrium();
+            args[count + 2] = container.getConductivity();
+            count += 3;
+        }
+
+        return DatabaseManager.executeStatement(UPDATE_SQL, databaseName,
+                roomDescription, args) > 0;
     }
 
     @Override
     public boolean existsInDatabase(String databaseName) {
-        return getRoomByRoomName(roomName,databaseName) != null;
+        return getByRoomName(roomName, databaseName) != null;
     }
     //</editor-fold>
-
-    public String displayRoom(WorldModel worldModel, String databaseName){
-        String itemSlot = "";
-        List<Item> items = worldModel.getItemCollection().getItemsInRoom(roomName, databaseName);
-
-        return String.format(Locale.US,
-                "%s\n%s\n\n",roomName, roomDescription);
-    }
 
     //<editor-fold desc="Getters">
     public String getRoomName() {
@@ -136,59 +236,32 @@ public class Room implements DatabaseManager.DatabaseEntry {
         return roomDescription;
     }
 
-    public String getUpRoomID() {
-        return upRoomID;
+    public List<RoomConnection> getOutgoingConnections() {
+        return RoomConnection.getConnectionsBySourceRoom(roomName, databaseName);
     }
 
-    public String getDownRoomID() {
-        return downRoomID;
+    public RoomConnection getOutgoingConnectionByIndex(int index, Entity viewer){
+        List<RoomConnection> visibleRooms = getOutgoingConnectionsFromPOV(viewer);
+        if(index >= 0 && index < visibleRooms.size())
+            return visibleRooms.get(index);
+        return null;
     }
 
-    public String getNorthRoomID() {
-        return northRoomID;
+    public List<RoomConnection> getOutgoingConnectionsFromPOV(Entity viewer) {
+        List<RoomConnection> availableConnections = RoomConnection.getConnectionsBySourceRoom(roomName, databaseName);
+        List<RoomConnection> visibleConnections = new ArrayList<>();
+        for (RoomConnection connection : availableConnections)
+            if (connection.isVisibleTo(viewer))
+                visibleConnections.add(connection);
+        return visibleConnections;
     }
 
-    public String getSouthRoomID() {
-        return southRoomID;
+    public List<Domain> getDomains(){
+        return domains;
     }
 
-    public String getEastRoomID() {
-        return eastRoomID;
-    }
-
-    public String getWestRoomID() {
-        return westRoomID;
-    }
-
-    private String[] getRoomIDs(){
-        return new String[]{getUpRoomID(), getNorthRoomID(), getEastRoomID(), getSouthRoomID(), getWestRoomID(), getDownRoomID()};
-    }
-
-    public String getConnectedRoomID(String direction){
-        int index;
-        if((index = directions.indexOf(direction)) != -1)
-            return getRoomIDs()[index];
-        return "";
-    }
-
-    public String[] getAvailableDirections(){
-        List<String> availableDirections = new ArrayList<>();
-        for(String direction: directions){
-            String roomName = getConnectedRoomID(direction);
-            Room r;
-            if(roomName != null && !roomName.isEmpty() && (r = getRoomByRoomName(roomName,databaseName)) != null && r.getVisibilityCode() == 0)
-                availableDirections.add(direction);
-        }
-        return availableDirections.toArray(new String[0]);
-    }
-
-    /**
-     * gets the room's visibility status.
-     * @return Will be 0 if visible like normal. Will be -1 if invisible with no hope of discovering it with a skill.
-     * if &gt;0 the number represents the difficulty of discovering the room with a skill. Recommended for hidden loot and the like
-     */
-    public int getVisibilityCode() {
-        return visibilityCode;
+    public Domain getDefaultDomain(){
+        return domains.get(0);
     }
 
     public String getDatabaseName() {

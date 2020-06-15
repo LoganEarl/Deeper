@@ -18,7 +18,7 @@ public class StatContainer implements Entity.SqlExtender {
     private static final Random RND = new Random(System.currentTimeMillis());
 
     public static final String SIGNIFIER = "stats";
-    private static final String[] HEADERS = new String[]{STR,DEX,INT,WIS,TOUGH,FIT};
+    private static final String[] HEADERS = new String[]{STR, DEX, INT, WIS, TOUGH, FIT};
 
     public StatContainer(int strength, int dexterity, int intelligence, int wisdom, int toughness, int fitness) {
         this.strength = strength;
@@ -40,15 +40,16 @@ public class StatContainer implements Entity.SqlExtender {
 
     /**
      * performs a stat check on the specified stat and difficulty
-     * @param stat the column name of the stat to roll for.
+     *
+     * @param stat               the column name of the stat to roll for.
      * @param difficultyModifier the amount to add or subtract from the result
-     * @throws IllegalArgumentException if you pass in a column name for stat that is not recognized
      * @return the net stat, with 0 and up being a success
+     * @throws IllegalArgumentException if you pass in a column name for stat that is not recognized
      */
-    public int preformStatCheck(String stat, int difficultyModifier){
+    public int preformStatCheck(String stat, int difficultyModifier) {
         int baseStat = getStat(stat);
 
-        return baseStat - RND.nextInt(100)+difficultyModifier;
+        return baseStat - RND.nextInt(100) + difficultyModifier;
     }
 
     public int getStat(String columnName) {
@@ -58,7 +59,7 @@ public class StatContainer implements Entity.SqlExtender {
             case DEX:
                 return dexterity;
             case INT:
-               return intelligence;
+                return intelligence;
             case WIS:
                 return wisdom;
             case TOUGH:
@@ -70,29 +71,29 @@ public class StatContainer implements Entity.SqlExtender {
         }
     }
 
-    public double getWeightSoftLimit(){
+    public double getWeightSoftLimit() {
         //15 to 100 kg based on str
-        return strength/100.0 * 85 + 15;
+        return strength / 100.0 * 85 + 15;
     }
 
-    public double getWeightHardLimit(){
+    public double getWeightHardLimit() {
         //40 to 400 kg based on str
-        return strength/100.0 * 360 + 40;
+        return strength / 100.0 * 360 + 40;
     }
 
-    public int calculateMaxHP(){
-        return getToughness() * 2 + (getStrength() + getDexterity())/2;
+    public int calculateMaxHP() {
+        return getToughness() * 2 + (getStrength() + getDexterity()) / 2;
     }
 
-    public int calculateMaxStamina(){
-        return getFitness() * 2 + (getStrength() + getDexterity())/2;
+    public int calculateMaxStamina() {
+        return getFitness() * 2 + (getStrength() + getDexterity()) / 2;
     }
 
-    public int calculateMaxMP(){
+    public int calculateMaxMP() {
         return getIntelligence() * 2 + getWisdom();
     }
 
-    public int calculateMaxBurnout(){
+    public int calculateMaxBurnout() {
         return getWisdom() * 2 + getIntelligence();
     }
 
@@ -103,7 +104,7 @@ public class StatContainer implements Entity.SqlExtender {
 
     @Override
     public Object[] getInsertSqlValues() {
-        return new Object[]{strength,dexterity,intelligence,wisdom, toughness, fitness};
+        return new Object[]{strength, dexterity, intelligence, wisdom, toughness, fitness};
     }
 
     @Override
@@ -114,7 +115,7 @@ public class StatContainer implements Entity.SqlExtender {
     @Override
     public String toString() {
         return String.format(Locale.US, "[STR:%d] [DEX:%d] [INT:%d] [WIS:%d] [FIT:%d] [TOUGH:%d]",
-                strength, dexterity, intelligence, wisdom,fitness,toughness);
+                strength, dexterity, intelligence, wisdom, fitness, toughness);
     }
 
     public int getStrength() {

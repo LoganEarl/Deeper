@@ -9,7 +9,8 @@ public enum Domain {
     surfaceWater,
     subterranean,
     hyperspace,
-    aether;
+    aether,
+    grey; //empty space. Devoid of all creation.
 
     public static List<Domain> decodeDomains(String encodedDomains){
         if(encodedDomains == null || encodedDomains.isEmpty())
@@ -39,5 +40,19 @@ public enum Domain {
             encoded.append(domain.name());
         }
         return encoded.toString();
+    }
+
+    public static String getTransitionDescription(Domain sourceDomain, Domain destinationDomain){
+        if(sourceDomain == surface && destinationDomain == air)
+            return "leaps into the air";
+        if(sourceDomain == air && destinationDomain == surface)
+            return "lands on the surface";
+        if(sourceDomain == air && destinationDomain == surfaceWater)
+            return "lands with a splash";
+        return "goes from the " + sourceDomain.name() + " to the " + destinationDomain.name();
+    }
+
+    public String getTravelVerb(){
+        return "travels";
     }
 }

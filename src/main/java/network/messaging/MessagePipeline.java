@@ -129,7 +129,7 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
      * a custom context in which commands can be executed. Messages that arrive from the
      * associated entity will first be routed to the context. The context can then choose
      * to consume the message or ignore it. If it is ignored, the message will go to the
-     * default context for all main.java.world messages.
+     * default context for all world messages.
      */
     public interface MessageContext {
         /**

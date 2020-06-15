@@ -44,7 +44,7 @@ public class SimulationManager {
         server.setClientRegistry(clientRegistry);
     }
 
-    /**Starts the server and ensures the directory system and main.java.world system is all in place*/
+    /**Starts the server and ensures the directory system and world system is all in place*/
     public void init() {
         System.out.println("Creating account tables");
         List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();

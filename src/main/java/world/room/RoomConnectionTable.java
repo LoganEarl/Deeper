@@ -8,9 +8,13 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
     public static final String TABLE_NAME = "roomConnection";
     /**The unique id of the connection*/
     public static final String CONNECTION_ID = "connection";
-    /**The name of the connection as displayed to the user*/
+    /**The name of the connection as displayed to the user.*/
     public static final String NAME = "name";
-    /**The message displayed to the user after traversing the connection*/
+    /**The message displayed to the user after traversing the connection. Certain keywords can be used in the message to replace them with in game names. The keywords are as follows
+     * <br>ENTITY1_NAME is replace with the name of the entity
+     * <br>ENTITY1_PRONOUN is replaced with the entity's pronoun. (it, he, she, they, etc)
+     * <br>ENTITY1_REFLEXIVE is replaced with the reflexive form of the entity's pronoun. (itself, himself, herself, theirself, etc
+     * <br>ENTITY1_POSSESSIVE is replaced with the possesive form of the entity's pronoun. (its, his, her, their)*/
     public static final String SUCCESS_MESSAGE = "successMessage";
     /**The message displayed to the user after failing the traversal. Ignored if no traverseSkillName specified*/
     public static final String FAILURE_MESSAGE = "failureMessage";
@@ -22,7 +26,7 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
     public static final String SOURCE_DOMAINS = "sourceDomains";
     /**Semicolon separated list of domains the user can enter the destination in. If no destDomain matches the domain user is currently in or none specified, they are placed in first available domain.*/
     public static final String DESTINATION_DOMAINS = "destinationDomains";
-    /**The difficulty of the skill check to traverse the connection. Is a positive int, user must roll higher than this int in a skill check. If value is 0 no skill check is needed*/
+    /**The difficulty of the skill check to traverse the connection. Is a signed int, is added to a skill check roll. 0 is normal, 20 is pretty easy, -20 pretty hard. 60 is trivial, -60 hellish*/
     public static final String TRAVERSE_DIFFICULTY = "traverseDifficulty";
     /**The skill required to traverse the room connection. If no value given, no skill check is needed.*/
     public static final String TRAVERSE_SKILL_NAME = "traverseSkillName";
@@ -42,8 +46,10 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
     public static final String SUCCESS_EFFECT_NAME = "successEffectName";
     /**The amount the base damage scales based on degrees of success on a traverse attempt. Has no effect if connection is freely traversable. Blank values will be substituted with a 1*/
     public static final String STAMINA_COST = "staminaCost";
-    /**The code of the key item required to unlock the passage. Must traverse using the */
+    /**The code of the key item required to unlock the passage. Must unlock the room with a key with the same keycode. If 0 or NULL it is not lockable via key*/
     public static final String KEY_CODE = "keyCode";
+    /**The state of the room. Determines if it is locked, unlocked, impassable*/
+    public static final String STATE = "state";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
     private final Set<String> CONSTRAINTS = new HashSet<>(2);
@@ -68,6 +74,7 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
         TABLE_DEFINITION.put(SUCCESS_EFFECT_NAME, "VARCHAR(32) COLLATE NOCASE");
         TABLE_DEFINITION.put(STAMINA_COST, "INT");
         TABLE_DEFINITION.put(KEY_CODE, "INT");
+        TABLE_DEFINITION.put(STATE, "VARCHAR(16) COLLATE NOCASE");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 SOURCE_ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));

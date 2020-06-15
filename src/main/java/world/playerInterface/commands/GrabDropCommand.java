@@ -44,7 +44,7 @@ public class GrabDropCommand extends EntityCommand {
 
     @Override
     protected void executeEntityCommand() {
-        if(pickUp)
+        if (pickUp)
             pickUp();
         else
             putIn();
@@ -52,45 +52,45 @@ public class GrabDropCommand extends EntityCommand {
         complete = true;
     }
 
-    private void putIn(){
-        Item toPutIn = Item.getFromEntityContext(itemIdentifier,getSourceEntity(), getWorldModel().getItemFactory());
-        if(toPutIn == null || !getSourceEntity().getEquipment().isHoldingItem(toPutIn))
+    private void putIn() {
+        Item toPutIn = Item.getFromEntityContext(itemIdentifier, getSourceEntity(), getWorldModel().getItemFactory());
+        if (toPutIn == null || !getSourceEntity().getEquipment().isHoldingItem(toPutIn))
             getSourceClient().sendMessage("You are not holding a " + itemIdentifier);
-        else if(containerIdentifier.isEmpty()){
+        else if (containerIdentifier.isEmpty()) {
             //drop it to the floor
             int result = getSourceEntity().getEquipment().dropItem(toPutIn);
-            if(result == CODE_SUCCESS) {
+            if (result == CODE_SUCCESS) {
                 getSourceClient().sendMessage("You drop the " + toPutIn.getDisplayableName());
 
                 toPutIn.updateInDatabase(toPutIn.getDatabaseName());
                 getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
-            }else if(result == CODE_NO_ITEM)
+            } else if (result == CODE_NO_ITEM)
                 getSourceClient().sendMessage("You are not holding a " + itemIdentifier);
             else
                 getSourceClient().sendMessage("An error has occurred. You are unable to drop a " + itemIdentifier + " (" + result + ")");
-        }else{
+        } else {
             //try store in container
             Item toStoreIn = Item.getFromEntityContext(containerIdentifier, getSourceEntity(), getWorldModel().getItemFactory());
-            if(toStoreIn == null)
+            if (toStoreIn == null)
                 getSourceClient().sendMessage("There is not a " + containerIdentifier + " nearby");
-            else if(toStoreIn.getItemType() != ItemType.container)
+            else if (toStoreIn.getItemType() != ItemType.container)
                 getSourceClient().sendMessage("The " + toStoreIn.getDisplayableName() + " is not a container. You cannot store items in it");
-            else if(toStoreIn.getItemID() == toPutIn.getItemID())
+            else if (toStoreIn.getItemID() == toPutIn.getItemID())
                 getSourceClient().sendMessage("You attempt to " + toPutIn.getDisplayableName() + " inside of itself. You fail. Honestly what did you expect?");
-            else{
+            else {
                 Container container = (Container) toStoreIn;
                 ArmorSlot returnSlot = getSourceEntity().getEquipment().getSlotOfItem(toPutIn);
                 int result = getSourceEntity().getEquipment().dropItem(toPutIn);
-                if(result == CODE_SUCCESS) {
+                if (result == CODE_SUCCESS) {
                     if (!container.canHoldItem(toPutIn)) {
                         getSourceClient().sendMessage("The " + container.getDisplayableName() + " cannot hold that item");
 
-                        getSourceEntity().getEquipment().forcePutItemInSlot(toPutIn,returnSlot);
-                    }else if (container.tryStoreItem(toPutIn)) {
+                        getSourceEntity().getEquipment().forcePutItemInSlot(toPutIn, returnSlot);
+                    } else if (container.tryStoreItem(toPutIn)) {
                         getSourceClient().sendMessage("You put the " +
                                 toPutIn.getDisplayableName() + " in the " +
                                 container.getDisplayableName());
-                        Notification notification = new ItemAcquiredNotification(getSourceEntity(),toPutIn,false,null,toStoreIn,getWorldModel().getRegistry());
+                        Notification notification = new ItemAcquiredNotification(getSourceEntity(), toPutIn, false, null, toStoreIn, getWorldModel().getRegistry());
                         notifyEntityRoom(notification);
 
                         toPutIn.updateInDatabase(toPutIn.getDatabaseName());
@@ -101,66 +101,68 @@ public class GrabDropCommand extends EntityCommand {
                                 toPutIn.getDisplayableName() + " in the " +
                                 container.getDisplayableName());
 
-                        getSourceEntity().getEquipment().forcePutItemInSlot(toPutIn,returnSlot);
+                        getSourceEntity().getEquipment().forcePutItemInSlot(toPutIn, returnSlot);
                     }
-                }else{
+                } else {
                     getSourceClient().sendMessage("You are unable to release the " + toPutIn.getDisplayableName());
                 }
             }
         }
     }
 
-    private Container getLocalContainer(String identifier){
+    private Container getLocalContainer(String identifier) {
         Item container = Item.getFromEntityContext(identifier, getSourceEntity(), getWorldModel().getItemFactory());
-        if(container != null && container.getItemType() == ItemType.container)
+        if (container != null && container.getItemType() == ItemType.container)
             return (Container) container;
         return null;
     }
 
-    private void pickUp(){
-        Item toPickUp = Item.getFromEntityContext(itemIdentifier,getSourceEntity(), getWorldModel().getItemFactory());
+    private void pickUp() {
+        Item toPickUp = Item.getFromEntityContext(itemIdentifier, getSourceEntity(), getWorldModel().getItemFactory());
         Container pickupFrom = null;
-        if(toPickUp == null && !containerIdentifier.isEmpty() &&
+        if (toPickUp == null && !containerIdentifier.isEmpty() &&
                 (pickupFrom = getLocalContainer(containerIdentifier)) != null) {
             toPickUp = pickupFrom.getContainedItem(itemIdentifier);
         }
 
         int holdCode;
 
-        if(toPickUp == null)
+        if (toPickUp == null)
             getSourceClient().sendMessage("There is no " + itemIdentifier + " nearby");
-        else if((holdCode = getSourceEntity().getEquipment().canHoldItem(toPickUp, pickupFrom != null)) != EquipmentContainer.CODE_SUCCESS){
-            if(holdCode == CODE_CONTAINER_FULL)
+        else if ((holdCode = getSourceEntity().getEquipment().canHoldItem(toPickUp, pickupFrom != null)) != EquipmentContainer.CODE_SUCCESS) {
+            if (holdCode == CODE_CONTAINER_FULL)
                 getSourceClient().sendMessage("Your hands are full. You cannot pick up the " + toPickUp.getDisplayableName());
-            else if(holdCode == CODE_TOO_HEAVY)
+            else if (holdCode == CODE_TOO_HEAVY)
                 getSourceClient().sendMessage("The " + toPickUp.getDisplayableName() + " is heavier than you can carry given your strength and equipment");
-            else if(holdCode == CODE_NOT_NEAR)
+            else if (holdCode == CODE_NOT_NEAR)
                 getSourceClient().sendMessage("There is no " + itemIdentifier + " nearby");
             else
                 getSourceClient().sendMessage("An error has occurred. You are unable to pick up that item");
-        }else{
+        } else {
             boolean proceed = false;
-            if(!containerIdentifier.isEmpty()){
-                if(pickupFrom == null)
+            if (!containerIdentifier.isEmpty()) {
+                if (pickupFrom == null)
                     getSourceClient().sendMessage("There is no " + containerIdentifier + " nearby");
-                else if(!(pickupFrom).containsItem(toPickUp))
+                else if (pickupFrom.getIsLocked())
+                    getSourceClient().sendMessage("The " + containerIdentifier + " is locked");
+                else if (!(pickupFrom).containsItem(toPickUp))
                     getSourceClient().sendMessage("The " + pickupFrom.getDisplayableName() + " does not contain a " + toPickUp.getDisplayableName());
                 else {
                     proceed = true;
                 }
-            }else{
+            } else {
                 proceed = true;
             }
 
-            if(proceed) {
+            if (proceed) {
                 getSourceEntity().getEquipment().holdItem(toPickUp, pickupFrom != null);
                 toPickUp.setContainerID(0);
                 toPickUp.setRoomName("");
                 getSourceEntity().updateInDatabase(getSourceEntity().getDatabaseName());
                 toPickUp.updateInDatabase(toPickUp.getDatabaseName());
 
-                Notification pickedUp = new ItemAcquiredNotification(getSourceEntity(),toPickUp,true,pickupFrom,null,getWorldModel().getRegistry());
-                NotificationScope scope = new RoomNotificationScope(getSourceEntity().getRoomName(),getSourceEntity().getDatabaseName());
+                Notification pickedUp = new ItemAcquiredNotification(getSourceEntity(), toPickUp, true, pickupFrom, null, getWorldModel().getRegistry());
+                NotificationScope scope = new RoomNotificationScope(getSourceEntity().getRoomName(), getSourceEntity().getDatabaseName());
                 getWorldModel().getNotificationService().notify(pickedUp, scope);
             }
         }
@@ -185,24 +187,24 @@ public class GrabDropCommand extends EntityCommand {
         @Override
         public String getAsMessage(Entity viewer) {
             String response;
-            if(viewer.equals(actor)){
-                if(wasPickedUp)
+            if (viewer.equals(actor)) {
+                if (wasPickedUp)
                     response = getMessageInColor("You take the ", INFORMATIVE) + getItemColored(target);
-                else if(destinationContainer == null)
+                else if (destinationContainer == null)
                     response = getMessageInColor("You drop the ", INFORMATIVE) + getItemColored(target);
                 else
-                    response = getMessageInColor("You put the " + getItemColored(target) + " in the " + getItemColored(destinationContainer),INFORMATIVE);
-            }else {
+                    response = getMessageInColor("You put the " + getItemColored(target) + " in the " + getItemColored(destinationContainer), INFORMATIVE);
+            } else {
                 if (wasPickedUp) {
-                    response = getEntityColored(actor,viewer,getWorldModel()) + getMessageInColor(" takes a ", INFORMATIVE) + getItemColored(target);
+                    response = getEntityColored(actor, viewer, getWorldModel()) + getMessageInColor(" takes a ", INFORMATIVE) + getItemColored(target);
                     if (sourceContainer == null)
                         response += getMessageInColor(" from the ground", INFORMATIVE);
                     else
                         response += getMessageInColor(" from the ", INFORMATIVE) + getItemColored(sourceContainer);
-                } else if (destinationContainer != null){
-                    response = getEntityColored(actor,viewer,getWorldModel()) + getMessageInColor(" puts a ", INFORMATIVE) + getItemColored(target) + " in the " + getItemColored(destinationContainer);
-                }else {
-                    response = getEntityColored(actor,viewer,getWorldModel()) + getMessageInColor( " drops up a ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(), ITEM);
+                } else if (destinationContainer != null) {
+                    response = getEntityColored(actor, viewer, getWorldModel()) + getMessageInColor(" puts a ", INFORMATIVE) + getItemColored(target) + " in the " + getItemColored(destinationContainer);
+                } else {
+                    response = getEntityColored(actor, viewer, getWorldModel()) + getMessageInColor(" drops up a ", INFORMATIVE) + getMessageInColor(target.getDisplayableName(), ITEM);
                 }
             }
             return response;

@@ -16,9 +16,9 @@ import main.java.world.item.weapon.Weapon;
 import main.java.world.meta.World;
 import main.java.world.notification.Notification;
 import main.java.world.notification.NotificationSubscriber;
+import main.java.world.room.Domain;
 import main.java.world.room.Room;
 import main.java.world.trait.Trait;
-import main.java.world.trait.TraitBestower;
 import main.java.world.trait.Traited;
 
 import java.sql.Connection;
@@ -49,6 +49,7 @@ public class Entity implements
     private String raceID;
 
     private Stance currentStance;
+    private Domain domain;
 
     private String databaseName;
     private WorldModel model;
@@ -86,6 +87,17 @@ public class Entity implements
 
         controllerType = readEntry.getString(CONTROLLER_TYPE);
         roomName = readEntry.getString(ROOM_NAME);
+
+        String rawDomain = readEntry.getString(DOMAIN);
+        try{
+            this.domain = Domain.valueOf(rawDomain);
+        }catch (IllegalArgumentException e){
+            domain = null;
+            Room myRoom = Room.getByRoomName(roomName, databaseName);
+            if(myRoom != null) domain = myRoom.getDefaultDomain();
+            if(domain == null)
+                throw new IllegalStateException("Entity does not have a domain");
+        }
 
         getPools().calculatePoolMaxes(getStats());
 
@@ -309,8 +321,8 @@ public class Entity implements
     @Override
     public boolean updateInDatabase(String databaseName) {
         boolean success = DatabaseManager.executeStatement(makeInsertSQL(extenders,
-                ENTITY_ID,DISPLAY_NAME,CONTROLLER_TYPE,ROOM_NAME,RACE_ID), databaseName, appendData(extenders,
-                entityID,displayName,controllerType,roomName,raceID)) > 0;
+                ENTITY_ID,DISPLAY_NAME,CONTROLLER_TYPE,ROOM_NAME,RACE_ID, DOMAIN), databaseName, appendData(extenders,
+                entityID,displayName,controllerType,roomName,raceID, domain.name())) > 0;
         if(success)
             entityCache.put(getEntityTag(entityID,databaseName),this);
         return success;
@@ -455,6 +467,10 @@ public class Entity implements
         this.roomName = newRoom.getRoomName();
     }
 
+    public void setRoom(String roomName){
+        this.roomName = roomName;
+    }
+
     public String getDatabaseName() {
         return databaseName;
     }
@@ -493,6 +509,14 @@ public class Entity implements
 
     public ProgressionContainer getProgression(){
         return (ProgressionContainer) extenders.get(ProgressionContainer.SIGNIFIER);
+    }
+
+    public Domain getDomain() {
+        return domain;
+    }
+
+    public void setDomain(Domain domain) {
+        this.domain = domain;
     }
 
     /**

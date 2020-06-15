@@ -19,7 +19,7 @@ public class WorldUtils {
         return null;
     }
 
-    public static String commaSeparate(List args) {
+    public static String commaSeparate(List<?> args) {
         if (args.size() == 0)
             return "";
         else if (args.size() == 1)
@@ -43,7 +43,7 @@ public class WorldUtils {
 
     public static String getRefusedFlavorText() {
         String[] possibleRefuses = new String[]{
-                "You muster your will, forging it, sculpting it into a great command to make the main.java.world tremble. You hurl it at space itself with your entire soul. Nothing happens. You feel as if you hear someone chuckling, perhaps you imagined it",
+                "You muster your will, forging it, sculpting it into a great command to make the world tremble. You hurl it at space itself with your entire soul. Nothing happens. You feel as if you hear someone chuckling, perhaps you imagined it",
 
                 "A man said to the universe: \n" +
                         "“Sir, I exist!”\n" +

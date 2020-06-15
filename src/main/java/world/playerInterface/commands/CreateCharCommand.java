@@ -222,7 +222,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 Entity newPlayer = builder.build();
                 newPlayer.transferToWorld(World.getHubWorld());
                 model.getNotificationService().subscribe(newPlayer);
-                model.getExecutor().scheduleCommand(new LookCommand("",false, sourceClient, model));
+                model.getExecutor().scheduleCommand(new LookCommand("",false,false, sourceClient, model));
                 stage = STAGE_COMPLETE;
             }
         }

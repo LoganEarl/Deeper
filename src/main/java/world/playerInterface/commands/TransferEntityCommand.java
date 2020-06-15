@@ -72,7 +72,7 @@ public class TransferEntityCommand extends EntityCommand {
                                 lastScope);
 
                         notifyEntityRoom(new TransferEntityNotification(getSourceEntity(),true, getWorldModel().getRegistry()));
-                        executor.scheduleCommand(new LookCommand("", false, getSourceClient(), getWorldModel()));
+                        executor.scheduleCommand(new LookCommand("", false,false, getSourceClient(), getWorldModel()));
                     }
                 } else {
                     getSourceClient().sendMessage("I don't see a main.java.world with ID: " + worldID);

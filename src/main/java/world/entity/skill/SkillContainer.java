@@ -50,15 +50,24 @@ public class SkillContainer implements Entity.SqlExtender, TraitBestower {
         return status;
     }
 
-    public int performSkillCheck(Skill toCheck, int baseNumber, int statLevel){
-        int baseRoll = RND.nextInt(101);
-        int skillBonus;
+    public int performSkillCheck(Skill toCheck, int baseNumber){
+        int statLevel = sourceEntity.getStats().getStat(toCheck.getAssociatedStat());
+        return performSkillCheck(toCheck, baseNumber, statLevel);
+    }
 
+    public int getSkillBonus(Skill toCheck){
         int skillLevel = getLearnLevel(toCheck);
+        int skillBonus;
         if(skillLevel != UNLEARNED)
             skillBonus = skillLevel * 10;
         else
             skillBonus = -20;
+        return skillBonus;
+    }
+
+    public int performSkillCheck(Skill toCheck, int baseNumber, int statLevel){
+        int baseRoll = RND.nextInt(101);
+        int skillBonus = getSkillBonus(toCheck);
 
         //on crit return 100 or the highest possible, whichever is higher
         if(baseRoll == 0) return baseNumber > 0? 100 + baseNumber: 100;

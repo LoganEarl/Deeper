@@ -32,9 +32,9 @@ public class ClientCreateWorldMessage extends ClientMessage {
                 getClient().getAssociatedAccount().getAccountType().compareToAcountType(Account.AccountType.ADMIN) >= 0) {
             World newWorld = World.createWorldFromTemplate(templateName);
             if(newWorld != null){
-                getClient().sendMessage("Success. Your new main.java.world ID is " + newWorld.getWorldID());
+                getClient().sendMessage("Success. Your new world ID is " + newWorld.getWorldID());
             }else
-                getClient().sendMessage("Failed to create main.java.world from template with name: " + templateName);
+                getClient().sendMessage("Failed to create world from template with name: " + templateName);
         }else
             getClient().sendMessage("You must be an admin to do that");
 

@@ -61,7 +61,7 @@ public class World implements DatabaseManager.DatabaseEntry {
 
     private int worldID;
     private String name;
-    private String status;
+    private Status status;
     private long endTime;
     private long startTime;
     private String entryRoomName;
@@ -72,17 +72,18 @@ public class World implements DatabaseManager.DatabaseEntry {
 
     public static final int MINIMUM_SIM_TIME_MINUTES = 30;
 
-    /**Value of getStatus() when the main.java.world is newly created and has not yet started*/
-    public static final String STATUS_NEW = "new";
-    /**Value of getStatus() when the main.java.world is created and actively being solved by players*/
-    public static final String STATUS_IN_PROGRESS = "inProgress";
-    /**Value of getStatus() when the main.java.world timed out without getting solved and was destroyed. World file has been deleted*/
-    public static final String STATUS_FAILED = "failed";
-    /**Value of getStatus() when the main.java.world has been completed but there are still players active in the sim*/
-    public static final String FINISHING = "finishing";
-    /**Value of getStatus() when the main.java.world was completed and all players have left. World file has been deleted*/
-    public static final String STATUS_COMPLETE = "complete";
-
+    public enum Status{
+        /**Value of getStatus() when the main.java.world is newly created and has not yet started*/
+        fresh,
+        /**Value of getStatus() when the main.java.world is created and actively being solved by players*/
+        inProgress,
+        /**Value of getStatus() when the main.java.world timed out without getting solved and was destroyed. World file has been deleted*/
+        failed,
+        /**Value of getStatus() when the main.java.world has been completed but there are still players active in the sim*/
+        finishing,
+        /**Value of getStatus() when the main.java.world was completed and all players have left. World file has been deleted*/
+        complete
+    }
     private static boolean nullOrEmpty(String s){
         return s == null || s.isEmpty();
     }
@@ -90,7 +91,7 @@ public class World implements DatabaseManager.DatabaseEntry {
     private World(int worldID, ResultSet templateMetaTableEntry) throws Exception{
         this.worldID = worldID;
         this.name = templateMetaTableEntry.getString(WorldMetaTable.WORLD_NAME);
-        this.status = STATUS_NEW;
+        this.status = Status.fresh;
         this.startTime = 0;
         this.endTime = 0;
         this.entryRoomName = templateMetaTableEntry.getString(WorldMetaTable.ENTRY_PORTAL_ROOM_NAME);
@@ -110,7 +111,11 @@ public class World implements DatabaseManager.DatabaseEntry {
     private World(ResultSet readEntry) throws SQLException {
         worldID = readEntry.getInt(WORLD_ID);
         name = readEntry.getString(WORLD_NAME);
-        status = readEntry.getString(WORLD_STATUS);
+        try {
+            status = Status.valueOf(readEntry.getString(WORLD_STATUS));
+        }catch (IllegalArgumentException e){
+            status = Status.fresh;
+        }
         endTime = readEntry.getLong(WORLD_END_TIME);
         startTime = readEntry.getLong(WORLD_START_TIME);
         entryRoomName = readEntry.getString(ENTRY_PORTAL_ROOM_NAME);
@@ -119,7 +124,7 @@ public class World implements DatabaseManager.DatabaseEntry {
         portalSize = readEntry.getInt(PORTAL_SIZE);
         durationMinutes = readEntry.getInt(PREFERRED_DURATION_MINUTES);
 
-        if(name == null || name.isEmpty() || status == null || status.isEmpty())
+        if(name == null || name.isEmpty())
             throw new IllegalArgumentException("Illegal main.java.world: " + worldID + ", unable to parse");
     }
 
@@ -370,7 +375,7 @@ public class World implements DatabaseManager.DatabaseEntry {
         return name;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -407,16 +412,16 @@ public class World implements DatabaseManager.DatabaseEntry {
     }
 
     public void resetStatus(){
-        this.status = STATUS_NEW;
+        this.status = Status.fresh;
         this.startTime = 0;
         this.endTime = 0;
         updateInDatabase("");
     }
 
     public void startWorld(){
-        if(!this.status.equals(STATUS_NEW))
+        if(this.status != Status.fresh)
             throw new IllegalStateException("World was already started");
-        this.status = STATUS_IN_PROGRESS;
+        this.status = Status.inProgress;
         this.startTime = System.currentTimeMillis();
         this.endTime = startTime + (durationMinutes * 60 * 1000);
     }

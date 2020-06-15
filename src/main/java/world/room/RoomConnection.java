@@ -3,6 +3,7 @@ package main.java.world.room;
 import main.java.database.DatabaseManager;
 import main.java.world.cache.WorldSpecificCache;
 import main.java.world.entity.Entity;
+import main.java.world.entity.skill.Skill;
 import main.java.world.trait.EffectArchetype;
 
 import java.sql.Connection;
@@ -26,7 +27,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     private String sourceRoomName;
     private String destRoomName;
     private int traverseDifficulty;
-    private String traverseSkillName;
+    private Skill traverseSkill;
     private int detectDifficulty;
     private EffectArchetype failureEffect;
     private EffectArchetype successEffect;
@@ -39,14 +40,20 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     private int keyCode;
     private List<Domain> sourceDomains;
     private List<Domain> destinationDomains;
+    private State state;
+
+    public enum State{
+        locked, unlocked, impassible
+    }
 
     private static Map<String, WorldSpecificCache<String, RoomConnection>> roomConnectionCache = new HashMap<>();
 
     //<editor-fold desc="SQL Operations">
     private static final String GET_SOURCE_SQL = String.format(Locale.US,"SELECT %s FROM %s WHERE %s=?",CONNECTION_ID, TABLE_NAME,SOURCE_ROOM_NAME);
     private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,CONNECTION_ID);
-    private static final String REPLACE_SQL = String.format(Locale.US,"REPLACE INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            TABLE_NAME, CONNECTION_ID, NAME, SUCCESS_MESSAGE, FAILURE_MESSAGE, SOURCE_ROOM_NAME, DEST_ROOM_NAME, SOURCE_DOMAINS, DESTINATION_DOMAINS, TRAVERSE_DIFFICULTY, TRAVERSE_SKILL_NAME, DETECT_DIFFICULTY, DETECT_DOMAINS, DETECT_WORD, FAILURE_EFFECT_NAME, FAILURE_ROOM_NAME, FAILURE_DESTINATION_DOMAINS, SUCCESS_EFFECT_NAME, STAMINA_COST, KEY_CODE);
+    private static final String REPLACE_SQL = String.format(Locale.US,
+            "REPLACE INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            TABLE_NAME, CONNECTION_ID, NAME, SUCCESS_MESSAGE, FAILURE_MESSAGE, SOURCE_ROOM_NAME, DEST_ROOM_NAME, SOURCE_DOMAINS, DESTINATION_DOMAINS, TRAVERSE_DIFFICULTY, TRAVERSE_SKILL_NAME, DETECT_DIFFICULTY, DETECT_DOMAINS, DETECT_WORD, FAILURE_EFFECT_NAME, FAILURE_ROOM_NAME, FAILURE_DESTINATION_DOMAINS, SUCCESS_EFFECT_NAME, STAMINA_COST, KEY_CODE, STATE);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,CONNECTION_ID);
 
 
@@ -58,7 +65,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         sourceRoomName = readEntry.getString(SOURCE_ROOM_NAME);
         destRoomName = readEntry.getString(DEST_ROOM_NAME);
         traverseDifficulty = readEntry.getInt(TRAVERSE_DIFFICULTY);
-        traverseSkillName = readEntry.getString(TRAVERSE_SKILL_NAME);
+        traverseSkill = Skill.getGeneralSkill(readEntry.getString(TRAVERSE_SKILL_NAME));
         detectDifficulty = readEntry.getInt(DETECT_DIFFICULTY);
 
         String raw = "";
@@ -78,12 +85,23 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
             successEffect = null;
         }
 
+        try{
+            raw = readEntry.getString(STATE);
+            state = raw != null? State.valueOf(raw): State.unlocked;
+        }catch (IllegalArgumentException e){
+            System.out.printf("Failed to load state for room connection:%s:%s\n",connectionID,raw);
+            state = State.unlocked;
+        }
+
         failureRoomName = readEntry.getString(FAILURE_ROOM_NAME);
 
         failureDestinationDomains = Domain.decodeDomains(readEntry.getString(FAILURE_DESTINATION_DOMAINS));
         sourceDomains = Domain.decodeDomains(readEntry.getString(SOURCE_DOMAINS));
         destinationDomains = Domain.decodeDomains(readEntry.getString(DESTINATION_DOMAINS));
         detectDomains = Domain.decodeDomains(readEntry.getString(DETECT_DOMAINS));
+
+        if(destinationDomains.isEmpty())
+            destinationDomains.add(Domain.surface);
 
         detectWord = readEntry.getString(DETECT_WORD);
         staminaCost = readEntry.getInt(STAMINA_COST);
@@ -105,7 +123,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
                 Domain.encodeDomains(sourceDomains),
                 Domain.encodeDomains(destinationDomains),
                 traverseDifficulty,
-                traverseSkillName,
+                traverseSkill.getSavableName(),
                 detectDifficulty,
                 Domain.encodeDomains(detectDomains),
                 detectWord,
@@ -114,7 +132,8 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
                 Domain.encodeDomains(failureDestinationDomains),
                 successEffect.name(),
                 staminaCost,
-                keyCode);
+                keyCode,
+                state.name());
         if(result > 0) addToCache(this);
 
         return result > 0;
@@ -259,8 +278,16 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         return traverseDifficulty;
     }
 
-    public String getTraverseSkillName() {
-        return traverseSkillName;
+    public Skill getTraverseSkill(){
+        return traverseSkill;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     public int getDetectDifficulty() {
@@ -303,7 +330,13 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         return sourceDomains;
     }
 
+    /**
+     * Get all available destination domains. Refer to RoomConnectionTable for more info.
+     * @return a non-empty list of domains, where the first element is the default domain
+     */
     public List<Domain> getDestinationDomains() {
+        if(destinationDomains.isEmpty())
+            destinationDomains.add(Domain.surface);
         return destinationDomains;
     }
 

@@ -8,7 +8,7 @@ import main.java.world.playerInterface.commands.MoveCommand;
 
 public class ClientMoveMessage extends ClientMessage {
     public static final String HEADER = "go";
-    private String direction;
+    private String rawConnectionIndex;
 
     public ClientMoveMessage(Client sourceClient, MessagePipeline messagePipeline, WorldModel worldModel) {
         super(HEADER, sourceClient, messagePipeline, worldModel);
@@ -17,8 +17,8 @@ public class ClientMoveMessage extends ClientMessage {
     @Override
     public boolean constructFromString(String rawMessage) {
         String[] args = rawMessage.split("\n");
-        if(args.length == 1){
-            direction = args[0];
+        if (args.length == 1) {
+            rawConnectionIndex = args[0];
             return true;
         }
         return false;
@@ -26,12 +26,12 @@ public class ClientMoveMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        getWorldModel().getExecutor().scheduleCommand(new MoveCommand(direction,getClient(), getWorldModel()));
+        getWorldModel().getExecutor().scheduleCommand(new MoveCommand(rawConnectionIndex, getClient(), getWorldModel()));
     }
 
     @Override
     public String getUsage() {
-        return "go {north/south/east/west/up/down}";
+        return "go (index of way to take)";
     }
 
     @Override

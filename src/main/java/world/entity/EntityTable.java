@@ -92,6 +92,8 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
     /**A foreign key to the room the entity is standing in*/
     public static final String ROOM_NAME = RoomTable.ROOM_NAME;
 
+    public static final String DOMAIN = "domain";
+
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
     private final Set<String> CONSTRAINTS = new HashSet<>(2);
 
@@ -115,6 +117,7 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(RACE_ID, "VARCHAR(16)");
         TABLE_DEFINITION.put(CONTROLLER_TYPE,"VARCHAR(16)");
         TABLE_DEFINITION.put(ROOM_NAME, "VARCHAR(32) COLLATE NOCASE");
+        TABLE_DEFINITION.put(DOMAIN, "VARCHAR(16) COLLATE NOCASE");
 
         TABLE_DEFINITION.put(SLOT_HEAD, "INT");
         TABLE_DEFINITION.put(SLOT_CHEST, "INT");

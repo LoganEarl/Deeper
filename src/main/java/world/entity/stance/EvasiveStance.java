@@ -41,10 +41,9 @@ public class EvasiveStance extends Stance {
             if(sourceEntity.getPools().getStamina() >= staminaUsed) {
                 sourceEntity.getPools().expendStamina(staminaUsed);
 
-                int associatedStat = sourceEntity.getStats().getStat(getRequiredSkill().getAssociatedStat());
-                int roll = sourceEntity.getSkills().performSkillCheck(getRequiredSkill(), 0, associatedStat);
+                int roll = sourceEntity.getSkills().performSkillCheck(getRequiredSkill(), 0);
                 in.setBaseRoll(in.getBaseRoll() - roll);
-                if (in.getBaseRoll() <= 0)
+                if (in.getBaseRoll() >= 0)
                     in.setAttemptedDamage(0).setDidDodge(true);
             }
         } else

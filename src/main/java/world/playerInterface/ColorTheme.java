@@ -36,6 +36,24 @@ public class ColorTheme {
         return getMessageInColor(message, getColorOfRelation(relation));
     }
 
+    /**
+     * Will return a color that represents how difficult a stat
+     * @param entityBase the stat or skill bonus level from the entity rolling. EG, for a strength check, would be the player's strength. For a skill check would
+     *                   be 10 * learn level if learned or -20 if unlearned.
+     * @param difficultyModifier how difficult the check is. negative numbers mean they are harder, positive they are easier. 0 is normal.
+     * @return A color scaled between red and blue, representing the probability of success
+     */
+    public static Color getColorOfRollDifficulty(int entityBase, int difficultyModifier){
+        //in a normal roll, mod would have rnd(0,100) subtracted from it with a result >= 0 a success. In this case, we use this to calculate odds.
+        double mod = entityBase + difficultyModifier;
+        mod = mod/100.0;
+        if(mod < 0) mod = 0;
+        if(mod > 1) mod = 1;
+        int red = (int)(Math.cos(mod * FAILURE.getRed()/255.0 * Math.PI) * 255);
+        int blue = (int)(Math.sin(mod * INFORMATIVE.getBlue()/255.0 *  Math.PI) * 255);
+        return new Color(red, 0, blue);
+    }
+
     public static Color getColorOfRelation(DiplomaticRelation relation){
         switch (relation){
             case allied:

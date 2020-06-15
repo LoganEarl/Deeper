@@ -204,7 +204,14 @@ public enum Skill implements TraitBestower {
         return null;
     }
 
+    public static Skill getGeneralSkill(String savableName){
+        return getSkill(savableName, 0);
+    }
+
     public static Skill getLearnLevel(Skill baseSkill, int learnLevel){
+        if(baseSkill == null)
+            return null;
+
         for(Skill skill : Skill.values()){
             if (skill.savableName.equals(baseSkill.savableName) && skill.elevationLevel == learnLevel) return skill;
         }
