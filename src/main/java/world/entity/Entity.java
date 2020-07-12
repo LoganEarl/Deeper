@@ -139,7 +139,15 @@ public class Entity implements
         String tag = getEntityTag(entityID,databaseName);
         entityCache.remove(tag);
         this.databaseName = newWorld.getDatabaseName();
-        this.roomName = newWorld.getEntryRoomName();
+
+        Room newRoom = Room.getByRoomName(newWorld.getEntryRoomName(),newWorld.getDatabaseName());
+        if(newRoom == null){
+            System.out.println("Failed to transfer entity to nonexistent room [" + newWorld.getEntryRoomName() + "] in world " + newWorld.getWorldID());
+            return CODE_TRANSFER_FAILED;
+        }
+        this.roomName = newRoom.getRoomName();
+        this.domain = newRoom.getDefaultDomain();
+
         tag = getEntityTag(entityID, databaseName);
         entityCache.put(tag,this);
         updateInDatabase(databaseName);
