@@ -50,6 +50,8 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
     public static final String KEY_CODE = "keyCode";
     /**The state of the room. Determines if it is locked, unlocked, impassable*/
     public static final String STATE = "state";
+    /**The direction of the room connection. Used to help orient players*/
+    public static final String DIRECTION = "direction";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
     private final Set<String> CONSTRAINTS = new HashSet<>(2);
@@ -72,9 +74,10 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
         TABLE_DEFINITION.put(FAILURE_ROOM_NAME, "VARCHAR(32) COLLATE NOCASE");
         TABLE_DEFINITION.put(FAILURE_DESTINATION_DOMAINS, "TEXT COLLATE NOCASE");
         TABLE_DEFINITION.put(SUCCESS_EFFECT_NAME, "VARCHAR(32) COLLATE NOCASE");
-        TABLE_DEFINITION.put(STAMINA_COST, "INT");
+        TABLE_DEFINITION.put(STAMINA_COST, "INT NOT NULL");
         TABLE_DEFINITION.put(KEY_CODE, "INT");
         TABLE_DEFINITION.put(STATE, "VARCHAR(16) COLLATE NOCASE");
+        TABLE_DEFINITION.put(DIRECTION, "VARCHAR(16) COLLATE NOCASE NOT NULL");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 SOURCE_ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));

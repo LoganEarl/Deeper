@@ -41,9 +41,27 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     private List<Domain> sourceDomains;
     private List<Domain> destinationDomains;
     private State state;
+    private Direction direction;
 
     public enum State{
         locked, unlocked, impassible
+    }
+
+    public enum Direction{
+        north, south, northeast, southwest, east, west, southeast, northwest, above, below;
+        public static Direction oppositeOf(Direction direction){
+               Direction[] directions = Direction.values();
+               for(int i = 0; i < directions.length; i++){
+                   if(directions[i] == direction){
+                       return i % 2 == 0? directions[i+1]: directions[i-1];
+                   }
+               }
+               throw new IllegalArgumentException("Invalid direction given");
+        }
+
+        public Direction opposite(){
+            return oppositeOf(this);
+        }
     }
 
     private static Map<String, WorldSpecificCache<String, RoomConnection>> roomConnectionCache = new HashMap<>();
@@ -52,8 +70,8 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     private static final String GET_SOURCE_SQL = String.format(Locale.US,"SELECT %s FROM %s WHERE %s=?",CONNECTION_ID, TABLE_NAME,SOURCE_ROOM_NAME);
     private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,CONNECTION_ID);
     private static final String REPLACE_SQL = String.format(Locale.US,
-            "REPLACE INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            TABLE_NAME, CONNECTION_ID, NAME, SUCCESS_MESSAGE, FAILURE_MESSAGE, SOURCE_ROOM_NAME, DEST_ROOM_NAME, SOURCE_DOMAINS, DESTINATION_DOMAINS, TRAVERSE_DIFFICULTY, TRAVERSE_SKILL_NAME, DETECT_DIFFICULTY, DETECT_DOMAINS, DETECT_WORD, FAILURE_EFFECT_NAME, FAILURE_ROOM_NAME, FAILURE_DESTINATION_DOMAINS, SUCCESS_EFFECT_NAME, STAMINA_COST, KEY_CODE, STATE);
+            "REPLACE INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            TABLE_NAME, CONNECTION_ID, NAME, SUCCESS_MESSAGE, FAILURE_MESSAGE, SOURCE_ROOM_NAME, DEST_ROOM_NAME, SOURCE_DOMAINS, DESTINATION_DOMAINS, TRAVERSE_DIFFICULTY, TRAVERSE_SKILL_NAME, DETECT_DIFFICULTY, DETECT_DOMAINS, DETECT_WORD, FAILURE_EFFECT_NAME, FAILURE_ROOM_NAME, FAILURE_DESTINATION_DOMAINS, SUCCESS_EFFECT_NAME, STAMINA_COST, KEY_CODE, STATE, DIRECTION);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,CONNECTION_ID);
 
 
@@ -91,6 +109,13 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         }catch (IllegalArgumentException e){
             System.out.printf("Failed to load state for room connection:%s:%s\n",connectionID,raw);
             state = State.unlocked;
+        }
+
+        try {
+            direction = Direction.valueOf(readEntry.getString(DIRECTION));
+        }catch (IllegalArgumentException e){
+            System.out.printf("Failed to load direction for connection:%s:%s\n",connectionID,raw);
+            direction = Direction.north;
         }
 
         failureRoomName = readEntry.getString(FAILURE_ROOM_NAME);
