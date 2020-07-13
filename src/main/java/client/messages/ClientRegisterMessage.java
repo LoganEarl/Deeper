@@ -35,6 +35,7 @@ public class ClientRegisterMessage extends ClientMessage {
     @Override
     protected void doActions() {
         getClient().tryUpdateInfo(getClient(),"",userName,"",hPass,email);
+
     }
 
     @Override

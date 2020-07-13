@@ -31,13 +31,15 @@ public class MessageSubstitutor {
             else result = "you";
         } else {
             Faction viewedFaction = toView.getDiplomacy().getFaction();
-            DiplomaticRelation relation = model.getDiplomacyManager().getRelation(viewedFaction,viewer.getDiplomacy().getFaction());
+            DiplomaticRelation relation = model.getDiplomacyManager().getRelation(viewedFaction, viewer.getDiplomacy().getFaction());
             Color messageColor = ColorTheme.getColorOfRelation(relation);
 
-            if (form.equals(REFLEXIVE)) result = ColorTheme.getMessageInColor(toView.getReflexivePronoun(),messageColor);
-            else if (form.equals(POSSESSIVE)) result = ColorTheme.getMessageInColor(toView.getPossessivePronoun(),messageColor);
-            else if(form.equals(PRONOUN)) result = ColorTheme.getMessageInColor(toView.getPronoun(),messageColor);
-            else result = ColorTheme.getEntityColored(toView, viewer,model);
+            if (form.equals(REFLEXIVE))
+                result = ColorTheme.getMessageInColor(toView.getReflexivePronoun(), messageColor);
+            else if (form.equals(POSSESSIVE))
+                result = ColorTheme.getMessageInColor(toView.getPossessivePronoun(), messageColor);
+            else if (form.equals(PRONOUN)) result = ColorTheme.getMessageInColor(toView.getPronoun(), messageColor);
+            else result = ColorTheme.getEntityColored(toView, viewer, model);
         }
         return result;
     }

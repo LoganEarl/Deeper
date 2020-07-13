@@ -43,17 +43,15 @@ public class ClientLoginMessage extends ClientMessage {
     public void doActions() {
         if(getClient().getStatus() == Client.ClientStatus.ACTIVE){
             Entity loggedEntity = getWorldModel().getEntityCollection().getPlayableEntityByID(getClient().getUserName());
-            if(loggedEntity != null) {
+            if(loggedEntity != null)
                 getWorldModel().getNotificationService().unsubscribe(loggedEntity);
-            }
         }
 
         getClient().tryLogIn(getClient(), userName, hashedPassword);
         if(getClient().getStatus() == Client.ClientStatus.ACTIVE){
             Entity loggedEntity = getWorldModel().getEntityCollection().getPlayableEntityByID(getClient().getUserName());
-            if(loggedEntity != null) {
+            if(loggedEntity != null)
                 getWorldModel().getNotificationService().subscribe(loggedEntity);
-            }
         }
     }
 

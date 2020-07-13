@@ -82,8 +82,10 @@ public class Client {
             Account newAccount = new Account(newUser, newHPass, newEmail, Account.AccountType.BASIC);
             newAccount.saveToDatabase(clientRegistry.getDatabaseName());
             associatedAccount = newAccount;
+            status = ClientStatus.ACTIVE;
             clientRegistry.sendMessage(getMessageInColor("Success, new account created",SUCCESS), sourceClient);
             System.out.println("A new account has been created: " + associatedAccount.getUserName());
+            System.out.println(associatedAccount.getUserName() + " has logged in");
             //they are not logged in
         } else if (associatedAccount == null || status == ClientStatus.INACTIVE || status == ClientStatus.UNAUTHENTICATED) {
             clientRegistry.sendMessage(getMessageInColor("Unknown Username/Password. Please try again",FAILURE),

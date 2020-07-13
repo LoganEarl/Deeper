@@ -44,15 +44,15 @@ public enum Domain {
 
     public static String getTransitionDescription(Domain sourceDomain, Domain destinationDomain){
         if(sourceDomain == surface && destinationDomain == air)
-            return "leaps into the air";
+            return "leaped into the air";
         if(sourceDomain == air && destinationDomain == surface)
-            return "lands on the surface";
+            return "landed on the surface";
         if(sourceDomain == air && destinationDomain == surfaceWater)
-            return "lands with a splash";
-        return "goes from the " + sourceDomain.name() + " to the " + destinationDomain.name();
+            return "landed with a splash";
+        return "went from the " + sourceDomain.name() + " to the " + destinationDomain.name();
     }
 
     public String getTravelVerb(){
-        return "travels";
+        return "traveled";
     }
 }
