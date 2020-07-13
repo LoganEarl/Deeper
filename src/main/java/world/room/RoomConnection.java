@@ -123,7 +123,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
                 Domain.encodeDomains(sourceDomains),
                 Domain.encodeDomains(destinationDomains),
                 traverseDifficulty,
-                traverseSkill.getSavableName(),
+                traverseSkill != null? traverseSkill.getSavableName(): "",
                 detectDifficulty,
                 Domain.encodeDomains(detectDomains),
                 detectWord,

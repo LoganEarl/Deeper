@@ -50,7 +50,11 @@ public class ColorTheme {
         if(mod < 0) mod = 0;
         if(mod > 1) mod = 1;
         int red = (int)(Math.cos(mod * FAILURE.getRed()/255.0 * Math.PI) * 255);
+        if(red > 255) red = 255;
+        if(red < 0) red = 0;
         int blue = (int)(Math.sin(mod * INFORMATIVE.getBlue()/255.0 *  Math.PI) * 255);
+        if(blue > 255) blue = 255;
+        if(blue < 0) blue = 0;
         return new Color(red, 0, blue);
     }
 

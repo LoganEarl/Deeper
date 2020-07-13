@@ -43,6 +43,6 @@ public class MessageSubstitutor {
     }
 
     private static String getEntityTag(int entityNumber, String tag) {
-        return "ENTITY" + entityNumber + tag;
+        return "ENTITY" + (entityNumber + 1) + "_" + tag;
     }
 }

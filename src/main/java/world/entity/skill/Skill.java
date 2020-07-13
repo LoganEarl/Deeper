@@ -108,7 +108,33 @@ public enum Skill implements TraitBestower {
             new Skill[]{deflect2}),
     deflect4("Deflect", 3, 24000, EntityTable.STR,
             new StatContainer(120, 0, 0, 0, 0, 0), hiddenUntilLearnable,
-            new Skill[]{deflect3});
+            new Skill[]{deflect3}),
+    //Athletics=========================
+    athletics1("Athletics",0,250, EntityTable.STR,
+            new StatContainer(12, 0,0,0,0,0), visible,
+            new Skill[0]),
+    athletics2("Athletics",1,1000, EntityTable.STR,
+            new StatContainer(32, 10,0,0,0,0), hiddenUntilSkills,
+            new Skill[]{athletics1}),
+    athletics3("Athletics",2,4000, EntityTable.STR,
+            new StatContainer(64, 20,0,0,0,0), hiddenUntilLearnable,
+            new Skill[]{athletics2}),
+    athletics4("Athletics",3,16000, EntityTable.STR,
+            new StatContainer(120, 40,0,0,0,0), hiddenUntilLearnable,
+            new Skill[]{athletics3}),
+    //Acrobatics=========================
+    acrobatics1("Acrobatics",0,250, EntityTable.DEX,
+            new StatContainer(0, 12,0,0,0,0), visible,
+            new Skill[0]),
+    acrobatics2("Acrobatics",1,1000, EntityTable.DEX,
+            new StatContainer(10, 32,0,0,0,0), hiddenUntilSkills,
+            new Skill[]{acrobatics1}),
+    acrobatics3("Acrobatics",2,4000, EntityTable.DEX,
+            new StatContainer(20, 64,0,0,0,0), hiddenUntilLearnable,
+            new Skill[]{acrobatics2}),
+    acrobatics4("Acrobatics",3,16000, EntityTable.DEX,
+            new StatContainer(40, 120,0,0,0,0), hiddenUntilLearnable,
+            new Skill[]{acrobatics3});
 
     public static final String[] modifiers = {"", "Improved", "Refined", "Masterful", "Perfected", "Unnatural","Godlike"};
 
@@ -197,9 +223,11 @@ public enum Skill implements TraitBestower {
     }
 
     public static Skill getSkill(String savableName, int elevationLevel) {
-        for (Skill skill : Skill.values()) {
-            if (skill.savableName.toLowerCase().equals(savableName.toLowerCase()) && skill.elevationLevel == elevationLevel)
-                return skill;
+        if(savableName != null) {
+            for (Skill skill : Skill.values()) {
+                if (skill.savableName.toLowerCase().equals(savableName.toLowerCase()) && skill.elevationLevel == elevationLevel)
+                    return skill;
+            }
         }
         return null;
     }

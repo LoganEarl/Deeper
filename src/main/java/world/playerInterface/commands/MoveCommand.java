@@ -71,7 +71,6 @@ public class MoveCommand extends EntityCommand {
         Domain currentDomain = entity.getDomain();
         if(!roomConnection.getSourceDomains().contains(currentDomain)){
             String message = "That way is only accessible from the ";
-
             message += WorldUtils.commaSeparate(roomConnection.getSourceDomains());
 
             getSourceClient().sendMessage(getMessageInColor(message, FAILURE));

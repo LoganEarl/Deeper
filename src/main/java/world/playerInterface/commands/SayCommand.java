@@ -42,25 +42,25 @@ public class SayCommand extends EntityCommand {
     }
 
     public class SpeechNotification extends ConcreteNotification {
-        private Entity sourceEntity;
-        private String toSay;
+                private Entity sourceEntity;
+                private String toSay;
 
-        private SpeechNotification(Entity sourceEntity, String message, ClientRegistry registry) {
-            super(registry);
+                private SpeechNotification(Entity sourceEntity, String message, ClientRegistry registry) {
+                    super(registry);
 
-            this.sourceEntity = sourceEntity;
-            this.toSay = message;
-        }
+                    this.sourceEntity = sourceEntity;
+                    this.toSay = message;
+                }
 
-        @Override
-        public String getAsMessage(Entity viewer) {
-            String message;
-            if(viewer.equals(sourceEntity))
-                message = getMessageInColor( "You say " + toSay, INFORMATIVE);
-            else
-                message = getEntityColored(viewer,sourceEntity,getWorldModel()) + getMessageInColor( " says " + toSay, INFORMATIVE);
+                @Override
+                public String getAsMessage(Entity viewer) {
+                    String message;
+                    if(viewer.equals(sourceEntity))
+                        message = getMessageInColor( "You say " + toSay, INFORMATIVE);
+                    else
+                        message = getEntityColored(sourceEntity, viewer, getWorldModel()) + getMessageInColor( " says " + toSay, INFORMATIVE);
 
-            return message;
+                    return message;
         }
     }
 }

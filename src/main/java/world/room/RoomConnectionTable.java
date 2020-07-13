@@ -11,7 +11,7 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
     /**The name of the connection as displayed to the user.*/
     public static final String NAME = "name";
     /**The message displayed to the user after traversing the connection. Certain keywords can be used in the message to replace them with in game names. The keywords are as follows
-     * <br>ENTITY1_NAME is replace with the name of the entity
+     * <br>ENTITY1_NAME is replace with the name of the first entity
      * <br>ENTITY1_PRONOUN is replaced with the entity's pronoun. (it, he, she, they, etc)
      * <br>ENTITY1_REFLEXIVE is replaced with the reflexive form of the entity's pronoun. (itself, himself, herself, theirself, etc
      * <br>ENTITY1_POSSESSIVE is replaced with the possesive form of the entity's pronoun. (its, his, her, their)*/
@@ -30,7 +30,7 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
     public static final String TRAVERSE_DIFFICULTY = "traverseDifficulty";
     /**The skill required to traverse the room connection. If no value given, no skill check is needed.*/
     public static final String TRAVERSE_SKILL_NAME = "traverseSkillName";
-    /**The difficulty of the hidden skill check to detect room connection. If no value is 0 no skill check is needed. If the hidden skill check fails, the player will have to either search the room via a look command, or re-enter the room to reroll the check. Checking this way will only work if enough time has elapsed*/
+    /**The difficulty of the hidden skill check to detect room connection. If no value no skill check is needed. If the hidden skill check fails, the player will have to either search the room via a look command, or re-enter the room to reroll the check. Checking this way will only work if enough time has elapsed*/
     public static final String DETECT_DIFFICULTY = "detectDifficulty";
     /**The domain the player must be in to have a chance at detecting the room connection. If no value is given, all domains are assumed valid*/
     public static final String DETECT_DOMAINS = "detectDomain";

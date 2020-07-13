@@ -147,9 +147,9 @@ public class LookCommand extends EntityCommand {
             for (int i = 0; i < connections.size(); i++) {
                 RoomConnection connection = connections.get(i);
                 String connectionPortion = (String.format(Locale.US, "[%d]%s%s%s", i,
-                        extendedDomainDetails ? " " : getDomainTransferInfo(connection, true),
+                        extendedDomainDetails ? " ": getDomainTransferInfo(connection, false),
                         connection.getDisplayName(),
-                        extendedDomainDetails ? getDomainTransferInfo(connection, false) : ""));
+                        extendedDomainDetails ? getDomainTransferInfo(connection, true) : ""));
 
                 Skill requiredSkill = connection.getTraverseSkill();
                 if(requiredSkill != null){
@@ -159,7 +159,7 @@ public class LookCommand extends EntityCommand {
                     Color messageColor = ColorTheme.getColorOfRollDifficulty(skillBonus + statBase, connection.getTraverseDifficulty());
                     connectionPortion = ColorTheme.getMessageInColor(connectionPortion, messageColor);
                 }
-                message.append(connectionPortion);
+                message.append(connectionPortion).append("\n");
             }
             return getMessageInColor(message.toString(), INFORMATIVE);
         }
