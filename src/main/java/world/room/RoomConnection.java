@@ -351,6 +351,10 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         return keyCode;
     }
 
+    public Direction getDirection() {
+        return direction;
+    }
+
     public List<Domain> getSourceDomains() {
         return sourceDomains;
     }

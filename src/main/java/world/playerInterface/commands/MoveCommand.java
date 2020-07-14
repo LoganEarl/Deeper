@@ -180,7 +180,8 @@ public class MoveCommand extends EntityCommand {
         @Override
         public String getAsMessage(Entity viewer) {
             String arrives = didEnter ? " from " : " to ";
-            return getMessageInColor(getEntityColored(sourceEntity, viewer, getWorldModel()) + " " + sourceDomain.getTravelVerb() + arrives + direction + " via the " + connectionUsed.getDisplayName(), INFORMATIVE);
+            String direction = didEnter? connectionUsed.getDirection().opposite().name(): connectionUsed.getDirection().name();
+            return getMessageInColor(getEntityColored(sourceEntity, viewer, getWorldModel()) + " " + sourceDomain.getTravelVerb() + arrives + "the "  + direction, INFORMATIVE);
         }
     }
 }

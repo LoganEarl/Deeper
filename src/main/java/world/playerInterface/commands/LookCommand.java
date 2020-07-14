@@ -56,11 +56,11 @@ public class LookCommand extends EntityCommand {
         else if (lookInto) {
             response = lookInContainer(target);
         } else {
+            //TODO look at entity
             response = getMessageInColor("Not yet implemented", FAILURE);
         }
 
         fromClient.sendMessage(response);
-
         complete = true;
     }
 
