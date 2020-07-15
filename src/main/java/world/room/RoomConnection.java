@@ -187,8 +187,8 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
                 staminaCost,
                 keyCode,
                 state.name(),
-                direction,
-                failureDirection);
+                direction.name(),
+                failureDirection != null? failureDirection.name():null);
         if (result > 0) addToCache(this);
 
         return result > 0;

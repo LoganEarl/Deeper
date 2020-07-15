@@ -86,7 +86,6 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
                 SOURCE_ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 DEST_ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));
-
     }
 
     @Override
