@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class DatabaseManager {
     public static final String DATA_DIRECTORY = System.getProperty("user.dir").replace("\\", "/") + "/data/";
     public static final String TEMPLATE_FOLDER = "template/";
     public static final String TEMPLATE_DIRECTORY = DATA_DIRECTORY + TEMPLATE_FOLDER;
 
-    private static Map<String, Connection> databaseConnections = new HashMap<>();
+    private static final Map<String, Connection> databaseConnections = new HashMap<>();
 
     public static void createDirectories() {
         File f = new File(DATA_DIRECTORY);
@@ -105,10 +106,17 @@ public class DatabaseManager {
                     for (String constraint : table.getConstraints())
                         sql.append(",").append(constraint);
 
-
                 sql.append(")");
                 stmt.executeUpdate(sql.toString());
+
+                for(String columnName : columnDefinitions.keySet()){
+                    String addColumn = "ALTER TABLE " + table.getTableName() + " ADD COLUMN " + columnName + " " + columnDefinitions.get(columnName);
+                    try{
+                        stmt.executeUpdate(addColumn);
+                    }catch (SQLException ignored){}
+                }
             }
+
             stmt.close();
             conn.close();
         } catch (Exception e) {

@@ -42,37 +42,53 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     private List<Domain> destinationDomains;
     private State state;
     private Direction direction;
+    private Direction failureDirection;
 
-    public enum State{
+    public enum State {
         locked, unlocked, impassible
     }
 
-    public enum Direction{
-        north, south, northeast, southwest, east, west, southeast, northwest, above, below;
-        public static Direction oppositeOf(Direction direction){
-               Direction[] directions = Direction.values();
-               for(int i = 0; i < directions.length; i++){
-                   if(directions[i] == direction){
-                       return i % 2 == 0? directions[i+1]: directions[i-1];
-                   }
-               }
-               throw new IllegalArgumentException("Invalid direction given");
+    public enum Direction {
+        north, south, northeast, southwest, east, west, southeast, northwest, above(""), below("");
+
+        private String transitionWord = "the ";
+
+        Direction() {
         }
 
-        public Direction opposite(){
+        Direction(String transitionWord) {
+            this.transitionWord = transitionWord;
+        }
+
+        public static Direction oppositeOf(Direction direction) {
+            Direction[] directions = Direction.values();
+            for (int i = 0; i < directions.length; i++) {
+                if (directions[i] == direction) {
+                    return i % 2 == 0 ? directions[i + 1] : directions[i - 1];
+                }
+            }
+            throw new IllegalArgumentException("Invalid direction given");
+        }
+
+        public Direction opposite() {
             return oppositeOf(this);
+        }
+
+        @Override
+        public String toString() {
+            return transitionWord + name();
         }
     }
 
-    private static Map<String, WorldSpecificCache<String, RoomConnection>> roomConnectionCache = new HashMap<>();
+    private static final Map<String, WorldSpecificCache<String, RoomConnection>> roomConnectionCache = new HashMap<>();
 
     //<editor-fold desc="SQL Operations">
-    private static final String GET_SOURCE_SQL = String.format(Locale.US,"SELECT %s FROM %s WHERE %s=?",CONNECTION_ID, TABLE_NAME,SOURCE_ROOM_NAME);
-    private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,CONNECTION_ID);
+    private static final String GET_SOURCE_SQL = String.format(Locale.US, "SELECT %s FROM %s WHERE %s=?", CONNECTION_ID, TABLE_NAME, SOURCE_ROOM_NAME);
+    private static final String GET_ID_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, CONNECTION_ID);
     private static final String REPLACE_SQL = String.format(Locale.US,
-            "REPLACE INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            TABLE_NAME, CONNECTION_ID, NAME, SUCCESS_MESSAGE, FAILURE_MESSAGE, SOURCE_ROOM_NAME, DEST_ROOM_NAME, SOURCE_DOMAINS, DESTINATION_DOMAINS, TRAVERSE_DIFFICULTY, TRAVERSE_SKILL_NAME, DETECT_DIFFICULTY, DETECT_DOMAINS, DETECT_WORD, FAILURE_EFFECT_NAME, FAILURE_ROOM_NAME, FAILURE_DESTINATION_DOMAINS, SUCCESS_EFFECT_NAME, STAMINA_COST, KEY_CODE, STATE, DIRECTION);
-    private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?", TABLE_NAME,CONNECTION_ID);
+            "REPLACE INTO %s (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            TABLE_NAME, CONNECTION_ID, NAME, SUCCESS_MESSAGE, FAILURE_MESSAGE, SOURCE_ROOM_NAME, DEST_ROOM_NAME, SOURCE_DOMAINS, DESTINATION_DOMAINS, TRAVERSE_DIFFICULTY, TRAVERSE_SKILL_NAME, DETECT_DIFFICULTY, DETECT_DOMAINS, DETECT_WORD, FAILURE_EFFECT_NAME, FAILURE_ROOM_NAME, FAILURE_DESTINATION_DOMAINS, SUCCESS_EFFECT_NAME, STAMINA_COST, KEY_CODE, STATE, DIRECTION, FAILURE_DIRECTION);
+    private static final String DELETE_SQL = String.format(Locale.US, "DELETE FROM %s WHERE %s=?", TABLE_NAME, CONNECTION_ID);
 
 
     private RoomConnection(ResultSet readEntry, String databaseName) throws SQLException {
@@ -89,43 +105,55 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         String raw = "";
         try {
             raw = readEntry.getString(FAILURE_EFFECT_NAME);
-            failureEffect = raw != null? EffectArchetype.valueOf(raw): null;
-        }catch (IllegalArgumentException e){
-            System.out.printf("Failed to load failure effect for room connection:%s:%s\n",connectionID,raw);
+            failureEffect = raw != null ? EffectArchetype.valueOf(raw) : null;
+        } catch (IllegalArgumentException e) {
+            System.out.printf("Failed to load failure effect for room connection:%s:%s\n", connectionID, raw);
             failureEffect = null;
         }
 
         try {
             raw = readEntry.getString(SUCCESS_EFFECT_NAME);
-            successEffect = raw != null? EffectArchetype.valueOf(raw): null;
-        }catch (IllegalArgumentException e){
-            System.out.printf("Failed to load success effect for room connection:%s:%s\n",connectionID,raw);
+            successEffect = raw != null ? EffectArchetype.valueOf(raw) : null;
+        } catch (IllegalArgumentException e) {
+            System.out.printf("Failed to load success effect for room connection:%s:%s\n", connectionID, raw);
             successEffect = null;
         }
 
-        try{
+        try {
             raw = readEntry.getString(STATE);
-            state = raw != null? State.valueOf(raw): State.unlocked;
-        }catch (IllegalArgumentException e){
-            System.out.printf("Failed to load state for room connection:%s:%s\n",connectionID,raw);
+            state = raw != null ? State.valueOf(raw) : State.unlocked;
+        } catch (IllegalArgumentException e) {
+            System.out.printf("Failed to load state for room connection:%s:%s\n", connectionID, raw);
             state = State.unlocked;
         }
 
         try {
             direction = Direction.valueOf(readEntry.getString(DIRECTION));
-        }catch (IllegalArgumentException e){
-            System.out.printf("Failed to load direction for connection:%s:%s\n",connectionID,raw);
+        } catch (IllegalArgumentException e) {
+            System.out.printf("Failed to load direction for connection:%s:%s\n", connectionID, raw);
             direction = Direction.north;
         }
 
         failureRoomName = readEntry.getString(FAILURE_ROOM_NAME);
+
+        String rawFailureDirection = readEntry.getString(FAILURE_DIRECTION);
+        try {
+            if(rawFailureDirection != null)
+                failureDirection = Direction.valueOf(rawFailureDirection);
+        } catch (IllegalArgumentException e) {
+            rawFailureDirection = null;
+        }
+        if(rawFailureDirection == null && failureRoomName != null){
+            System.out.printf("Failed to load failure direction for connection:%s:%s\n", connectionID, raw);
+            failureDirection = Direction.north;
+        }
 
         failureDestinationDomains = Domain.decodeDomains(readEntry.getString(FAILURE_DESTINATION_DOMAINS));
         sourceDomains = Domain.decodeDomains(readEntry.getString(SOURCE_DOMAINS));
         destinationDomains = Domain.decodeDomains(readEntry.getString(DESTINATION_DOMAINS));
         detectDomains = Domain.decodeDomains(readEntry.getString(DETECT_DOMAINS));
 
-        if(destinationDomains.isEmpty())
+        if (destinationDomains.isEmpty())
             destinationDomains.add(Domain.surface);
 
         detectWord = readEntry.getString(DETECT_WORD);
@@ -148,7 +176,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
                 Domain.encodeDomains(sourceDomains),
                 Domain.encodeDomains(destinationDomains),
                 traverseDifficulty,
-                traverseSkill != null? traverseSkill.getSavableName(): "",
+                traverseSkill != null ? traverseSkill.getSavableName() : "",
                 detectDifficulty,
                 Domain.encodeDomains(detectDomains),
                 detectWord,
@@ -158,58 +186,60 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
                 successEffect.name(),
                 staminaCost,
                 keyCode,
-                state.name());
-        if(result > 0) addToCache(this);
+                state.name(),
+                direction,
+                failureDirection);
+        if (result > 0) addToCache(this);
 
         return result > 0;
     }
 
-    public static RoomConnection getConnectionByID(String id, String databaseName){
+    public static RoomConnection getConnectionByID(String id, String databaseName) {
         RoomConnection toReturn = null;
         WorldSpecificCache<String, RoomConnection> worldCache = roomConnectionCache.get(databaseName);
-        if(worldCache == null)
+        if (worldCache == null)
             roomConnectionCache.put(databaseName, new WorldSpecificCache<>(databaseName));
         else
             toReturn = worldCache.getValue(id);
-        if(toReturn != null) return toReturn;
+        if (toReturn != null) return toReturn;
 
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
-        if(c == null)
+        if (c == null)
             return null;
-        else{
+        else {
             try {
                 getSQL = c.prepareStatement(GET_ID_SQL);
-                getSQL.setString(1,id);
+                getSQL.setString(1, id);
                 ResultSet resultSet = getSQL.executeQuery();
-                if(resultSet.next())
-                    toReturn = new RoomConnection(resultSet,databaseName);
+                if (resultSet.next())
+                    toReturn = new RoomConnection(resultSet, databaseName);
                 else
                     toReturn = null;
                 getSQL.close();
-            }catch (SQLException e){
+            } catch (SQLException e) {
                 toReturn = null;
             }
         }
-        if(toReturn != null) addToCache(toReturn);
+        if (toReturn != null) addToCache(toReturn);
         return toReturn;
     }
 
-    public static List<RoomConnection> getConnectionsBySourceRoom(String sourceRoomName, String databaseName){
+    public static List<RoomConnection> getConnectionsBySourceRoom(String sourceRoomName, String databaseName) {
         Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL;
         List<String> connectionIDs = new ArrayList<>();
-        if(c == null)
+        if (c == null)
             return Collections.emptyList();
-        else{
+        else {
             try {
                 getSQL = c.prepareStatement(GET_SOURCE_SQL);
-                getSQL.setString(1,sourceRoomName);
+                getSQL.setString(1, sourceRoomName);
                 ResultSet resultSet = getSQL.executeQuery();
-                while(resultSet.next())
+                while (resultSet.next())
                     connectionIDs.add(resultSet.getString(CONNECTION_ID));
                 getSQL.close();
-            }catch (SQLException e){
+            } catch (SQLException e) {
                 System.out.println("Failed to retrieve connections with source: " + sourceRoomName);
                 e.printStackTrace();
             }
@@ -217,7 +247,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
 
         //this is done so that if they have a room object, they can guarantee its the only room object with that ID
         List<RoomConnection> connections = new ArrayList<>();
-        for(String id: connectionIDs)
+        for (String id : connectionIDs)
             connections.add(getConnectionByID(id, databaseName));
 
         return connections;
@@ -225,8 +255,8 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
 
     @Override
     public boolean removeFromDatabase(String databaseName) {
-        int result = DatabaseManager.executeStatement(DELETE_SQL,databaseName, connectionID);
-        if(result >= 0) removeFromCache(this);
+        int result = DatabaseManager.executeStatement(DELETE_SQL, databaseName, connectionID);
+        if (result >= 0) removeFromCache(this);
         return result > 0;
     }
 
@@ -242,25 +272,25 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     //</editor-fold>
 
     //<editor-fold desc="Utility">
-    public boolean isVisibleTo(Entity entity){
-        if(!entity.getDatabaseName().equals(databaseName))
+    public boolean isVisibleTo(Entity entity) {
+        if (!entity.getDatabaseName().equals(databaseName))
             return false;
-        if(detectDifficulty == 0)
+        if (detectDifficulty == 0)
             return true;
 
         return RoomConnectionDiscoveryTable.connectionIsVisible(connectionID, entity.getID(), databaseName);
     }
 
-    private static void addToCache(RoomConnection connection){
+    private static void addToCache(RoomConnection connection) {
         WorldSpecificCache<String, RoomConnection> worldCache = roomConnectionCache.get(connection.databaseName);
-        if(worldCache == null)
+        if (worldCache == null)
             roomConnectionCache.put(connection.databaseName, worldCache = new WorldSpecificCache<>(connection.databaseName));
         worldCache.putValue(connection.connectionID, connection);
     }
 
-    private static void removeFromCache(RoomConnection connection){
+    private static void removeFromCache(RoomConnection connection) {
         WorldSpecificCache<String, RoomConnection> worldCache;
-        if((worldCache = roomConnectionCache.get(connection.databaseName)) != null)
+        if ((worldCache = roomConnectionCache.get(connection.databaseName)) != null)
             worldCache.remove(connection.connectionID);
     }
 
@@ -303,7 +333,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         return traverseDifficulty;
     }
 
-    public Skill getTraverseSkill(){
+    public Skill getTraverseSkill() {
         return traverseSkill;
     }
 
@@ -351,16 +381,25 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         return keyCode;
     }
 
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public Direction getFailureDirection() {
+        return failureDirection;
+    }
+
     public List<Domain> getSourceDomains() {
         return sourceDomains;
     }
 
     /**
      * Get all available destination domains. Refer to RoomConnectionTable for more info.
+     *
      * @return a non-empty list of domains, where the first element is the default domain
      */
     public List<Domain> getDestinationDomains() {
-        if(destinationDomains.isEmpty())
+        if (destinationDomains.isEmpty())
             destinationDomains.add(Domain.surface);
         return destinationDomains;
     }

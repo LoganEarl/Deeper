@@ -12,6 +12,7 @@ import main.java.world.playerInterface.MessageSubstitutor;
 import main.java.world.room.Domain;
 import main.java.world.room.Room;
 import main.java.world.room.RoomConnection;
+import main.java.world.room.RoomConnection.Direction;
 
 import java.awt.*;
 
@@ -77,6 +78,8 @@ public class MoveCommand extends EntityCommand {
         }
 
         boolean didMove;
+        Direction moveDirection = roomConnection.getDirection();
+        boolean didGetFailureMessage = false;
         Room destinationRoom = Room.getByRoomName(roomConnection.getDestRoomName(), roomConnection.getDatabaseName());
         if (roomConnection.getTraverseDifficulty() != 0) {
             //we need to make a skill check
@@ -84,6 +87,7 @@ public class MoveCommand extends EntityCommand {
 
             int result = entity.getSkills().performSkillCheck(requiredSkill, roomConnection.getTraverseDifficulty());
 
+            didGetFailureMessage = true;
             notifyEntityRoom(new TransferSkillCheckNotification(
                     (result >= 0 ? roomConnection.getSuccessMessage() : roomConnection.getFailureMessage()),
                     result,
@@ -94,13 +98,18 @@ public class MoveCommand extends EntityCommand {
                 //failed to travel
                 if(roomConnection.getFailureRoomName() != null){
                     destinationRoom = Room.getByRoomName(roomConnection.getFailureRoomName(),roomConnection.getDatabaseName());
+                    moveDirection = roomConnection.getFailureDirection();
                     didMove = true;
                 }else
                     didMove = false;
-            }else
+            }else {
                 didMove = true;
-        }else
+                moveDirection = roomConnection.getDirection();
+            }
+        }else {
             didMove = true;
+            moveDirection = roomConnection.getDirection();
+        }
 
         if(destinationRoom == null){
             System.out.printf("Entity %s tried to move to nonexistent room with name %s\n", entity.getDatabaseName(), roomConnection.getDestRoomName());
@@ -109,10 +118,11 @@ public class MoveCommand extends EntityCommand {
 
         staminaUsed = staminaNeeded;
         if(didMove) {
-            notifyEntityRoom(new TransferRoomNotification(getSourceEntity(), false, roomConnection, getSourceEntity().getDomain(), getWorldModel().getRegistry()), getSourceEntity().getID());
+            if(!didGetFailureMessage)
+                notifyEntityRoom(new TransferRoomNotification(getSourceEntity(), false, roomConnection, moveDirection, getSourceEntity().getDomain(), getWorldModel().getRegistry()), getSourceEntity().getID());
             entity.setRoom(destinationRoom);
             entity.updateInDatabase(entity.getDatabaseName());
-            notifyEntityRoom(new TransferRoomNotification(getSourceEntity(), true, roomConnection, getSourceEntity().getDomain(), getWorldModel().getRegistry()), getSourceEntity().getID());
+            notifyEntityRoom(new TransferRoomNotification(getSourceEntity(), true, roomConnection, moveDirection, getSourceEntity().getDomain(), getWorldModel().getRegistry()), getSourceEntity().getID());
             new LookCommand("", false,false, getSourceClient(), getWorldModel()).execute();
         }
     }
@@ -167,20 +177,23 @@ public class MoveCommand extends EntityCommand {
         private final Entity sourceEntity;
         private final RoomConnection connectionUsed;
         private final Domain sourceDomain;
+        private final Direction directionMoved;
         private final boolean didEnter;
 
-        public TransferRoomNotification(Entity sourceEntity, boolean didEnter, RoomConnection connectionUsed, Domain sourceDomain, ClientRegistry registry) {
+        public TransferRoomNotification(Entity sourceEntity, boolean didEnter, RoomConnection connectionUsed, Direction directionMoved, Domain sourceDomain, ClientRegistry registry) {
             super(registry);
             this.connectionUsed = connectionUsed;
             this.sourceDomain = sourceDomain;
             this.didEnter = didEnter;
             this.sourceEntity = sourceEntity;
+            this.directionMoved = directionMoved;
         }
 
         @Override
         public String getAsMessage(Entity viewer) {
             String arrives = didEnter ? " from " : " to ";
-            return getMessageInColor(getEntityColored(sourceEntity, viewer, getWorldModel()) + " " + sourceDomain.getTravelVerb() + arrives + direction + " via the " + connectionUsed.getDisplayName(), INFORMATIVE);
+            Direction directionViewed = didEnter? directionMoved.opposite(): directionMoved;
+            return getMessageInColor(getEntityColored(sourceEntity, viewer, getWorldModel()) + " " + sourceDomain.getTravelVerb() + arrives + directionViewed.toString(), INFORMATIVE);
         }
     }
 }

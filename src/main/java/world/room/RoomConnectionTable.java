@@ -52,6 +52,8 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
     public static final String STATE = "state";
     /**The direction of the room connection. Used to help orient players*/
     public static final String DIRECTION = "direction";
+    /**The direction the player will go on a failed skill check. Should be the direction of the FAILURE_ROOM_NAME. Does nothing if no failure room name is set*/
+    public static final String FAILURE_DIRECTION = "failureDirection";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
     private final Set<String> CONSTRAINTS = new HashSet<>(2);
@@ -77,7 +79,8 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
         TABLE_DEFINITION.put(STAMINA_COST, "INT NOT NULL");
         TABLE_DEFINITION.put(KEY_CODE, "INT");
         TABLE_DEFINITION.put(STATE, "VARCHAR(16) COLLATE NOCASE");
-        TABLE_DEFINITION.put(DIRECTION, "VARCHAR(16) COLLATE NOCASE NOT NULL");
+        TABLE_DEFINITION.put(DIRECTION, "VARCHAR(16) COLLATE NOCASE NOT NULL DEFAULT north");
+        TABLE_DEFINITION.put(FAILURE_DIRECTION, "VARCHAR(16) COLLATE NOCASE");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 SOURCE_ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));

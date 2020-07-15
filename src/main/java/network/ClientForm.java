@@ -6,13 +6,19 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.net.Socket;
-import java.util.LinkedList;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ClientForm {
     private JPanel clientView;
     private JTextField inputText;
     private JTextPane outputText;
+    private boolean quit;
 
     private BufferedInputStream in;
     private BufferedOutputStream out;
@@ -20,7 +26,12 @@ public class ClientForm {
     private String sessionLog = "";
     private int selectIndex = -1;
 
-    private java.util.List<String> prevEntries = new LinkedList<>();
+    private static final String CREATE_CHEPE = "register Chepe a;create new character;Chepe;human;add 25 to str;add 25 to dex;add 40 to fit;add 10 to tough;done;yes";
+    private static final String CREATE_CART = "register Cart a;create new character;Cart;human;add 25 to str;add 25 to dex;add 40 to fit;add 10 to tough;done;yes";
+
+    private final List<String> waitingMessages = Collections.synchronizedList(new ArrayList<>());
+
+    private final java.util.List<String> prevEntries = new LinkedList<>();
 
     public static void main(String... args) {
         JFrame frame = new JFrame("Simulacrum");
@@ -91,26 +102,15 @@ public class ClientForm {
                         prevEntries.add(prevEntries.size(), entry);
                     selectIndex = prevEntries.size();
                     inputText.setText("");
-                    String[] words = entry.split(" ");
-                    StringBuilder messageToSend = new StringBuilder();
 
-                    boolean firstLine = true;
-                    for (String word : words) {
-                        if (firstLine)
-                            firstLine = false;
-                        else
-                            messageToSend.append("\n");
-                        messageToSend.append(word);
-                    }
+                    if(entry.equals("CARTTIME"))
+                        entry = CREATE_CART;
+                    if(entry.equals("CHEPETIME"))
+                        entry = CREATE_CHEPE;
 
-                    messageToSend.append(WebServer.MESSAGE_DIVIDER);
+                    String[] entries = entry.split(";");
+                    waitingMessages.addAll(Arrays.asList(entries));
 
-                    try {
-                        out.write(messageToSend.toString().getBytes());
-                        out.flush();
-                    } catch (Exception ignored) {
-
-                    }
                 } else if (e.getKeyCode() == KeyEvent.VK_UP && prevEntries.size() > 0) {
                     selectIndex--;
                     if (selectIndex < 0)
@@ -130,32 +130,63 @@ public class ClientForm {
         inputText.grabFocus();
     }
 
+    private void sendMessage(String entry){
+        String[] words = entry.split(" ");
+        StringBuilder messageToSend = new StringBuilder();
+
+        boolean firstLine = true;
+        for (String word : words) {
+            if (firstLine)
+                firstLine = false;
+            else
+                messageToSend.append("\n");
+            messageToSend.append(word);
+        }
+
+        messageToSend.append(WebServer.MESSAGE_DIVIDER);
+
+        try {
+            out.write(messageToSend.toString().getBytes());
+            out.flush();
+        } catch (Exception ignored) {
+
+        }
+    }
+
     private void setupSocket(String address, int port) throws Exception{
         Socket socket = new Socket(address, port);
         in = new BufferedInputStream(socket.getInputStream());
-        new Thread(() -> {
-            boolean quit = false;
-            while (!quit) {
-                try {
-                    int available = in.available();
-                    if (available > 0) {
-                        byte[] message = new byte[available];
-                        //noinspection ResultOfMethodCallIgnored
-                        in.read(message, 0, available);
-                        String rawMessages = new String(message);
-                        rawMessages = rawMessages.replace("SERVER_PROMPT_MESSAGE\n", "");
-                        String[] messages = rawMessages.split("<!EOM!>");
-
-                        for (String msg : messages)
-                            appendToDisplayText(msg);
-                    }
-                    Thread.sleep(50);
-                } catch (Exception e) {
-                    quit = true;
-                }
-            }
-        }).start();
 
         out = new BufferedOutputStream(socket.getOutputStream());
+
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleAtFixedRate(() -> {
+            try {
+                int available = in.available();
+                if (available > 0) {
+                    byte[] message = new byte[available];
+                    //noinspection ResultOfMethodCallIgnored
+                    in.read(message, 0, available);
+                    String rawMessages = new String(message);
+                    rawMessages = rawMessages.replace("SERVER_PROMPT_MESSAGE\n", "");
+                    String[] messages = rawMessages.split("<!EOM!>");
+
+                    for (String msg : messages)
+                        appendToDisplayText(msg);
+                }
+            }catch (IOException e){
+                quit = true;
+            }
+        }, 50,50, TimeUnit.MILLISECONDS);
+
+        executor.scheduleAtFixedRate(() -> {
+                try{
+                    if(waitingMessages.size() > 0)
+                        sendMessage(waitingMessages.remove(0));
+                    Thread.sleep(300);
+                }catch (Exception e) {
+                    quit = true;
+                }
+            },500,500,TimeUnit.MILLISECONDS);
     }
 }
