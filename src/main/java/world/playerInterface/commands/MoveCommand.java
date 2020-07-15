@@ -79,7 +79,7 @@ public class MoveCommand extends EntityCommand {
 
         boolean didMove;
         Direction moveDirection = roomConnection.getDirection();
-        boolean didGetFailureMessage = false;
+        boolean didGetCheckMessage = false;
         Room destinationRoom = Room.getByRoomName(roomConnection.getDestRoomName(), roomConnection.getDatabaseName());
         if (roomConnection.getTraverseDifficulty() != 0) {
             //we need to make a skill check
@@ -87,7 +87,7 @@ public class MoveCommand extends EntityCommand {
 
             int result = entity.getSkills().performSkillCheck(requiredSkill, roomConnection.getTraverseDifficulty());
 
-            didGetFailureMessage = true;
+            didGetCheckMessage = true;
             notifyEntityRoom(new TransferSkillCheckNotification(
                     (result >= 0 ? roomConnection.getSuccessMessage() : roomConnection.getFailureMessage()),
                     result,
@@ -118,7 +118,7 @@ public class MoveCommand extends EntityCommand {
 
         staminaUsed = staminaNeeded;
         if(didMove) {
-            if(!didGetFailureMessage)
+            if(!didGetCheckMessage)
                 notifyEntityRoom(new TransferRoomNotification(getSourceEntity(), false, roomConnection, moveDirection, getSourceEntity().getDomain(), getWorldModel().getRegistry()), getSourceEntity().getID());
             entity.setRoom(destinationRoom);
             entity.updateInDatabase(entity.getDatabaseName());

@@ -54,6 +54,8 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
     public static final String DIRECTION = "direction";
     /**The direction the player will go on a failed skill check. Should be the direction of the FAILURE_ROOM_NAME. Does nothing if no failure room name is set*/
     public static final String FAILURE_DIRECTION = "failureDirection";
+    /**The base cooldown to detect a room again. Can be affected by the perception of entity*/
+    public static final String DETECT_COOLDOWN_SECONDS = "detectCooldownSeconds";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
     private final Set<String> CONSTRAINTS = new HashSet<>(2);
@@ -67,7 +69,7 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
         TABLE_DEFINITION.put(DEST_ROOM_NAME, "VARCHAR(32) NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(SOURCE_DOMAINS, "TEXT COLLATE NOCASE");
         TABLE_DEFINITION.put(DESTINATION_DOMAINS, "TEXT COLLATE NOCASE");
-        TABLE_DEFINITION.put(TRAVERSE_DIFFICULTY, "INT NOT NULL");
+        TABLE_DEFINITION.put(TRAVERSE_DIFFICULTY, "INT NOT NULL DEFAULT 0");
         TABLE_DEFINITION.put(TRAVERSE_SKILL_NAME, "VARCHAR(32) COLLATE NOCASE");
         TABLE_DEFINITION.put(DETECT_DIFFICULTY, "INT NOT NULL");
         TABLE_DEFINITION.put(DETECT_DOMAINS, "TEXT COLLATE NOCASE");
@@ -76,11 +78,12 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
         TABLE_DEFINITION.put(FAILURE_ROOM_NAME, "VARCHAR(32) COLLATE NOCASE");
         TABLE_DEFINITION.put(FAILURE_DESTINATION_DOMAINS, "TEXT COLLATE NOCASE");
         TABLE_DEFINITION.put(SUCCESS_EFFECT_NAME, "VARCHAR(32) COLLATE NOCASE");
-        TABLE_DEFINITION.put(STAMINA_COST, "INT NOT NULL");
+        TABLE_DEFINITION.put(STAMINA_COST, "INT NOT NULL DEFAULT 10");
         TABLE_DEFINITION.put(KEY_CODE, "INT");
         TABLE_DEFINITION.put(STATE, "VARCHAR(16) COLLATE NOCASE");
         TABLE_DEFINITION.put(DIRECTION, "VARCHAR(16) COLLATE NOCASE NOT NULL DEFAULT north");
         TABLE_DEFINITION.put(FAILURE_DIRECTION, "VARCHAR(16) COLLATE NOCASE");
+        TABLE_DEFINITION.put(DETECT_COOLDOWN_SECONDS, "INT DEFAULT 30");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 SOURCE_ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));
