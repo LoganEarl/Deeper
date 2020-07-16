@@ -278,7 +278,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         if (detectDifficulty == 0)
             return true;
 
-        return RoomConnectionDiscoveryTable.connectionIsVisible(connectionID, entity.getID(), databaseName);
+        return true;
     }
 
     private static void addToCache(RoomConnection connection) {

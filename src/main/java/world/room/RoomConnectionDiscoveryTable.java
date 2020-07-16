@@ -15,7 +15,7 @@ public class RoomConnectionDiscoveryTable implements DatabaseManager.DatabaseTab
     public static final String CONNECTION_ID = RoomConnectionTable.CONNECTION_ID;
     public static final String ENTITY_ID = EntityTable.ENTITY_ID;
     public static final String LAST_UPDATE = "lastUpdate";
-    public static final String IS_VISIBLE = "isVisible";
+    public static final String DETECTION_STATUS = "detectionStatus";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
     private final Set<String> CONSTRAINTS = new HashSet<>(2);
@@ -24,7 +24,7 @@ public class RoomConnectionDiscoveryTable implements DatabaseManager.DatabaseTab
         TABLE_DEFINITION.put(CONNECTION_ID,"VARCHAR(32) NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(ENTITY_ID,"VARCHAR(32) NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(LAST_UPDATE,"INT NOT NULL");
-        TABLE_DEFINITION.put(IS_VISIBLE,"INT NOT NULL");
+        TABLE_DEFINITION.put(DETECTION_STATUS,"VARCHAR(16) NOT NULL DEFAULT unencountered");
 
         CONSTRAINTS.add(String.format(Locale.US,"PRIMARY KEY (%s, %s)",CONNECTION_ID,ENTITY_ID));
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
@@ -34,30 +34,6 @@ public class RoomConnectionDiscoveryTable implements DatabaseManager.DatabaseTab
     }
 
     private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=? AND %s=?",TABLE_NAME,CONNECTION_ID,ENTITY_ID);
-
-    static boolean connectionIsVisible(String connectionID, String entityID, String databaseName){
-        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
-        PreparedStatement getSQL = null;
-        boolean toReturn;
-        if(c == null)
-            return false;
-        else{
-            try {
-                getSQL = c.prepareStatement(GET_SQL);
-                getSQL.setString(1,connectionID);
-                getSQL.setString(2,entityID);
-                ResultSet resultSet = getSQL.executeQuery();
-                if(resultSet.next())
-                    toReturn = resultSet.getInt(IS_VISIBLE) == 1;
-                else
-                    toReturn = false;
-                getSQL.close();
-            }catch (SQLException e){
-                toReturn = false;
-            }
-        }
-        return toReturn;
-    }
 
     @Override
     public String getTableName() {
