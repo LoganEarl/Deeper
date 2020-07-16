@@ -13,7 +13,7 @@ public class SayCommand extends EntityCommand {
     private ClientRegistry registry;
     private String message;
 
-    public SayCommand(String message, Client sourceClient, WorldModel model){
+    public SayCommand(String message, Client sourceClient, WorldModel model) {
         super(sourceClient, model);
         this.registry = model.getRegistry();
         this.message = message;
@@ -21,7 +21,7 @@ public class SayCommand extends EntityCommand {
 
     @Override
     protected void executeEntityCommand() {
-        notifyEntityRoom(new SpeechNotification(getSourceEntity(),message, registry));
+        notifyEntityRoom(new SpeechNotification(getSourceEntity(), message, registry));
 
         complete = true;
     }
@@ -42,25 +42,25 @@ public class SayCommand extends EntityCommand {
     }
 
     public class SpeechNotification extends ConcreteNotification {
-                private Entity sourceEntity;
-                private String toSay;
+        private Entity sourceEntity;
+        private String toSay;
 
-                private SpeechNotification(Entity sourceEntity, String message, ClientRegistry registry) {
-                    super(registry);
+        private SpeechNotification(Entity sourceEntity, String message, ClientRegistry registry) {
+            super(registry);
 
-                    this.sourceEntity = sourceEntity;
-                    this.toSay = message;
-                }
+            this.sourceEntity = sourceEntity;
+            this.toSay = message;
+        }
 
-                @Override
-                public String getAsMessage(Entity viewer) {
-                    String message;
-                    if(viewer.equals(sourceEntity))
-                        message = getMessageInColor( "You say " + toSay, INFORMATIVE);
-                    else
-                        message = getEntityColored(sourceEntity, viewer, getWorldModel()) + getMessageInColor( " says " + toSay, INFORMATIVE);
+        @Override
+        public String getAsMessage(Entity viewer) {
+            String message;
+            if (viewer.equals(sourceEntity))
+                message = getMessageInColor("You say " + toSay, INFORMATIVE);
+            else
+                message = getEntityColored(sourceEntity, viewer, getWorldModel()) + getMessageInColor(" says " + toSay, INFORMATIVE);
 
-                    return message;
+            return message;
         }
     }
 }

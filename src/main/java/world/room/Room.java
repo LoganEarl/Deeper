@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+import static main.java.world.room.RoomDiscoveryToken.DetectionStatus.known;
 import static main.java.world.room.RoomTable.*;
 
 /**
@@ -241,19 +242,34 @@ public class Room implements DatabaseManager.DatabaseEntry {
     }
 
     public RoomConnection getOutgoingConnectionByIndex(int index, Entity viewer){
-        List<RoomConnection> visibleRooms = getOutgoingConnectionsFromPOV(viewer);
+        List<RoomConnection> visibleRooms = getOutgoingConnectionsFromPOV(viewer, known);
         if(index >= 0 && index < visibleRooms.size())
             return visibleRooms.get(index);
         return null;
     }
 
-    public List<RoomConnection> getOutgoingConnectionsFromPOV(Entity viewer) {
+    public void detectTriviallyVisibleConnections(Entity viewer){
+        for(RoomConnection connection: getOutgoingConnections()) {
+            RoomDiscoveryToken token = RoomDiscoveryToken.getToken(viewer.getID(), connection.getConnectionID(), viewer.getDatabaseName());
+            if (connection.getDetectDifficulty() == null && token.getDetectedStatus() != known)
+                RoomDiscoveryToken.revealConnection(viewer.getID(), connection.getConnectionID(), System.currentTimeMillis(), viewer.getDatabaseName());
+            else{
+                if(token.getDetectedStatus() == RoomDiscoveryToken.DetectionStatus.unencountered) {
+                    token.hide(System.currentTimeMillis());
+                }
+            }
+        }
+    }
+
+    public List<RoomConnection> getOutgoingConnectionsFromPOV(Entity viewer, RoomDiscoveryToken.DetectionStatus desiredStatus) {
         List<RoomConnection> availableConnections = RoomConnection.getConnectionsBySourceRoom(roomName, databaseName);
-        List<RoomConnection> visibleConnections = new ArrayList<>();
-        for (RoomConnection connection : availableConnections)
-            if (connection.isVisibleTo(viewer))
-                visibleConnections.add(connection);
-        return visibleConnections;
+        List<RoomConnection> applicableConnections = new ArrayList<>();
+        for (RoomConnection connection : availableConnections) {
+            RoomDiscoveryToken token = RoomDiscoveryToken.getToken(viewer.getID(),connection.getConnectionID(),databaseName);
+            if (token.getDetectedStatus() == desiredStatus)
+                applicableConnections.add(connection);
+        }
+        return applicableConnections;
     }
 
     public List<Domain> getDomains(){

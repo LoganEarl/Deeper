@@ -28,7 +28,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     private String destRoomName;
     private int traverseDifficulty;
     private Skill traverseSkill;
-    private int detectDifficulty;
+    private Integer detectDifficulty;
     private EffectArchetype failureEffect;
     private EffectArchetype successEffect;
     private String failureRoomName;
@@ -100,7 +100,12 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         destRoomName = readEntry.getString(DEST_ROOM_NAME);
         traverseDifficulty = readEntry.getInt(TRAVERSE_DIFFICULTY);
         traverseSkill = Skill.getGeneralSkill(readEntry.getString(TRAVERSE_SKILL_NAME));
-        detectDifficulty = readEntry.getInt(DETECT_DIFFICULTY);
+
+        String rawDetectDifficulty = readEntry.getString(DETECT_DIFFICULTY);
+        if(rawDetectDifficulty == null)
+            detectDifficulty = null;
+        else
+            detectDifficulty = Integer.parseInt(rawDetectDifficulty);
 
         String raw = "";
         try {
@@ -163,37 +168,6 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         this.databaseName = databaseName;
     }
 
-    @Override
-    public boolean saveToDatabase(String databaseName) {
-        //Kinda wish i knew about hibernate when i started this.
-        int result = DatabaseManager.executeStatement(REPLACE_SQL, databaseName,
-                connectionID,
-                displayName,
-                successMessage,
-                failureMessage,
-                sourceRoomName,
-                destRoomName,
-                Domain.encodeDomains(sourceDomains),
-                Domain.encodeDomains(destinationDomains),
-                traverseDifficulty,
-                traverseSkill != null ? traverseSkill.getSavableName() : "",
-                detectDifficulty,
-                Domain.encodeDomains(detectDomains),
-                detectWord,
-                failureEffect.name(),
-                failureRoomName,
-                Domain.encodeDomains(failureDestinationDomains),
-                successEffect.name(),
-                staminaCost,
-                keyCode,
-                state.name(),
-                direction.name(),
-                failureDirection != null? failureDirection.name():null);
-        if (result > 0) addToCache(this);
-
-        return result > 0;
-    }
-
     public static RoomConnection getConnectionByID(String id, String databaseName) {
         RoomConnection toReturn = null;
         WorldSpecificCache<String, RoomConnection> worldCache = roomConnectionCache.get(databaseName);
@@ -254,6 +228,37 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     }
 
     @Override
+    public boolean saveToDatabase(String databaseName) {
+        //Kinda wish i knew about hibernate when i started this.
+        int result = DatabaseManager.executeStatement(REPLACE_SQL, databaseName,
+                connectionID,
+                displayName,
+                successMessage,
+                failureMessage,
+                sourceRoomName,
+                destRoomName,
+                Domain.encodeDomains(sourceDomains),
+                Domain.encodeDomains(destinationDomains),
+                traverseDifficulty,
+                traverseSkill != null ? traverseSkill.getSavableName() : "",
+                detectDifficulty,
+                Domain.encodeDomains(detectDomains),
+                detectWord,
+                failureEffect.name(),
+                failureRoomName,
+                Domain.encodeDomains(failureDestinationDomains),
+                successEffect.name(),
+                staminaCost,
+                keyCode,
+                state.name(),
+                direction.name(),
+                failureDirection != null? failureDirection.name():null);
+        if (result > 0) addToCache(this);
+
+        return result > 0;
+    }
+
+    @Override
     public boolean removeFromDatabase(String databaseName) {
         int result = DatabaseManager.executeStatement(DELETE_SQL, databaseName, connectionID);
         if (result >= 0) removeFromCache(this);
@@ -272,15 +277,6 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     //</editor-fold>
 
     //<editor-fold desc="Utility">
-    public boolean isVisibleTo(Entity entity) {
-        if (!entity.getDatabaseName().equals(databaseName))
-            return false;
-        if (detectDifficulty == 0)
-            return true;
-
-        return true;
-    }
-
     private static void addToCache(RoomConnection connection) {
         WorldSpecificCache<String, RoomConnection> worldCache = roomConnectionCache.get(connection.databaseName);
         if (worldCache == null)
@@ -345,7 +341,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         this.state = state;
     }
 
-    public int getDetectDifficulty() {
+    public Integer getDetectDifficulty() {
         return detectDifficulty;
     }
 

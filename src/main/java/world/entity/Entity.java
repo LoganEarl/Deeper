@@ -18,6 +18,7 @@ import main.java.world.notification.Notification;
 import main.java.world.notification.NotificationSubscriber;
 import main.java.world.room.Domain;
 import main.java.world.room.Room;
+import main.java.world.room.RoomConnection;
 import main.java.world.trait.Trait;
 import main.java.world.trait.Traited;
 
@@ -86,7 +87,8 @@ public class Entity implements
             throw new IllegalArgumentException("Race of the entity is not recognized");
 
         controllerType = readEntry.getString(CONTROLLER_TYPE);
-        roomName = readEntry.getString(ROOM_NAME);
+        String roomName = readEntry.getString(ROOM_NAME);
+        setRoom(roomName);
 
         String rawDomain = readEntry.getString(DOMAIN);
         try{
@@ -473,6 +475,7 @@ public class Entity implements
 
     public void setRoom(Room newRoom){
         this.roomName = newRoom.getRoomName();
+        newRoom.detectTriviallyVisibleConnections(this);
     }
 
     public void setRoom(String roomName){
@@ -605,7 +608,7 @@ public class Entity implements
             e.entityID = entityID;
             e.displayName = displayName;
             e.controllerType = controllerType;
-            e.roomName = roomName;
+            e.setRoom(roomName);
             e.raceID = raceID;
             e.databaseName = databaseName;
 

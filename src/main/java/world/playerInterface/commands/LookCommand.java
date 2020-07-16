@@ -11,6 +11,7 @@ import main.java.world.playerInterface.ColorTheme;
 import main.java.world.room.Domain;
 import main.java.world.room.Room;
 import main.java.world.room.RoomConnection;
+import main.java.world.room.RoomDiscoveryToken;
 
 import java.awt.*;
 import java.util.*;
@@ -133,11 +134,13 @@ public class LookCommand extends EntityCommand {
     }
 
     private void rollToDetectHiddenWays() {
+        //List<RoomConnection>
+
         //TODO chance to detect rooms
     }
 
     private String getWays(Room r, boolean extendedDomainDetails) {
-        List<RoomConnection> connections = r.getOutgoingConnectionsFromPOV(getSourceEntity());
+        List<RoomConnection> connections = r.getOutgoingConnectionsFromPOV(getSourceEntity(), RoomDiscoveryToken.DetectionStatus.known);
         Collections.sort(connections);
 
         if (connections.size() == 0)
