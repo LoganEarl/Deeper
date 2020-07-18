@@ -66,6 +66,7 @@ public class EquipCommand extends EntityCommand {
         }
         complete = true;
     }
+
     class EquipNotification extends ConcreteNotification {
         private Armor armor;
         private boolean wasPutOn;

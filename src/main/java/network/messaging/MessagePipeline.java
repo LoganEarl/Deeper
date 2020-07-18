@@ -5,6 +5,7 @@ import main.java.client.ClientRegistry;
 import main.java.network.CommandExecutor;
 import main.java.network.WebServer;
 import main.java.world.WorldModel;
+import main.java.world.playerInterface.ColorTheme;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static main.java.world.playerInterface.ColorTheme.FAILURE;
 
 public class MessagePipeline implements WebServer.OnMessageReceivedListener {
     private Map<String, Constructor<? extends ClientMessage>> loadedMessageBuilders = new HashMap<>();
@@ -46,13 +49,15 @@ public class MessagePipeline implements WebServer.OnMessageReceivedListener {
 
                 if (message.constructFromString(getMessageBody(rawMessage)))
                     message.resolve();
+                else
+                    registry.sendMessage(ColorTheme.getMessageInColor("That is not the way you " + header + ".", FAILURE) + "\nIt is used like " + message.getUsage());
             } catch (Exception e) {
                 System.out.println("Attempt to invoke a clientMessage constructor failed");
                 e.printStackTrace();
             }
 
         } else
-            registry.sendMessage("Im sorry, but I did not recognize that. Please try again or use 'help' if you have any questions", client);
+            registry.sendMessage("Im sorry, but " + ColorTheme.getMessageInColor("I did not recognize that.", FAILURE) + " Please try again or use 'help' if you have any questions", client);
     }
 
     public void loadMessage(Class<? extends ClientMessage> messageClass) {

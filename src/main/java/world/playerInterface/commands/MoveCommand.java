@@ -57,7 +57,7 @@ public class MoveCommand extends EntityCommand {
 
     private void travel(RoomConnection roomConnection) {
         Entity entity = getSourceEntity();
-
+        //TODO find a way to automatically reveal rooms you enter another room through
         //TODO add a way to unlock rooms
         if (roomConnection.getState() == RoomConnection.State.locked) {
             getSourceClient().sendMessage(getMessageInColor("The way is barred", FAILURE));

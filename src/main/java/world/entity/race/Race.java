@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * instantiated from of a race. Note, all playable races are stored as constants of this class. When a new main.java.world is instantiated, these playable races need to be replaced into the new file to ensure that players migrating to the main.java.world do not fail their foreign key restraints.
+ * instantiated from of a race. Note, all playable races are stored as constants of this class. When a new world is instantiated, these playable races need to be replaced into the new file to ensure that players migrating to the main.java.world do not fail their foreign key restraints.
  * @author Logan Earl
  */
 public class Race implements TraitBestower {

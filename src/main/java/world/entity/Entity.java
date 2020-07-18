@@ -116,13 +116,13 @@ public class Entity implements
      * will transfer this entity to the given main.java.world, updating the meta file and everything.
      * If it fails, it will return the appropriate code and keep the entity in it's current main.java.world.
      * There cannot be more than one entity with the same Entity_ID in one main.java.world, attempting to move
-     * an entity whos ID is also in the new main.java.world will fail the attempt
+     * an entity whose ID is also in the new main.java.world will fail the attempt
      * @param newWorld the new main.java.world this entity will exist in
      * @return ont of the CODE_* constants defined above.
      */
     public int transferToWorld(World newWorld){
         if(newWorld == null)
-            throw new IllegalArgumentException("cannot transfer to a null main.java.world");
+            throw new IllegalArgumentException("cannot transfer to a null world");
 
         if(existsInDatabase(databaseName) && !removeFromDatabase(databaseName)) {
             updateInDatabase(databaseName);
@@ -147,8 +147,8 @@ public class Entity implements
             System.out.println("Failed to transfer entity to nonexistent room [" + newWorld.getEntryRoomName() + "] in world " + newWorld.getWorldID());
             return CODE_TRANSFER_FAILED;
         }
-        this.roomName = newRoom.getRoomName();
-        this.domain = newRoom.getDefaultDomain();
+        setRoom(newRoom);
+        setDomain(newRoom.getDefaultDomain());
 
         tag = getEntityTag(entityID, databaseName);
         entityCache.put(tag,this);
@@ -474,12 +474,14 @@ public class Entity implements
     }
 
     public void setRoom(Room newRoom){
-        this.roomName = newRoom.getRoomName();
-        newRoom.detectTriviallyVisibleConnections(this);
+        if(newRoom != null) {
+            this.roomName = newRoom.getRoomName();
+            newRoom.detectTriviallyVisibleConnections(this);
+        }
     }
 
     public void setRoom(String roomName){
-        this.roomName = roomName;
+        setRoom(Room.getByRoomName(roomName, databaseName));
     }
 
     public String getDatabaseName() {

@@ -32,8 +32,11 @@ public class LookCommand extends EntityCommand {
 
     private boolean complete = false;
 
+    public LookCommand(boolean extendedDetails, Client fromClient, WorldModel model) {
+        this("",false,extendedDetails,fromClient,model);
+    }
+
     /**
-     * Sole constructor
      *
      * @param target     the item/entity/container that is being inspected.
      * @param lookInto   true to look inside the selected thing. Does not apply to rooms
@@ -129,17 +132,31 @@ public class LookCommand extends EntityCommand {
         itemsString = getItemsString(r);
 
         return String.format(Locale.US,
-                "%s\n\n%s\n\n%s\n" +
-                        "%s\n\n%s", roomName, roomDesc, waysDesc, creaturesString, itemsString);
+                             "%s\n\n%s\n\n%s\n" +
+                                     "%s\n\n%s", roomName, roomDesc, waysDesc, creaturesString, itemsString);
     }
 
-    private void rollToDetectHiddenWays() {
-        //List<RoomConnection>
-
-        //TODO chance to detect rooms
+    private void rollToDetectHiddenWays(Room currentRoom) {
+        List<RoomConnection> detectionCandidates = currentRoom.getOutgoingConnectionsFromPOV(getSourceEntity(), RoomDiscoveryToken.DetectionStatus.unencountered);
+        for (RoomConnection connection : detectionCandidates) {
+            RoomDiscoveryToken token = RoomDiscoveryToken.getToken(getSourceEntity().getID(), connection.getConnectionID(), connection.getDatabaseName());
+            long retryTimestamp = connection.getDetectCooldownSeconds() * 1000 + token.getLastUpdate();
+            long time = System.currentTimeMillis();
+            if (time > retryTimestamp) {
+                //roll perception
+                int result = getSourceEntity().getSkills().performSkillCheck(Skill.perception1, connection.getDetectDifficulty() - 10);
+                if (result >= 0) {
+                    getSourceClient().sendMessage(ColorTheme.getMessageInColor("You noticed a hidden passageway! (Perception:" + result + ")", SUCCESS));
+                    token.update(RoomDiscoveryToken.DetectionStatus.known, time);
+                } else {
+                    token.hide(0);
+                }
+            }
+        }
     }
 
     private String getWays(Room r, boolean extendedDomainDetails) {
+        rollToDetectHiddenWays(r);
         List<RoomConnection> connections = r.getOutgoingConnectionsFromPOV(getSourceEntity(), RoomDiscoveryToken.DetectionStatus.known);
         Collections.sort(connections);
 
@@ -149,13 +166,16 @@ public class LookCommand extends EntityCommand {
             StringBuilder message = new StringBuilder();
             for (int i = 0; i < connections.size(); i++) {
                 RoomConnection connection = connections.get(i);
-                String connectionPortion = (String.format(Locale.US, "[%d]%s%s%s", i,
-                        extendedDomainDetails ? " ": getDomainTransferInfo(connection, false),
-                        connection.getDisplayName(),
-                        extendedDomainDetails ? getDomainTransferInfo(connection, true) : ""));
+                String hiddenText = connection.getDetectDifficulty() != null ? " [hidden:" + connection.getDetectDifficulty() + "] " : "";
+
+                String connectionPortion = (String.format(Locale.US, "[%d]%s%s%s%s", i,
+                                                          hiddenText,
+                                                          extendedDomainDetails ? " " : getDomainTransferInfo(connection, false),
+                                                          connection.getDisplayName(),
+                                                          extendedDomainDetails ? getDomainTransferInfo(connection, true) : ""));
 
                 Skill requiredSkill = connection.getTraverseSkill();
-                if(requiredSkill != null){
+                if (requiredSkill != null) {
                     int skillBonus = getSourceEntity().getSkills().getSkillBonus(requiredSkill);
                     int statBase = getSourceEntity().getStats().getStat(requiredSkill.getAssociatedStat());
 
@@ -179,10 +199,10 @@ public class LookCommand extends EntityCommand {
             StringBuilder builder = new StringBuilder("\nDomains:\n");
             for (Domain domain : connection.getSourceDomains()) {
                 builder.append(String.format(Locale.US, "    %s%15s%s => %-15s\n",
-                        domain == currentDomain ? "[" : "",
-                        domain.name(),
-                        domain == currentDomain ? "]" : "",
-                        domainMapToDisplay.get(domain)
+                                             domain == currentDomain ? "[" : "",
+                                             domain.name(),
+                                             domain == currentDomain ? "]" : "",
+                                             domainMapToDisplay.get(domain)
                 ));
             }
             return builder.toString();

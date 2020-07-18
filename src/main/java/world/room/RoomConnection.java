@@ -2,7 +2,6 @@ package main.java.world.room;
 
 import main.java.database.DatabaseManager;
 import main.java.world.cache.WorldSpecificCache;
-import main.java.world.entity.Entity;
 import main.java.world.entity.skill.Skill;
 import main.java.world.trait.EffectArchetype;
 
@@ -16,33 +15,34 @@ import static main.java.world.room.RoomConnectionTable.*;
 import static main.java.world.room.RoomConnectionTable.TABLE_NAME;
 
 public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable<RoomConnection> {
-    private String connectionID;
-    private String displayName;
+    private final String connectionID;
+    private final String displayName;
 
-    private String databaseName;
+    private final String databaseName;
 
     //skill check info
-    private String successMessage;
-    private String failureMessage;
-    private String sourceRoomName;
-    private String destRoomName;
-    private int traverseDifficulty;
-    private Skill traverseSkill;
-    private Integer detectDifficulty;
+    private final String successMessage;
+    private final String failureMessage;
+    private final String sourceRoomName;
+    private final String destRoomName;
+    private final int traverseDifficulty;
+    private final Skill traverseSkill;
+    private final Integer detectDifficulty;
     private EffectArchetype failureEffect;
     private EffectArchetype successEffect;
     private String failureRoomName;
-    private List<Domain> failureDestinationDomains;
+    private final List<Domain> failureDestinationDomains;
 
-    private List<Domain> detectDomains;
-    private String detectWord;
-    private int staminaCost;
-    private int keyCode;
-    private List<Domain> sourceDomains;
-    private List<Domain> destinationDomains;
+    private final List<Domain> detectDomains;
+    private final String detectWord;
+    private final int staminaCost;
+    private final int keyCode;
+    private final List<Domain> sourceDomains;
+    private final List<Domain> destinationDomains;
     private State state;
     private Direction direction;
     private Direction failureDirection;
+    private int detectCooldownSeconds;
 
     public enum State {
         locked, unlocked, impassible
@@ -100,6 +100,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         destRoomName = readEntry.getString(DEST_ROOM_NAME);
         traverseDifficulty = readEntry.getInt(TRAVERSE_DIFFICULTY);
         traverseSkill = Skill.getGeneralSkill(readEntry.getString(TRAVERSE_SKILL_NAME));
+        detectCooldownSeconds = readEntry.getInt(DETECT_COOLDOWN_SECONDS);
 
         String rawDetectDifficulty = readEntry.getString(DETECT_DIFFICULTY);
         if(rawDetectDifficulty == null)
@@ -107,10 +108,11 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         else
             detectDifficulty = Integer.parseInt(rawDetectDifficulty);
 
-        String raw = "";
+        String raw = null;
         try {
             raw = readEntry.getString(FAILURE_EFFECT_NAME);
-            failureEffect = raw != null ? EffectArchetype.valueOf(raw) : null;
+            if(raw != null && !raw.isEmpty())
+                failureEffect =  EffectArchetype.valueOf(raw);
         } catch (IllegalArgumentException e) {
             System.out.printf("Failed to load failure effect for room connection:%s:%s\n", connectionID, raw);
             failureEffect = null;
@@ -118,7 +120,8 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
 
         try {
             raw = readEntry.getString(SUCCESS_EFFECT_NAME);
-            successEffect = raw != null ? EffectArchetype.valueOf(raw) : null;
+            if(raw != null && !raw.isEmpty())
+                successEffect = EffectArchetype.valueOf(raw);
         } catch (IllegalArgumentException e) {
             System.out.printf("Failed to load success effect for room connection:%s:%s\n", connectionID, raw);
             successEffect = null;
@@ -126,7 +129,10 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
 
         try {
             raw = readEntry.getString(STATE);
-            state = raw != null ? State.valueOf(raw) : State.unlocked;
+            if(raw != null && !raw.isEmpty())
+                state = State.valueOf(raw);
+            else
+                state = State.unlocked;
         } catch (IllegalArgumentException e) {
             System.out.printf("Failed to load state for room connection:%s:%s\n", connectionID, raw);
             state = State.unlocked;
@@ -140,10 +146,11 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         }
 
         failureRoomName = readEntry.getString(FAILURE_ROOM_NAME);
+        if(failureRoomName != null && failureRoomName.isEmpty()) failureRoomName = null;
 
         String rawFailureDirection = readEntry.getString(FAILURE_DIRECTION);
         try {
-            if(rawFailureDirection != null)
+            if(rawFailureDirection != null && !rawFailureDirection.isEmpty())
                 failureDirection = Direction.valueOf(rawFailureDirection);
         } catch (IllegalArgumentException e) {
             rawFailureDirection = null;
@@ -387,6 +394,10 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
 
     public List<Domain> getSourceDomains() {
         return sourceDomains;
+    }
+
+    public int getDetectCooldownSeconds() {
+        return detectCooldownSeconds;
     }
 
     /**

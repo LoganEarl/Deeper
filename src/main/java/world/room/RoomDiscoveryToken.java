@@ -78,6 +78,7 @@ public class RoomDiscoveryToken implements DatabaseManager.DatabaseEntry {
     public void hide(long time){
         detectedStatus = DetectionStatus.undetected;
         lastUpdate = time;
+        updateInDatabase(databaseName);
     }
 
     public static RoomDiscoveryToken getToken(String entityID, String connectionID, String databaseName) {
@@ -136,7 +137,7 @@ public class RoomDiscoveryToken implements DatabaseManager.DatabaseEntry {
 
     @Override
     public boolean existsInDatabase(String databaseName) {
-        return getToken(entityID,connectionID,databaseName) != null;
+        return true; //it is assumed the entry exists, even if it does not. This is because there is always a token available for any request
     }
 
     private static String getCacheTag(String entityID, String connectionID) {

@@ -6,8 +6,8 @@ import main.java.world.entity.EntityTable;
 import java.util.*;
 
 /**
- * A table made to record what main.java.world each entity is in. Each main.java.world is it's own database file,
- * so we can't put the entity's current main.java.world
+ * A table made to record what world each entity is in. Each world is it's own database file,
+ * so we can't put the entity's current world
  */
 public class EntityWorldTable implements DatabaseManager.DatabaseTable {
     public static final String TABLE_NAME = "entityWorldTable";

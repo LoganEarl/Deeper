@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static main.java.world.room.RoomDiscoveryToken.DetectionStatus.known;
+import static main.java.world.room.RoomDiscoveryToken.DetectionStatus.undetected;
 import static main.java.world.room.RoomTable.*;
 
 /**
@@ -106,39 +107,39 @@ public class Room implements DatabaseManager.DatabaseEntry {
     //<editor-fold desc="SQL Operations/Constructor">
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ROOM_NAME);
     private static final String CREATE_SQL = String.format(Locale.US, "INSERT INTO %s " +
-                    "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" +
-                    " VALUES " +
-                    "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            TABLE_NAME, ROOM_NAME, ROOM_DESCRIPTION, DOMAINS,
-            WIND_LEVEL, WIND_EQUILIBRIUM, WIND_CONDUCTIVITY,
-            RAIN_LEVEL, RAIN_EQUILIBRIUM, RAIN_CONDUCTIVITY,
-            TEMP_LEVEL, TEMP_EQUILIBRIUM, TEMP_CONDUCTIVITY,
-            TOXIC_LEVEL, TOXIC_EQUILIBRIUM, TEMP_CONDUCTIVITY,
-            ACID_LEVEL, ACID_EQUILIBRIUM, ACID_CONDUCTIVITY,
-            INFO_LEVEL, INFO_CONDUCTIVITY, INFO_EQUILIBRIUM,
-            QUAKE_LEVEL, QUAKE_EQUILIBRIUM, QUAKE_CONDUCTIVITY,
-            OIL_LEVEL, OIL_EQUILIBRIUM, OIL_CONDUCTIVITY);
+                                                                   "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" +
+                                                                   " VALUES " +
+                                                                   "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                                           TABLE_NAME, ROOM_NAME, ROOM_DESCRIPTION, DOMAINS,
+                                                           WIND_LEVEL, WIND_EQUILIBRIUM, WIND_CONDUCTIVITY,
+                                                           RAIN_LEVEL, RAIN_EQUILIBRIUM, RAIN_CONDUCTIVITY,
+                                                           TEMP_LEVEL, TEMP_EQUILIBRIUM, TEMP_CONDUCTIVITY,
+                                                           TOXIC_LEVEL, TOXIC_EQUILIBRIUM, TEMP_CONDUCTIVITY,
+                                                           ACID_LEVEL, ACID_EQUILIBRIUM, ACID_CONDUCTIVITY,
+                                                           INFO_LEVEL, INFO_CONDUCTIVITY, INFO_EQUILIBRIUM,
+                                                           QUAKE_LEVEL, QUAKE_EQUILIBRIUM, QUAKE_CONDUCTIVITY,
+                                                           OIL_LEVEL, OIL_EQUILIBRIUM, OIL_CONDUCTIVITY);
     private static final String DELETE_SQL = String.format(Locale.US, "DELETE FROM %s WHERE %s=?", TABLE_NAME, ROOM_NAME);
     private static final String UPDATE_SQL = String.format(Locale.US, "UPDATE %s SET " +
-                    "%s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?," +
-                    "%s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?," +
-                    "%s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
-            TABLE_NAME, ROOM_DESCRIPTION, DOMAINS,
-            WIND_LEVEL, WIND_EQUILIBRIUM, WIND_CONDUCTIVITY,
-            RAIN_LEVEL, RAIN_EQUILIBRIUM, RAIN_CONDUCTIVITY,
-            TEMP_LEVEL, TEMP_EQUILIBRIUM, TEMP_CONDUCTIVITY,
-            TOXIC_LEVEL, TOXIC_EQUILIBRIUM, TEMP_CONDUCTIVITY,
-            ACID_LEVEL, ACID_EQUILIBRIUM, ACID_CONDUCTIVITY,
-            INFO_LEVEL, INFO_CONDUCTIVITY, INFO_EQUILIBRIUM,
-            QUAKE_LEVEL, QUAKE_EQUILIBRIUM, QUAKE_CONDUCTIVITY,
-            OIL_LEVEL, OIL_EQUILIBRIUM, OIL_CONDUCTIVITY, ROOM_NAME);
+                                                                   "%s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?," +
+                                                                   "%s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?," +
+                                                                   "%s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
+                                                           TABLE_NAME, ROOM_DESCRIPTION, DOMAINS,
+                                                           WIND_LEVEL, WIND_EQUILIBRIUM, WIND_CONDUCTIVITY,
+                                                           RAIN_LEVEL, RAIN_EQUILIBRIUM, RAIN_CONDUCTIVITY,
+                                                           TEMP_LEVEL, TEMP_EQUILIBRIUM, TEMP_CONDUCTIVITY,
+                                                           TOXIC_LEVEL, TOXIC_EQUILIBRIUM, TEMP_CONDUCTIVITY,
+                                                           ACID_LEVEL, ACID_EQUILIBRIUM, ACID_CONDUCTIVITY,
+                                                           INFO_LEVEL, INFO_CONDUCTIVITY, INFO_EQUILIBRIUM,
+                                                           QUAKE_LEVEL, QUAKE_EQUILIBRIUM, QUAKE_CONDUCTIVITY,
+                                                           OIL_LEVEL, OIL_EQUILIBRIUM, OIL_CONDUCTIVITY, ROOM_NAME);
 
     private Room(ResultSet readEntry, String databaseName) throws SQLException {
         roomName = readEntry.getString(ROOM_NAME);
         roomDescription = readEntry.getString(ROOM_DESCRIPTION);
 
         domains = Domain.decodeDomains(readEntry.getString(DOMAINS));
-        if(domains.isEmpty())domains.add(Domain.grey);
+        if (domains.isEmpty()) domains.add(Domain.grey);
 
         for (EnvironmentType type : EnvironmentType.values()) {
             environmentalLevels.put(type, new EnvironmentLevelContainer(readEntry, type));
@@ -219,7 +220,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
         }
 
         return DatabaseManager.executeStatement(UPDATE_SQL, databaseName,
-                roomDescription, args) > 0;
+                                                roomDescription, args) > 0;
     }
 
     @Override
@@ -241,23 +242,18 @@ public class Room implements DatabaseManager.DatabaseEntry {
         return RoomConnection.getConnectionsBySourceRoom(roomName, databaseName);
     }
 
-    public RoomConnection getOutgoingConnectionByIndex(int index, Entity viewer){
+    public RoomConnection getOutgoingConnectionByIndex(int index, Entity viewer) {
         List<RoomConnection> visibleRooms = getOutgoingConnectionsFromPOV(viewer, known);
-        if(index >= 0 && index < visibleRooms.size())
+        if (index >= 0 && index < visibleRooms.size())
             return visibleRooms.get(index);
         return null;
     }
 
-    public void detectTriviallyVisibleConnections(Entity viewer){
-        for(RoomConnection connection: getOutgoingConnections()) {
+    public void detectTriviallyVisibleConnections(Entity viewer) {
+        for (RoomConnection connection : getOutgoingConnections()) {
             RoomDiscoveryToken token = RoomDiscoveryToken.getToken(viewer.getID(), connection.getConnectionID(), viewer.getDatabaseName());
             if (connection.getDetectDifficulty() == null && token.getDetectedStatus() != known)
-                RoomDiscoveryToken.revealConnection(viewer.getID(), connection.getConnectionID(), System.currentTimeMillis(), viewer.getDatabaseName());
-            else{
-                if(token.getDetectedStatus() == RoomDiscoveryToken.DetectionStatus.unencountered) {
-                    token.hide(System.currentTimeMillis());
-                }
-            }
+                token.update(known, System.currentTimeMillis());
         }
     }
 
@@ -265,18 +261,18 @@ public class Room implements DatabaseManager.DatabaseEntry {
         List<RoomConnection> availableConnections = RoomConnection.getConnectionsBySourceRoom(roomName, databaseName);
         List<RoomConnection> applicableConnections = new ArrayList<>();
         for (RoomConnection connection : availableConnections) {
-            RoomDiscoveryToken token = RoomDiscoveryToken.getToken(viewer.getID(),connection.getConnectionID(),databaseName);
+            RoomDiscoveryToken token = RoomDiscoveryToken.getToken(viewer.getID(), connection.getConnectionID(), databaseName);
             if (token.getDetectedStatus() == desiredStatus)
                 applicableConnections.add(connection);
         }
         return applicableConnections;
     }
 
-    public List<Domain> getDomains(){
+    public List<Domain> getDomains() {
         return domains;
     }
 
-    public Domain getDefaultDomain(){
+    public Domain getDefaultDomain() {
         return domains.get(0);
     }
 
