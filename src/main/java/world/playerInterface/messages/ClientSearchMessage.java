@@ -30,6 +30,6 @@ public class ClientSearchMessage extends ClientMessage {
 
     @Override
     protected void doActions() {
-        getWorldModel().getExecutor().scheduleCommand(new SearchCommand());
+        getWorldModel().getExecutor().scheduleCommand(new SearchCommand(getClient(), getWorldModel()));
     }
 }

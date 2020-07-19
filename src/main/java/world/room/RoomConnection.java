@@ -27,7 +27,7 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     private final String destRoomName;
     private final int traverseDifficulty;
     private final Skill traverseSkill;
-    private final Integer detectDifficulty;
+    private Integer detectDifficulty;
     private EffectArchetype failureEffect;
     private EffectArchetype successEffect;
     private String failureRoomName;
@@ -42,7 +42,8 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     private State state;
     private Direction direction;
     private Direction failureDirection;
-    private int detectCooldownSeconds;
+    private final int detectCooldownSeconds;
+    private final String linkedRoomConnectionIdentifier;
 
     public enum State {
         locked, unlocked, impassible
@@ -101,12 +102,18 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         traverseDifficulty = readEntry.getInt(TRAVERSE_DIFFICULTY);
         traverseSkill = Skill.getGeneralSkill(readEntry.getString(TRAVERSE_SKILL_NAME));
         detectCooldownSeconds = readEntry.getInt(DETECT_COOLDOWN_SECONDS);
+        linkedRoomConnectionIdentifier = readEntry.getString(LINKED_CONNECTION_ID);
 
         String rawDetectDifficulty = readEntry.getString(DETECT_DIFFICULTY);
-        if(rawDetectDifficulty == null)
+        if(rawDetectDifficulty == null || rawDetectDifficulty.isEmpty())
             detectDifficulty = null;
-        else
-            detectDifficulty = Integer.parseInt(rawDetectDifficulty);
+        else {
+            try {
+                detectDifficulty = Integer.parseInt(rawDetectDifficulty);
+            }catch (NumberFormatException e){
+                detectDifficulty = null;
+            }
+        }
 
         String raw = null;
         try {
@@ -409,6 +416,13 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
         if (destinationDomains.isEmpty())
             destinationDomains.add(Domain.surface);
         return destinationDomains;
+    }
+
+    public RoomConnection getInverseRoomConnection(){
+        if(linkedRoomConnectionIdentifier != null){
+            return RoomConnection.getConnectionByID(linkedRoomConnectionIdentifier, databaseName);
+        }
+        return null;
     }
 
     //</editor-fold>

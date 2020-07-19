@@ -73,6 +73,8 @@ public class Entity implements
     }
 
     private Entity(ResultSet readEntry, WorldModel model, String databaseName) throws Exception {
+        this.databaseName = databaseName;
+
         extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(readEntry));
         extenders.put(StatContainer.SIGNIFIER, new StatContainer(readEntry));
         extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(readEntry, model.getItemCollection(), this));
@@ -103,7 +105,6 @@ public class Entity implements
 
         getPools().calculatePoolMaxes(getStats());
 
-        this.databaseName = databaseName;
         this.model = model;
 
         //this last to load the skills

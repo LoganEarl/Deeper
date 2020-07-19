@@ -265,6 +265,7 @@ public class Room implements DatabaseManager.DatabaseEntry {
             if (token.getDetectedStatus() == desiredStatus)
                 applicableConnections.add(connection);
         }
+        Collections.sort(applicableConnections);
         return applicableConnections;
     }
 

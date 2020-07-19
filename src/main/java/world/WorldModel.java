@@ -72,6 +72,7 @@ public class WorldModel {
         messagePipeline.loadMessage(ClientEvadeMessage.class);
         messagePipeline.loadMessage(ClientDeflectMessage.class);
         messagePipeline.loadMessage(ClientStatsMessage.class);
+        messagePipeline.loadMessage(ClientSearchMessage.class);
     }
 
     public NotificationService getNotificationService() {

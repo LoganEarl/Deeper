@@ -56,6 +56,8 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
     public static final String FAILURE_DIRECTION = "failureDirection";
     /**The base cooldown to detect a room again. Can be affected by the perception of entity*/
     public static final String DETECT_COOLDOWN_SECONDS = "detectCooldownSeconds";
+    /**The room id of a room connection whose entry point is this room's exit point, and whose exit point is this room's entry point*/
+    public static final String LINKED_CONNECTION_ID = "linkedConnectionID";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
     private final Set<String> CONSTRAINTS = new HashSet<>(2);
@@ -84,6 +86,7 @@ public class RoomConnectionTable implements DatabaseManager.DatabaseTable{
         TABLE_DEFINITION.put(DIRECTION, "VARCHAR(16) COLLATE NOCASE NOT NULL DEFAULT north");
         TABLE_DEFINITION.put(FAILURE_DIRECTION, "VARCHAR(16) COLLATE NOCASE");
         TABLE_DEFINITION.put(DETECT_COOLDOWN_SECONDS, "INT DEFAULT 30");
+        TABLE_DEFINITION.put(LINKED_CONNECTION_ID, "VARCHAR(32)");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 SOURCE_ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));

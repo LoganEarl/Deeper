@@ -72,10 +72,13 @@ public class SearchCommand extends EntityCommand {
                     time / 1000,
                     connection.getDetectCooldownSeconds());
 
-            if (debuff > 0) cooldownDebuffActive = true;
+            if (debuff < 0) cooldownDebuffActive = true;
 
             if (roll + debuff + connection.getDetectDifficulty() >= 0) {
                 token.update(known, time);
+                RoomConnection inverse = connection.getInverseRoomConnection();
+                if(inverse != null)
+                    RoomDiscoveryToken.revealConnection(entity.getID(), inverse.getConnectionID(), time, entity.getDatabaseName());
                 foundConnections.add(connection);
             } else {
                 token.update(undetected, time);
@@ -83,14 +86,14 @@ public class SearchCommand extends EntityCommand {
         }
 
         getSourceClient().sendMessage(getMessageInColor("You search the room for secrets (Perception:" + roll + ")", INFORMATIVE));
-
         final String a = foundConnections.size() == 1? "a ": "";
         final String plural = foundConnections.size() > 1? "s!":"!";
-        getSourceClient().sendMessage(getMessageInColor("You have found " + a + foundConnections.size() + " hidden passageway" + plural, SUCCESS));
 
         if(foundConnections.size() == 0){
             String debuffUncertainty = cooldownDebuffActive? ", however, you were somewhat distracted by frustration at " + getMessageInColor("searching the room again so soon.",WARNING): ".";
             getSourceClient().sendMessage("You are reasonably certain there is " + getMessageInColor("nothing to find in this room", INFORMATIVE) + debuffUncertainty);
+        }else{
+            getSourceClient().sendMessage(getMessageInColor("You have found " + a + foundConnections.size() + " hidden passageway" + plural, SUCCESS));
         }
 
         final boolean debuffsActive = cooldownDebuffActive;
@@ -103,10 +106,11 @@ public class SearchCommand extends EntityCommand {
                 boolean notices = relation == allied || relation == friendly;
                 if(!notices){
                     int result = entity.getSkills().performSkillCheck(Skill.obscureIntent1,0) - viewer.getSkills().performSkillCheck(Skill.perception1,0);
-                    if(result >= 0){
+                    if(result <= 0){
                         getSourceClient().sendMessage(getMessageInColor("You obscured your searching from " + getEntityColored(entity, viewer, getWorldModel()), SUCCESS));
                     }else{
                         getSourceClient().sendMessage(getMessageInColor( getEntityColored(entity, viewer, getWorldModel()) + " has noticed your searching", SUCCESS));
+                        notices = true;
                     }
                 }
 
@@ -118,8 +122,12 @@ public class SearchCommand extends EntityCommand {
 
                     if (foundConnections.size() > 0) {
                         message += getEntityColored(entity, viewer, getWorldModel()) + " has found " + a + foundConnections.size() + " hidden passage" + plural + "\n";
-                        for(RoomConnection connection: foundConnections)
-                            RoomDiscoveryToken.revealConnection(viewer.getID(), connection.getConnectionID(),time,entity.getDatabaseName());
+                        for(RoomConnection connection: foundConnections) {
+                            RoomDiscoveryToken.revealConnection(viewer.getID(), connection.getConnectionID(), time, entity.getDatabaseName());
+                            RoomConnection inverse = connection.getInverseRoomConnection();
+                            if (inverse != null)
+                                RoomDiscoveryToken.revealConnection(entity.getID(), inverse.getConnectionID(), time, entity.getDatabaseName());
+                        }
                     } else {
                         message += getMessageInColor("The search was in vain",INFORMATIVE);
                     }
@@ -139,6 +147,7 @@ public class SearchCommand extends EntityCommand {
         double elapsedPercentage = (curTimeSeconds - lastTimeSeconds) / (double) cooldownSeconds;
         if (elapsedPercentage > 1) elapsedPercentage = 1;
         if (elapsedPercentage < 0) elapsedPercentage = 0;
+        elapsedPercentage = 1- elapsedPercentage;
         elapsedPercentage = Math.pow(elapsedPercentage - 1, 3) + 1;
         return (int) (elapsedPercentage * MAX_REPEAT_SEARCH_DEBUFF);
     }
