@@ -23,8 +23,8 @@ public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceM
     masterworkWeapon(new DamageScalarContainer(0,0,0,0,.02),10,0,0,0,
             "Of great quality, granting +10 to hit, and +.02% to the damage scaling of the weapon's primary attribute."),
     masterworkArmor(new DamageScalarContainer(0,0,0,0,0),0,0,4,4,
-            "Of great quality, granting +3 AC from the base value and +4 damage reduction")
-    ;
+            "Of great quality, granting +3 AC from the base value and +4 damage reduction"),
+    testPools(new PoolValueContainer(1000,2000,3000,4000),"This is an OP test trait");
 
     private final StatContainer statModifiers; //TODO not implemented
     private final PoolValueContainer poolModifiers; //TODO not implemented

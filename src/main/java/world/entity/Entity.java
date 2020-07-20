@@ -64,7 +64,7 @@ public class Entity implements
     public static final int CODE_TRANSFER_COMPLETE = 0;
     /**Code returned when an entity could not be transferred to the new main.java.world because there already exists an entity by that id in the target main.java.world*/
     public static final int CODE_ALREADY_EXISTS_AT_DESTINATION = -1;
-    /**Code returned when an entity could not be transferred to the new main.java.world because of an unspecified database/file io error*/
+    /**Code returned when an entity could not be transferred to the new world because of an unspecified database/file io error*/
     public static final int CODE_TRANSFER_FAILED = -2;
 
     private Entity() {
@@ -102,13 +102,11 @@ public class Entity implements
                 throw new IllegalStateException("Entity does not have a domain");
         }
 
-        getPools().calculatePoolMaxes(getStats());
-
         this.model = model;
 
-        //this last to load the skills
         extenders.put(SkillContainer.SIGNIFIER, new SkillContainer(entityID, databaseName));
 
+        getPools().calculatePoolMaxes(getStats());
         setStance(new BaseStance());
     }
 
