@@ -103,7 +103,7 @@ public class LearnSkillCommand extends EntityCommand {
                     lastPercentage = completionPercent;
                 }
             } else if (!canceled){
-                boolean success = getSourceEntity().getSkills().learnSkill(toLearn);
+                boolean success = getSourceEntity().getSkills().learnSkill(toLearn, getSourceEntity());
 
                 notifyEntityRoom(new LearningNotification(toLearn, sourceEntity, 1, lastPercentage, success, registry));
                 controllerComplete = true;

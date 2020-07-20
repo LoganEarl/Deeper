@@ -20,6 +20,10 @@ public class StatContainer implements Entity.SqlExtender {
     public static final String SIGNIFIER = "stats";
     private static final String[] HEADERS = new String[]{STR, DEX, INT, WIS, TOUGH, FIT};
 
+    public StatContainer() {
+        this(0,0,0,0,0,0);
+    }
+
     public StatContainer(int strength, int dexterity, int intelligence, int wisdom, int toughness, int fitness) {
         this.strength = strength;
         this.dexterity = dexterity;

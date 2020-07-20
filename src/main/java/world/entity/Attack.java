@@ -44,8 +44,10 @@ public class Attack {
     }
 
     public Attack setAttemptedDamage(int attemptedDamage) {
-        if (!isLocked)
+        if (!isLocked) {
+            if(attemptedDamage < 1) attemptedDamage = 1;
             this.attemptedDamage = attemptedDamage;
+        }
         return this;
     }
 

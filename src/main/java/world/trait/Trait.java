@@ -1,28 +1,112 @@
 package main.java.world.trait;
 import main.java.world.entity.Attack;
+import main.java.world.entity.StatContainer;
+import main.java.world.entity.pool.PoolContainer;
+import main.java.world.entity.skill.Skill;
+import main.java.world.item.weapon.Weapon;
+import main.java.world.item.weapon.Weapon.DamageScalarContainer;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceModifier {
     //Traversal
-    flight,
-    burrowing,
-    swimming,
-    waterBreathing,
-    hyperspaceCapable,
-    extraPlanar,
-
-    reach,
-    masterwork{
-        @Override
-        public Attack modifyOutgoingAttack(Attack in) {
-            in.setBaseRoll(in.getBaseRoll() + 5);
-            in.setAttemptedDamage((int)(in.getAttemptedDamage() * 1.1));
-            return in;
-        }
-    }
+    flying("Capable of flight"),
+    burrowing("Capable of burrowing through the ground"),
+    swimming("Capable of swimming"),
+    waterBreathing("Incapable of drowning"),
+    hyperspaceCapable("You are capable of entering hyperspace"),
+    extraPlanar("Capable of entering the Aether"),
+    reach("Capable of attacking enemies in physical domains adjacent to your own."),
+    masterworkWeapon(new DamageScalarContainer(0,0,0,0,.02),10,0,0,0,
+            "Of great quality, granting +10 to hit, and +.02% to the damage scaling of the weapon's primary attribute."),
+    masterworkArmor(new DamageScalarContainer(0,0,0,0,0),0,0,4,4,
+            "Of great quality, granting +3 AC from the base value and +4 damage reduction")
     ;
+
+    private final StatContainer statModifiers; //TODO not implemented
+    private final PoolContainer poolModifiers; //TODO not implemented
+    private final DamageScalarContainer damageScalarContainer; //TODO not implemented
+    private final Map<Skill, Integer> skillBonuses; //TODO not implemented
+    private final int hitBonus;
+    private final int damageBonus;
+    private final int armorBonus;
+    private final int damageReduction;
+
+    private final String description;
+
+    Trait(String description) {
+        this(new StatContainer(), new PoolContainer(),new DamageScalarContainer(), Collections.emptyMap(), 0,0,0,0, description);
+    }
+
+    Trait(StatContainer statModifiers,String description) {
+        this(new StatContainer(), new PoolContainer(),new DamageScalarContainer(), Collections.emptyMap(), 0,0,0,0, description);
+    }
+
+    Trait(PoolContainer poolModifiers,String description) {
+        this(new StatContainer(), poolModifiers,new DamageScalarContainer(), Collections.emptyMap(), 0,0,0,0, description);
+    }
+
+    Trait(DamageScalarContainer damageScalarContainer, int hitBonus, int damageBonus, int armorBonus, int damageReduction, String description) {
+        this(new StatContainer(), new PoolContainer(),damageScalarContainer, Collections.emptyMap(), hitBonus, damageBonus, armorBonus, damageReduction, description);
+    }
+
+    Trait(Map<Skill, Integer> skillBonuses, String description) {
+        this(new StatContainer(), new PoolContainer(),new DamageScalarContainer(), skillBonuses, 0,0,0,0, description);
+    }
+
+    Trait(int hitBonus, int damageBonus, int armorBonus, int damageReduction, String description) {
+        this(new StatContainer(), new PoolContainer(), new DamageScalarContainer(), Collections.emptyMap(), hitBonus, damageBonus, armorBonus, damageReduction, description);
+    }
+
+    Trait(StatContainer statModifiers, PoolContainer poolModifiers, DamageScalarContainer damageScalarContainer, Map<Skill, Integer> skillBonuses, int hitBonus, int damageBonus, int armorBonus, int damageReduction, String description) {
+        this.statModifiers = statModifiers;
+        this.poolModifiers = poolModifiers;
+        this.skillBonuses = skillBonuses;
+        this.damageScalarContainer = damageScalarContainer;
+        this.hitBonus = hitBonus;
+        this.damageBonus = damageBonus;
+        this.armorBonus = armorBonus;
+        this.damageReduction = damageReduction;
+        this.description = description;
+    }
+
+    public static String getSavableForm(Set<Trait> traits){
+        StringBuilder b = new StringBuilder();
+        boolean first = true;
+        for(Trait t:traits){
+            if(first)
+                first = false;
+            else
+                b.append(";");
+            b.append(t);
+        }
+        return b.toString();
+    }
+
+    public String getDisplayableName(){
+        return this.toString();
+    }
+
+    @Override
+    public Attack modifyIncomingAttack(Attack in) {
+        in.setBaseRoll(in.getBaseRoll() - armorBonus);
+        in.setAttemptedDamage(in.getAttemptedDamage() - damageReduction);
+        return in;
+    }
+
+    @Override
+    public Attack modifyOutgoingAttack(Attack in) {
+        in.setBaseRoll(in.getBaseRoll() + hitBonus);
+        in.setAttemptedDamage(
+                in.getAttemptedDamage() +
+                damageBonus +
+                damageScalarContainer.getDamageContribution(in.getAggressor().getStats())
+        );
+        return in;
+    }
 
     /**
      * parses a trait from a string
@@ -55,30 +139,35 @@ public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceM
         return traits;
     }
 
-    public static String getSavableForm(Set<Trait> traits){
-        StringBuilder b = new StringBuilder();
-        boolean first = true;
-        for(Trait t:traits){
-            if(first)
-                first = false;
-            else
-                b.append(";");
-            b.append(t);
-        }
-        return b.toString();
+    public StatContainer getStatModifiers() {
+        return statModifiers;
     }
 
-    public String getDisplayableName(){
-        return this.toString();
+    public PoolContainer getPoolModifiers() {
+        return poolModifiers;
     }
 
-    @Override
-    public Attack modifyIncomingAttack(Attack in) {
-        return in;
+    public Map<Skill, Integer> getSkillBonuses() {
+        return skillBonuses;
     }
 
-    @Override
-    public Attack modifyOutgoingAttack(Attack in) {
-        return in;
+    public int getHitBonus() {
+        return hitBonus;
+    }
+
+    public int getDamageBonus() {
+        return damageBonus;
+    }
+
+    public int getArmorBonus() {
+        return armorBonus;
+    }
+
+    public int getDamageReduction() {
+        return damageReduction;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

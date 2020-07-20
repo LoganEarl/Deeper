@@ -23,10 +23,10 @@ import static main.java.world.item.armor.ArmorSlot.*;
 public class EquipmentContainer implements Entity.SqlExtender, Attack.AttackDefenceModifier, TraitBestower {
     public static final String SIGNIFIER = "items";
 
-    private Map<ArmorSlot, Integer> slots = new HashMap<>();
+    private final Map<ArmorSlot, Integer> slots = new HashMap<>();
 
-    private Entity entity;
-    private ItemCollection itemCollection;
+    private final Entity entity;
+    private final ItemCollection itemCollection;
 
     private static final List<String> HEADERS = Arrays.asList(SLOT_HEAD, SLOT_CHEST, SLOT_LEGS, SLOT_FEET, SLOT_HANDS, SLOT_HAND_LEFT, SLOT_SHEATH_LEFT, SLOT_HAND_RIGHT, SLOT_SHEATH_RIGHT, SLOT_BACK, SLOT_BELT_POUCH, SLOT_BELT_UTIL);
 
@@ -59,12 +59,30 @@ public class EquipmentContainer implements Entity.SqlExtender, Attack.AttackDefe
             Integer i = slots.get(slot);
             Item item;
             if (!empty(i) && (item = itemCollection.getItemByID(i, entity.getDatabaseName())) != null) {
-                //kek, no holding a breastplate to get the bonuses from it
+                //no holding a breastplate to get the bonuses from it
                 ArmorSlot itemSlot;
                 if (item.getItemType() == ItemType.armor &&
                         ((itemSlot = ((Armor) item).getSlot()) == slot ||
                                 itemSlot == leftHand || itemSlot == rightHand)) {
                     total += ((Armor) item).getArmorClass();
+                }
+            }
+        }
+        return total;
+    }
+
+    public int getEquipmentDR(){
+        int total = 0;
+        for (ArmorSlot slot : slots.keySet()) {
+            Integer i = slots.get(slot);
+            Item item;
+            if (!empty(i) && (item = itemCollection.getItemByID(i, entity.getDatabaseName())) != null) {
+                //no holding a breastplate to get the bonuses from it
+                ArmorSlot itemSlot;
+                if (item.getItemType() == ItemType.armor &&
+                        ((itemSlot = ((Armor) item).getSlot()) == slot ||
+                                itemSlot == leftHand || itemSlot == rightHand)) {
+                    total += ((Armor) item).getDamageReduction();
                 }
             }
         }
@@ -316,6 +334,12 @@ public class EquipmentContainer implements Entity.SqlExtender, Attack.AttackDefe
         if(resistance > 1) resistance = 1;
         int reduction = (int)(in.getAttemptedDamage() * resistance);
         in.setAttemptedDamage(in.getAttemptedDamage() - reduction);
+
+        in.setBaseRoll(in.getBaseRoll() - getEquipmentAC());
+        int newAttemptedDamage = in.getAttemptedDamage() - getEquipmentDR();
+        if(newAttemptedDamage < 1) newAttemptedDamage = 1;
+        in.setAttemptedDamage(newAttemptedDamage);
+
         return in;
     }
 

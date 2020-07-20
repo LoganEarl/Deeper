@@ -150,6 +150,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 registry.sendMessage("Please enter the name you wish to go by", sourceClient);
             } else if(newMessageArgs.length == 1 &&
                     newMessageArgs[0].length() > 3 &&
+                    newMessageArgs[0].length() <= 16 &&
                     newMessageArgs[0].chars().allMatch(Character::isAlphabetic)){
                 builder.setDisplayName(newMessageArgs[0]);
                 selectedName = newMessageArgs[0];
@@ -157,7 +158,7 @@ public class CreateCharCommand implements CommandExecutor.Command, MessagePipeli
                 stage = STAGE_RACE;
                 newMessageArgs = null;
             }else{
-                registry.sendMessage("That name will not do. Please choose a name with 4 or more letters, made up of only letters", sourceClient);
+                registry.sendMessage("That name will not do. Please choose a name with 4-16 letters, made up of only letters", sourceClient);
             }
         }
     }

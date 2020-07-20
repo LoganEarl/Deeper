@@ -85,7 +85,7 @@ public class MoveCommand extends EntityCommand {
             //we need to make a skill check
             Skill requiredSkill = roomConnection.getTraverseSkill();
 
-            int result = entity.getSkills().performSkillCheck(requiredSkill, roomConnection.getTraverseDifficulty());
+            int result = entity.getSkills().performSkillCheck(requiredSkill, roomConnection.getTraverseDifficulty(), entity);
 
             didGetCheckMessage = true;
             notifyEntityRoom(new TransferSkillCheckNotification(

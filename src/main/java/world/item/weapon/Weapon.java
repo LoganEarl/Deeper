@@ -1,5 +1,6 @@
 package main.java.world.item.weapon;
 
+import main.java.world.entity.StatContainer;
 import main.java.world.item.DamageType;
 import main.java.world.item.Item;
 import main.java.world.item.ItemFactory;
@@ -13,10 +14,13 @@ import java.util.Random;
 import static main.java.world.item.weapon.WeaponStatTable.*;
 
 public class Weapon extends Item {
-    private static final Random  rnd = new Random();
+    private static final Random rnd = new Random();
+    private DamageScalarContainer damageScalarContainer;
 
-    public Weapon(ResultSet fromEntry, ItemFactory factory, String databaseName) throws Exception{
-        super(fromEntry,factory, databaseName);
+    public Weapon(ResultSet fromEntry, ItemFactory factory, String databaseName) throws Exception {
+        super(fromEntry, factory, databaseName);
+        initStats();
+        damageScalarContainer = new DamageScalarContainer(this);
     }
 
     @Override
@@ -26,7 +30,7 @@ public class Weapon extends Item {
 
     @Override
     protected Map<String, String> getDerivedStats() {
-        return WeaponStatTable.getStatsForWeapon(getItemName(),getDatabaseName());
+        return WeaponStatTable.getStatsForWeapon(getItemName(), getDatabaseName());
     }
 
     @Override
@@ -38,40 +42,35 @@ public class Weapon extends Item {
     @Override
     protected boolean writeCompositeStatsToWorld(World targetWorld) {
         initStats();
-        return WeaponStatTable.writeStatsToWorld(getDerivedStats(),targetWorld);
+        return WeaponStatTable.writeStatsToWorld(getDerivedStats(), targetWorld);
     }
 
-    public double getStaminaUsage(int str, int dex){
+    public double getStaminaUsage(int str, int dex) {
         double weight = super.getWeight();
         double balance = getBalance();
         double base = 5 + weight * 4;
         double strengthReduction = 0.05 * str;
-        double balanceReduction = (50-dex)/100.0*balance*weight;
+        double balanceReduction = (50 - dex) / 100.0 * balance * weight;
 
         return (base - strengthReduction - balanceReduction) * 10;
     }
 
-    public int rollDamage(int str, int dex, int intel, int wis){
+    public int rollDamage(StatContainer statContainer) {
         int dmgRange = getMaxBaseDamage() - getMinBaseDamage();
 
         int rawDmg = rnd.nextInt(dmgRange) + getMinBaseDamage();
+        rawDmg += damageScalarContainer.getDamageContribution(statContainer);
 
-        float strAddition = str * getStrScalar();
-        float dexAddition = dex * getDexScalar();
-        float intAddition = intel * getIntScalar();
-        float wisAddition = wis * getWisScalar();
-
-        rawDmg += Math.floor(strAddition + dexAddition + intAddition + wisAddition);
         return rawDmg;
     }
 
-    public int rollHit(int str, int dex, int intel, int wis){
-        int rawRoll = rnd.nextInt(99) + 1;
-        rawRoll = modWithPrimaryStat(rawRoll,str,dex,intel,wis);
+    public int rollHit(StatContainer statContainer) {
+        int rawRoll = rnd.nextInt(100);
+        rawRoll = modWithPrimaryStat(rawRoll, statContainer);
 
-        if(rawRoll < 0){
+        if (rawRoll < 0) {
             int simpleBonus = getSimpleBonus();
-            if(rawRoll + simpleBonus > 0)
+            if (rawRoll + simpleBonus > 0)
                 rawRoll = 0;
             else
                 rawRoll += simpleBonus;
@@ -82,13 +81,13 @@ public class Weapon extends Item {
         return rawRoll;
     }
 
-    private int modWithPrimaryStat(int rawRoll, int str, int dex, int intel, int wis){
-        int[] stats = {str, dex, intel, wis};
-        float[] scalars = {getStrScalar(), getDexScalar(), getIntScalar(), getWisScalar()};
+    private int modWithPrimaryStat(int rawRoll, StatContainer statContainer) {
+        int[] stats = {statContainer.getStrength(), statContainer.getDexterity(), statContainer.getIntelligence(), statContainer.getWisdom()};
+        double[] scalars = {damageScalarContainer.getStrScalar(), damageScalarContainer.getDexScalar(), damageScalarContainer.getIntScalar(), damageScalarContainer.getWisScalar()};
         int bestIndex = 0;
-        float bestScalar = -1.0f;
-        for(int i = 0; i < scalars.length; i++){
-            if(scalars[i] > bestScalar || (scalars[i] == bestScalar && stats[i] > stats[bestIndex])){
+        double bestScalar = -1.0f;
+        for (int i = 0; i < scalars.length; i++) {
+            if (scalars[i] > bestScalar || (scalars[i] == bestScalar && stats[i] > stats[bestIndex])) {
                 bestIndex = i;
                 bestScalar = scalars[i];
             }
@@ -96,44 +95,28 @@ public class Weapon extends Item {
         return stats[bestIndex] - rawRoll;
     }
 
-    public int getMinBaseDamage(){
+    public int getMinBaseDamage() {
         initStats();
         return getCastInt(MIN_BASE_DAMAGE);
     }
 
-    public int getMaxBaseDamage(){
+    public int getMaxBaseDamage() {
         initStats();
         return getCastInt(MAX_BASE_DAMAGE);
     }
 
-    public float getAttackSpeed(){
+    public float getAttackSpeed() {
         initStats();
         return getCastFloat(ATTACK_SPEED);
     }
 
-    public float getBalance(){
+    public float getBalance() {
         initStats();
         return getCastFloat(BALANCE);
     }
 
-    public float getStrScalar(){
-        initStats();
-        return getCastFloat(STR_SCALAR);
-    }
-
-    public float getDexScalar() {
-        initStats();
-        return getCastFloat(DEX_SCALAR);
-    }
-
-    public float getIntScalar() {
-        initStats();
-        return getCastFloat(INT_SCALAR);
-    }
-
-    public float getWisScalar() {
-        initStats();
-        return getCastFloat(WIS_SCALAR);
+    public DamageScalarContainer getDamageScalars() {
+        return damageScalarContainer;
     }
 
     public int getHitBonus() {
@@ -150,7 +133,8 @@ public class Weapon extends Item {
         initStats();
         try {
             return DamageType.valueOf(getCastString(DAMAGE_TYPE));
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
         return DamageType.slash;
     }
 
@@ -162,11 +146,82 @@ public class Weapon extends Item {
 
         @Override
         public Item parseFromResultSet(ResultSet fromEntry, ItemFactory sourceFactory, String databaseName) throws Exception {
-            return new Weapon(fromEntry,sourceFactory,databaseName);
+            return new Weapon(fromEntry, sourceFactory, databaseName);
         }
     };
 
-    public static ItemFactory.ItemParser factory(){
+    public static class DamageScalarContainer {
+        private final double strScalar;
+        private final double dexScalar;
+        private final double intScalar;
+        private final double wisScalar;
+        private final double primaryScalarBuff;
+
+        public DamageScalarContainer() {
+            this(0, 0, 0, 0, 0);
+        }
+
+        private DamageScalarContainer(Weapon readFrom) {
+            this(readFrom.getCastDouble(STR_SCALAR),
+                    readFrom.getCastDouble(DEX_SCALAR),
+                    readFrom.getCastDouble(INT_SCALAR),
+                    readFrom.getCastDouble(WIS_SCALAR),
+                    0);
+        }
+
+        public DamageScalarContainer(double strScalar, double dexScalar, double intScalar, double wisScalar, double primaryScalarBuff) {
+            this.strScalar = strScalar;
+            this.dexScalar = dexScalar;
+            this.intScalar = intScalar;
+            this.wisScalar = wisScalar;
+            this.primaryScalarBuff = primaryScalarBuff;
+        }
+
+        public DamageScalarContainer addValuesWith(DamageScalarContainer container) {
+            return new DamageScalarContainer(
+                    strScalar + container.strScalar,
+                    dexScalar + container.dexScalar,
+                    intScalar + container.intScalar,
+                    wisScalar + container.wisScalar,
+                    primaryScalarBuff + container.primaryScalarBuff
+            );
+        }
+
+        public int getDamageContribution(StatContainer statContainer) {
+            double strAddition = statContainer.getStrength() * getStrScalar();
+            double dexAddition = statContainer.getDexterity() * getDexScalar();
+            double intAddition = statContainer.getIntelligence() * getIntScalar();
+            double wisAddition = statContainer.getWisdom() * getWisScalar();
+
+            return (int) Math.floor(strAddition + dexAddition + intAddition + wisAddition);
+        }
+
+        public double getStrScalar() {
+            if (strScalar >= dexScalar && strScalar >= intScalar && strScalar >= wisScalar)
+                return strScalar + primaryScalarBuff;
+            return strScalar;
+        }
+
+        public double getDexScalar() {
+            if (dexScalar > strScalar && dexScalar > intScalar && dexScalar > wisScalar)
+                return dexScalar + primaryScalarBuff;
+            return dexScalar;
+        }
+
+        public double getIntScalar() {
+            if (intScalar > strScalar && intScalar > dexScalar && intScalar > wisScalar)
+                return intScalar + primaryScalarBuff;
+            return intScalar;
+        }
+
+        public double getWisScalar() {
+            if (wisScalar > strScalar && wisScalar > dexScalar && wisScalar > intScalar)
+                return wisScalar + primaryScalarBuff;
+            return wisScalar;
+        }
+    }
+
+    public static ItemFactory.ItemParser factory() {
         return parser;
     }
 }

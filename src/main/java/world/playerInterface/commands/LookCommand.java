@@ -144,7 +144,7 @@ public class LookCommand extends EntityCommand {
             long time = System.currentTimeMillis();
             if (time > retryTimestamp) {
                 //roll perception
-                int result = getSourceEntity().getSkills().performSkillCheck(Skill.perception1, connection.getDetectDifficulty() - 10);
+                int result = getSourceEntity().getSkills().performSkillCheck(Skill.perception1, connection.getDetectDifficulty() - 10, getSourceEntity());
                 if (result >= 0) {
                     getSourceClient().sendMessage(ColorTheme.getMessageInColor("You noticed a hidden passageway! (Perception:" + result + ")", SUCCESS));
                     token.update(RoomDiscoveryToken.DetectionStatus.known, time);

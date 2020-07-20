@@ -108,7 +108,7 @@ public class Entity implements
         this.model = model;
 
         //this last to load the skills
-        extenders.put(SkillContainer.SIGNIFIER, new SkillContainer(this));
+        extenders.put(SkillContainer.SIGNIFIER, new SkillContainer(entityID, databaseName));
 
         setStance(new BaseStance());
     }
@@ -422,16 +422,8 @@ public class Entity implements
     public Attack produceAttackWithWeapon(Weapon weapon, int situationalHitBonus) {
         StatContainer myStats = getStats();
 
-        int roll = weapon.rollHit(
-                myStats.getStrength(),
-                myStats.getDexterity(),
-                myStats.getIntelligence(),
-                myStats.getWisdom()) + situationalHitBonus;
-        int damage = weapon.rollDamage(
-                myStats.getStrength(),
-                myStats.getDexterity(),
-                myStats.getIntelligence(),
-                myStats.getWisdom());
+        int roll = weapon.rollHit(getStats()) + situationalHitBonus;
+        int damage = weapon.rollDamage(getStats());
 
         return new Attack()
                 .setBaseRoll(roll)
@@ -605,7 +597,7 @@ public class Entity implements
             extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(model.getItemCollection(), e));
             extenders.put(ProgressionContainer.SIGNIFIER, new ProgressionContainer(e));
             extenders.put(DiplomacyContainer.SIGNIFIER, new DiplomacyContainer());
-            extenders.put(SkillContainer.SIGNIFIER, new SkillContainer(e));
+            extenders.put(SkillContainer.SIGNIFIER, new SkillContainer(entityID, databaseName));
 
             e.extenders = extenders;
             e.entityID = entityID;
@@ -618,7 +610,7 @@ public class Entity implements
             e.getPools().calculatePoolMaxes(e.getStats());
             e.getPools().fill();
             //TODO remove this
-            e.getProgression().addIP(100000);
+            e.getProgression().earnIP(100000);
 
             e.setStance(new BaseStance());
 

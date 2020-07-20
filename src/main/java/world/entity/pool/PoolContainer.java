@@ -21,7 +21,11 @@ public class PoolContainer implements Entity.SqlExtender {
 
     public static final String SIGNIFIER = "pools";
 
-    private static final String[] HEADERS = new String[]{HP, MAX_HP, MP,MAX_MP, STAMINA,MAX_STAMINA,BURNOUT,MAX_BURNOUT};
+    private static final String[] HEADERS = new String[]{HP, MAX_HP, MP, MAX_MP, STAMINA, MAX_STAMINA, BURNOUT, MAX_BURNOUT};
+
+    public PoolContainer() {
+        this(0, 0, 0, 0, 0, 0, 0, 0);
+    }
 
     public PoolContainer(int hp, int maxHP, int mp, int maxMP, int stamina, int maxStamina, int burnout, int maxBurnout) {
         this.hp = hp;
@@ -45,20 +49,20 @@ public class PoolContainer implements Entity.SqlExtender {
         maxBurnout = readEntry.getInt(MAX_BURNOUT);
     }
 
-    public void expendStamina(int stamina){
+    public void expendStamina(int stamina) {
         this.stamina -= stamina;
-        if(this.stamina < 0) this.stamina = 0;
+        if (this.stamina < 0) this.stamina = 0;
     }
 
-    public void damage(int damage){
+    public void damage(int damage) {
         damage(damage, null, 0);
     }
 
-    public void damage(int damage, Entity aggressor, int hitRoll){
+    public void damage(int damage, Entity aggressor, int hitRoll) {
         this.hp -= damage;
-        if(hp <= 0){
+        if (hp <= 0) {
             //TODO enter dying state
-        }else if(hp< maxHP/-4){
+        } else if (hp < maxHP / -4) {
             //TODO enter dead state
         }
     }
@@ -70,7 +74,7 @@ public class PoolContainer implements Entity.SqlExtender {
 
     @Override
     public Object[] getInsertSqlValues() {
-        return new Object[]{hp,maxHP,mp,maxMP,stamina,maxStamina,burnout,maxBurnout};
+        return new Object[]{hp, maxHP, mp, maxMP, stamina, maxStamina, burnout, maxBurnout};
     }
 
     @Override
@@ -79,8 +83,8 @@ public class PoolContainer implements Entity.SqlExtender {
     }
 
 
-    public void regenPools(BaseStance.RegenPacket regenPacket){
-        if(!isDead()) {
+    public void regenPools(BaseStance.RegenPacket regenPacket) {
+        if (!isDead()) {
             hp += regenPacket.getHp();
             mp += regenPacket.getMp();
             stamina += regenPacket.getStamina();
@@ -89,34 +93,49 @@ public class PoolContainer implements Entity.SqlExtender {
         }
     }
 
-    private void rectifyPools(){
-        if(hp > maxHP)hp = maxHP;
-        if(mp > maxMP) mp = maxMP;
-        if(stamina > maxStamina) stamina = maxStamina;
-        if(burnout > maxBurnout) burnout = maxBurnout;
+    private void rectifyPools() {
+        if (hp > maxHP) hp = maxHP;
+        if (mp > maxMP) mp = maxMP;
+        if (stamina > maxStamina) stamina = maxStamina;
+        if (burnout > maxBurnout) burnout = maxBurnout;
     }
 
-    /**Recalculates the maximum hp/mp/stamina/burnout values based on the entity's stats*/
-    public void calculatePoolMaxes(StatContainer stats){
-        maxHP = (stats.getStrength() / 2 + stats.getDexterity() / 2 + (int)(stats.getToughness() * 1.5) * 10);
-        maxStamina = (stats.getDexterity() / 2 + stats.getStrength() / 2 + (int)(stats.getFitness() * 1.5) * 10);
+    /**
+     * Recalculates the maximum hp/mp/stamina/burnout values based on the entity's stats
+     */
+    public void calculatePoolMaxes(StatContainer stats) {
+        maxHP = (stats.getStrength() / 2 + stats.getDexterity() / 2 + (int) (stats.getToughness() * 1.5) * 10);
+        maxStamina = (stats.getDexterity() / 2 + stats.getStrength() / 2 + (int) (stats.getFitness() * 1.5) * 10);
         maxMP = (stats.getIntelligence() * 2 + stats.getWisdom()) * 10;
         maxBurnout = (stats.getWisdom() * 2 + stats.getIntelligence()) * 10;
     }
 
-    public void fill(){
+    public PoolContainer addValuesWith(PoolContainer poolContainer) {
+        return new PoolContainer(
+                hp + poolContainer.hp,
+                maxHP + poolContainer.maxHP,
+                mp + poolContainer.mp,
+                maxMP + poolContainer.maxMP,
+                stamina + poolContainer.stamina,
+                maxStamina + poolContainer.maxStamina,
+                burnout + poolContainer.burnout,
+                maxBurnout + poolContainer.maxBurnout
+        );
+    }
+
+    public void fill() {
         hp = maxHP;
         stamina = maxStamina;
         mp = maxMP;
         burnout = maxBurnout;
     }
 
-    public boolean isDying(){
-        return hp <= 0 && hp > getMaxHP()/-4;
+    public boolean isDying() {
+        return hp <= 0 && hp > getMaxHP() / -4;
     }
 
-    public boolean isDead(){
-        return hp <= getMaxHP()/-4;
+    public boolean isDead() {
+        return hp <= getMaxHP() / -4;
     }
 
     public int getHp() {

@@ -13,6 +13,7 @@ public class ArmorStatTable implements DatabaseManager.DatabaseTable {
 
     public static final String ITEM_NAME = ItemStatTable.ITEM_NAME;
     public static final String ARMOR_CLASS = "armorClass";
+    public static final String DAMAGE_REDUCTION = "damageReduction";
     public static final String PIERCE_DEFENCE = "defencePierce";
     public static final String SLASH_DEFENCE = "defenceSlash";
     public static final String CRUSH_DEFENCE = "defenceCrush";
@@ -39,20 +40,21 @@ public class ArmorStatTable implements DatabaseManager.DatabaseTable {
 
     public ArmorStatTable(){
         TABLE_DEFINITION.put(ITEM_NAME,"VARCHAR(32) PRIMARY KEY NOT NULL COLLATE NOCASE");
-        TABLE_DEFINITION.put(ARMOR_CLASS,"INT");
+        TABLE_DEFINITION.put(ARMOR_CLASS,"INT NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(DAMAGE_REDUCTION, "INT NOT NULL DEFAULT 0");
 
-        TABLE_DEFINITION.put(PIERCE_DEFENCE, "DECIMAL");
-        TABLE_DEFINITION.put(SLASH_DEFENCE, "DECIMAL");
-        TABLE_DEFINITION.put(CRUSH_DEFENCE, "DECIMAL");
-        TABLE_DEFINITION.put(HEAT_DEFENCE, "DECIMAL");
-        TABLE_DEFINITION.put(COLD_DEFENCE, "DECIMAL");
-        TABLE_DEFINITION.put(POISON_DEFENCE, "DECIMAL");
-        TABLE_DEFINITION.put(CORROSIVE_DEFENCE, "DECIMAL");
-        TABLE_DEFINITION.put(ELECTRIC_DEFENCE, "DECIMAL");
-        TABLE_DEFINITION.put(PLASMA_DEFENCE, "DECIMAL");
-        TABLE_DEFINITION.put(OBLIVION_DEFENCE, "DECIMAL");
-        TABLE_DEFINITION.put(ARMOR_TYPE,"VARCHAR(16)");
-        TABLE_DEFINITION.put(ARMOR_SLOT,"VARCHAR(16)");
+        TABLE_DEFINITION.put(PIERCE_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(SLASH_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(CRUSH_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(HEAT_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(COLD_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(POISON_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(CORROSIVE_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(ELECTRIC_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(PLASMA_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(OBLIVION_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
+        TABLE_DEFINITION.put(ARMOR_TYPE,"VARCHAR(16) NOT NULL");
+        TABLE_DEFINITION.put(ARMOR_SLOT,"VARCHAR(16) NOT NULL");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME));
@@ -77,6 +79,7 @@ public class ArmorStatTable implements DatabaseManager.DatabaseTable {
 
         String name = stats.get(ITEM_NAME);
         String rawAC = stats.get(ARMOR_CLASS);
+        String rawDR = stats.get(DAMAGE_REDUCTION);
 
         String rawPierce = stats.get(PIERCE_DEFENCE);
         String rawSlash = stats.get(SLASH_DEFENCE);
@@ -92,11 +95,12 @@ public class ArmorStatTable implements DatabaseManager.DatabaseTable {
         String armorSlot = stats.get(ARMOR_SLOT);
         String armorType = stats.get(ARMOR_TYPE);
 
-        Integer AC;
+        Integer ac, dr;
         Double pierce, slash, crush, heat, cold, poison, corrosive,
             electric, plasma, oblivion;
         try {
-            AC = Integer.parseInt(rawAC);
+            ac = Integer.parseInt(rawAC);
+            dr = Integer.parseInt(rawDR);
             pierce = Double.parseDouble(rawPierce);
             slash = Double.parseDouble(rawSlash);
             crush = Double.parseDouble(rawCrush);
@@ -112,7 +116,7 @@ public class ArmorStatTable implements DatabaseManager.DatabaseTable {
         }
 
         return DatabaseManager.executeStatement(INSERT_SQL, targetWorld.getDatabaseName(),
-                name, AC, pierce, slash, crush, heat, cold, poison,
+                name, ac,dr, pierce, slash, crush, heat, cold, poison,
                 corrosive, electric, plasma, oblivion, armorSlot, armorType) > 0;
     }
 

@@ -64,7 +64,7 @@ public class SearchCommand extends EntityCommand {
         final List<RoomConnection> foundConnections = new ArrayList<>();
         boolean cooldownDebuffActive = false;
 
-        int roll = entity.getSkills().performSkillCheck(Skill.perception1, 0);
+        int roll = entity.getSkills().performSkillCheck(Skill.perception1, 0, entity);
         for (RoomConnection connection : findableConnections) {
             RoomDiscoveryToken token = RoomDiscoveryToken.getToken(entity.getID(), connection.getConnectionID(), entity.getDatabaseName());
             int debuff = getRecentSearchDebuff(
@@ -105,7 +105,7 @@ public class SearchCommand extends EntityCommand {
 
                 boolean notices = relation == allied || relation == friendly;
                 if(!notices){
-                    int result = entity.getSkills().performSkillCheck(Skill.obscureIntent1,0) - viewer.getSkills().performSkillCheck(Skill.perception1,0);
+                    int result = entity.getSkills().performSkillCheck(Skill.obscureIntent1,0, entity) - viewer.getSkills().performSkillCheck(Skill.perception1,0, entity);
                     if(result <= 0){
                         getSourceClient().sendMessage(getMessageInColor("You obscured your searching from " + getEntityColored(entity, viewer, getWorldModel()), SUCCESS));
                     }else{
@@ -133,7 +133,6 @@ public class SearchCommand extends EntityCommand {
                     }
                 }
                 return message;
-
             }
         },entity.getID());
 

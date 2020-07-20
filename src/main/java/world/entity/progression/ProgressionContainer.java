@@ -37,8 +37,19 @@ public class ProgressionContainer implements Entity.SqlExtender {
     }
 
     public void addIP(int ip){
+        if(ip < 0) throw new IllegalArgumentException("Cannot add negative IP");
+        this.ip += ip;
+    }
+
+    public void earnIP(int ip){
+        if(ip < 0) throw new IllegalArgumentException("Cannot earn negative IP");
         this.ip += ip;
         this.totalIp += ip;
+    }
+
+    public void subtractIP(int ip){
+        if(ip < 0) throw new IllegalArgumentException("Cannot subtract negative IP");
+        this.ip -= ip;
     }
 
     public int getIPCostForNextStat(int newStatVal, int curStatVal, int racialBaseStat){

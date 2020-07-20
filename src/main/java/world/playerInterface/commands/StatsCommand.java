@@ -54,7 +54,7 @@ public class StatsCommand extends EntityCommand {
 
     private String getSkillView() {
         StringBuilder skills = new StringBuilder();
-        for(Skill s: SkillTable.getEntitySkills(getSourceEntity()))
+        for(Skill s: getSourceEntity().getSkills().getKnownSkills())
             skills.append("\t").append(s.getDisplayName()).append("\n");
 
         return skills.toString();

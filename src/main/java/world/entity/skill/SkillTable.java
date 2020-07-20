@@ -12,35 +12,35 @@ import java.util.*;
 public class SkillTable implements DatabaseManager.DatabaseTable {
     public static final String TABLE_NAME = "skills";
 
-    public static final String ENTITY_ID = EntityTable.ENTITY_ID;
+    public static final String SKILL_CONTAINER_ID = "id";
     public static final String SKILL_NAME = "skillName";
     public static final String SKILL_LEVEL = "skillLevel";
 
     private final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
     private final Set<String> CONSTRAINTS = new HashSet<>(2);
 
-    private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,ENTITY_ID);
-    private static final String LEARN_SQL = String.format(Locale.US, "REPLACE INTO %s(%s, %s, %s) VALUES (?, ?, ?)",TABLE_NAME,ENTITY_ID,SKILL_NAME, SKILL_LEVEL);
-    private static final String FORGET_SQL = String.format(Locale.US,"DELETE FROM %s WHERE (%s=? AND %s=?)",TABLE_NAME,ENTITY_ID,SKILL_NAME);
+    private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=?",TABLE_NAME,SKILL_CONTAINER_ID);
+    private static final String LEARN_SQL = String.format(Locale.US, "REPLACE INTO %s(%s, %s, %s) VALUES (?, ?, ?)",TABLE_NAME,SKILL_CONTAINER_ID,SKILL_NAME, SKILL_LEVEL);
+    private static final String FORGET_SQL = String.format(Locale.US,"DELETE FROM %s WHERE (%s=? AND %s=?)",TABLE_NAME,SKILL_CONTAINER_ID,SKILL_NAME);
 
     public SkillTable(){
-        TABLE_DEFINITION.put(ENTITY_ID, "VARCHAR(32) NOT NULL COLLATE NOCASE");
+        TABLE_DEFINITION.put(SKILL_CONTAINER_ID, "VARCHAR(32) NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(SKILL_NAME, "VARCHAR(32) NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(SKILL_LEVEL, "INT NOT NULL");
 
-        CONSTRAINTS.add(String.format(Locale.US,"PRIMARY KEY (%s, %s)",ENTITY_ID,SKILL_NAME));
+        CONSTRAINTS.add(String.format(Locale.US,"PRIMARY KEY (%s, %s)",SKILL_CONTAINER_ID,SKILL_NAME));
     }
 
-    public static boolean learnSkill(Entity sourceEntity, Skill toLearn, int level){
-        return DatabaseManager.executeStatement(LEARN_SQL,sourceEntity.getDatabaseName(), sourceEntity.getID(),toLearn.getSavableName(), level) > 0;
+    public static boolean learnSkill(String containerID, Skill toLearn, int level, String databaseName){
+        return DatabaseManager.executeStatement(LEARN_SQL,databaseName, containerID,toLearn.getSavableName(), level) > 0;
     }
 
-    public static boolean forgetSkill(Entity sourceEntity, Skill toForget){
-        return DatabaseManager.executeStatement(FORGET_SQL,sourceEntity.getDatabaseName(),sourceEntity.getID(), toForget.getSavableName()) > 0;
+    public static boolean forgetSkill(String containerID, Skill toForget, String databaseName){
+        return DatabaseManager.executeStatement(FORGET_SQL,databaseName,containerID, toForget.getSavableName()) > 0;
     }
 
-    public static Skill[] getEntitySkills(Entity sourceEntity){
-        Connection c = DatabaseManager.getDatabaseConnection(sourceEntity.getDatabaseName());
+    public static Skill[] getSkillsByContainerID(String skillContainerID, String databaseName){
+        Connection c = DatabaseManager.getDatabaseConnection(databaseName);
         PreparedStatement getSQL = null;
         List<Skill> skills;
         if(c == null)
@@ -48,12 +48,12 @@ public class SkillTable implements DatabaseManager.DatabaseTable {
         else{
             try {
                 getSQL = c.prepareStatement(GET_SQL);
-                getSQL.setString(1,sourceEntity.getID());
-                ResultSet accountSet = getSQL.executeQuery();
+                getSQL.setString(1,skillContainerID);
+                ResultSet skillSet = getSQL.executeQuery();
 
                 skills = new ArrayList<>();
-                while(accountSet.next()){
-                    Skill skill = Skill.getSkill(accountSet.getString(SKILL_NAME), accountSet.getInt(SKILL_LEVEL));
+                while(skillSet.next()){
+                    Skill skill = Skill.getSkill(skillSet.getString(SKILL_NAME), skillSet.getInt(SKILL_LEVEL));
                     if(skill != null)
                         skills.add(skill);
                 }

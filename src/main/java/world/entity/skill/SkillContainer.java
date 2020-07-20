@@ -13,19 +13,22 @@ public class SkillContainer implements Entity.SqlExtender, TraitBestower {
 
     private static Random RND = new Random(System.currentTimeMillis());
 
-    private Entity sourceEntity;
+    private String containerID;
+    private String databaseName;
     private Map<String, Integer> skillLevels;
+    private Skill[] skills;
 
-    public SkillContainer(Entity sourceEntity){
+    public SkillContainer(String containerID, String databaseName){
         skillLevels = new HashMap<>();
-        this.sourceEntity = sourceEntity;
-
+        this.containerID = containerID;
+        this.databaseName = databaseName;
         updateSkills();
     }
 
     private void updateSkills(){
-        for(Skill skill: SkillTable.getEntitySkills(sourceEntity))
+        for(Skill skill: SkillTable.getSkillsByContainerID(containerID,databaseName))
             skillLevels.put(skill.getSavableName(),skill.getElevationLevel());
+        skills = SkillTable.getSkillsByContainerID(containerID, databaseName);
     }
 
     public int getLearnLevel(Skill skill){
@@ -34,25 +37,22 @@ public class SkillContainer implements Entity.SqlExtender, TraitBestower {
         return UNLEARNED;
     }
 
-    public boolean learnSkill(Skill toLearn){
+    public boolean learnSkill(Skill toLearn, Entity sourceEntity){
         boolean status = false;
         if(sourceEntity.getProgression().getIP() >= toLearn.getIPCost()){
-            sourceEntity.getProgression().addIP(-1 * toLearn.getIPCost());
+            sourceEntity.getProgression().subtractIP(toLearn.getIPCost());
             status = true;
         }
 
-        if(status && SkillTable.learnSkill(sourceEntity,toLearn, toLearn.getElevationLevel()))
+        if(status && SkillTable.learnSkill(sourceEntity.getID(),toLearn, toLearn.getElevationLevel(), sourceEntity.getDatabaseName()))
             skillLevels.put(toLearn.getSavableName(), toLearn.getElevationLevel());
 
         if(!status) //if we failed, refund them the ip
             sourceEntity.getProgression().addIP(toLearn.getIPCost());
 
-        return status;
-    }
+        updateSkills();
 
-    public int performSkillCheck(Skill toCheck, int baseNumber){
-        int statLevel = sourceEntity.getStats().getStat(toCheck.getAssociatedStat());
-        return performSkillCheck(toCheck, baseNumber, statLevel);
+        return status;
     }
 
     public int getSkillBonus(Skill toCheck){
@@ -65,8 +65,13 @@ public class SkillContainer implements Entity.SqlExtender, TraitBestower {
         return skillBonus;
     }
 
+    public int performSkillCheck(Skill toCheck, int baseNumber, Entity sourceEntity){
+        int statLevel = sourceEntity.getStats().getStat(toCheck.getAssociatedStat());
+        return performSkillCheck(toCheck, baseNumber, statLevel);
+    }
+
     public int performSkillCheck(Skill toCheck, int baseNumber, int statLevel){
-        int baseRoll = RND.nextInt(101);
+        int baseRoll = RND.nextInt(10);
         int skillBonus = getSkillBonus(toCheck);
 
         //on crit return 100 or the highest possible, whichever is higher
@@ -75,10 +80,14 @@ public class SkillContainer implements Entity.SqlExtender, TraitBestower {
         return baseNumber + (statLevel - baseRoll) + skillBonus;
     }
 
+    public Skill[] getKnownSkills(){
+        return skills;
+    }
+
     @Override
     public Set<Trait> getBestowedTraits() {
         Set<Trait> traits = new HashSet<>();
-        for(Skill skill: SkillTable.getEntitySkills(sourceEntity))
+        for(Skill skill: skills)
             traits.addAll(skill.getBestowedTraits());
 
         return traits;

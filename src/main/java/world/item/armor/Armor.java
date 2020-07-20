@@ -27,7 +27,7 @@ public class Armor extends Item {
         bindings.put(DamageType.slash, SLASH_DEFENCE);
         return bindings;
     }
-    private static Map<DamageType, String> defenceColumnBindings = mapDamageTypes();
+    private static final Map<DamageType, String> defenceColumnBindings = mapDamageTypes();
 
     protected Armor(ResultSet entry, ItemFactory factory, String databaseName) throws Exception {
         super(entry, factory, databaseName);
@@ -46,6 +46,11 @@ public class Armor extends Item {
     public int getArmorClass(){
         initStats();
         return getCastInt(ARMOR_CLASS);
+    }
+
+    public int getDamageReduction(){
+        initStats();
+        return getCastInt(DAMAGE_REDUCTION);
     }
 
     @Override
@@ -93,7 +98,7 @@ public class Armor extends Item {
         }
     }
 
-    private static ItemFactory.ItemParser parser = new ItemFactory.ItemParser() {
+    private static final ItemFactory.ItemParser parser = new ItemFactory.ItemParser() {
         @Override
         public ItemType getAssociatedType() {
             return ItemType.armor;
