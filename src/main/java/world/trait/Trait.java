@@ -1,9 +1,9 @@
 package main.java.world.trait;
 import main.java.world.entity.Attack;
 import main.java.world.entity.StatContainer;
-import main.java.world.entity.pool.PoolContainer;
+import main.java.world.entity.pool.EntityPoolContainer;
+import main.java.world.entity.pool.PoolValueContainer;
 import main.java.world.entity.skill.Skill;
-import main.java.world.item.weapon.Weapon;
 import main.java.world.item.weapon.Weapon.DamageScalarContainer;
 
 import java.util.Collections;
@@ -27,7 +27,7 @@ public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceM
     ;
 
     private final StatContainer statModifiers; //TODO not implemented
-    private final PoolContainer poolModifiers; //TODO not implemented
+    private final PoolValueContainer poolModifiers; //TODO not implemented
     private final DamageScalarContainer damageScalarContainer; //TODO not implemented
     private final Map<Skill, Integer> skillBonuses; //TODO not implemented
     private final int hitBonus;
@@ -38,30 +38,30 @@ public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceM
     private final String description;
 
     Trait(String description) {
-        this(new StatContainer(), new PoolContainer(),new DamageScalarContainer(), Collections.emptyMap(), 0,0,0,0, description);
+        this(new StatContainer(), new PoolValueContainer(), new DamageScalarContainer(), Collections.emptyMap(), 0, 0, 0, 0, description);
     }
 
     Trait(StatContainer statModifiers,String description) {
-        this(new StatContainer(), new PoolContainer(),new DamageScalarContainer(), Collections.emptyMap(), 0,0,0,0, description);
+        this(new StatContainer(), new PoolValueContainer(), new DamageScalarContainer(), Collections.emptyMap(), 0, 0, 0, 0, description);
     }
 
-    Trait(PoolContainer poolModifiers,String description) {
+    Trait(PoolValueContainer poolModifiers, String description) {
         this(new StatContainer(), poolModifiers,new DamageScalarContainer(), Collections.emptyMap(), 0,0,0,0, description);
     }
 
     Trait(DamageScalarContainer damageScalarContainer, int hitBonus, int damageBonus, int armorBonus, int damageReduction, String description) {
-        this(new StatContainer(), new PoolContainer(),damageScalarContainer, Collections.emptyMap(), hitBonus, damageBonus, armorBonus, damageReduction, description);
+        this(new StatContainer(), new PoolValueContainer(), damageScalarContainer, Collections.emptyMap(), hitBonus, damageBonus, armorBonus, damageReduction, description);
     }
 
     Trait(Map<Skill, Integer> skillBonuses, String description) {
-        this(new StatContainer(), new PoolContainer(),new DamageScalarContainer(), skillBonuses, 0,0,0,0, description);
+        this(new StatContainer(), new PoolValueContainer(), new DamageScalarContainer(), skillBonuses, 0, 0, 0, 0, description);
     }
 
     Trait(int hitBonus, int damageBonus, int armorBonus, int damageReduction, String description) {
-        this(new StatContainer(), new PoolContainer(), new DamageScalarContainer(), Collections.emptyMap(), hitBonus, damageBonus, armorBonus, damageReduction, description);
+        this(new StatContainer(), new PoolValueContainer(), new DamageScalarContainer(), Collections.emptyMap(), hitBonus, damageBonus, armorBonus, damageReduction, description);
     }
 
-    Trait(StatContainer statModifiers, PoolContainer poolModifiers, DamageScalarContainer damageScalarContainer, Map<Skill, Integer> skillBonuses, int hitBonus, int damageBonus, int armorBonus, int damageReduction, String description) {
+    Trait(StatContainer statModifiers, PoolValueContainer poolModifiers, DamageScalarContainer damageScalarContainer, Map<Skill, Integer> skillBonuses, int hitBonus, int damageBonus, int armorBonus, int damageReduction, String description) {
         this.statModifiers = statModifiers;
         this.poolModifiers = poolModifiers;
         this.skillBonuses = skillBonuses;
@@ -143,7 +143,7 @@ public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceM
         return statModifiers;
     }
 
-    public PoolContainer getPoolModifiers() {
+    public PoolValueContainer getPoolModifiers() {
         return poolModifiers;
     }
 

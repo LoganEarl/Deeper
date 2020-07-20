@@ -7,7 +7,6 @@ import main.java.world.WorldUtils;
 import main.java.world.entity.Entity;
 import main.java.world.entity.skill.Skill;
 import main.java.world.entity.skill.SkillContainer;
-import main.java.world.notification.ConcreteNotification;
 import main.java.world.notification.Notification;
 import main.java.world.room.RoomNotificationScope;
 
@@ -48,7 +47,7 @@ public abstract class EntityCommand implements CommandExecutor.Command {
             else
                 sourceClient.sendMessage("You must " + getMessageInColor("learn an unknown skill",FAILURE) + " before you can do that");
             done = true;
-        } else if(getRequiredStamina() > sourceEntity.getPools().getStamina()){
+        } else if(getRequiredStamina() > sourceEntity.getPools().getCurrentValues().getStamina()){
             sourceClient.sendMessage("You are too " + getMessageInColor("exhausted", STAMINA_COLOR) + " to do that");
             done = true;
         }else{

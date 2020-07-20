@@ -38,7 +38,7 @@ public class EvasiveStance extends Stance {
             int learnLevel = sourceEntity.getSkills().getLearnLevel(getRequiredSkill());
             int staminaUsed = 40 - 3 * learnLevel;
 
-            if(sourceEntity.getPools().getStamina() >= staminaUsed) {
+            if(sourceEntity.getPools().getCurrentValues().getStamina() >= staminaUsed) {
                 sourceEntity.getPools().expendStamina(staminaUsed);
 
                 int roll = sourceEntity.getSkills().performSkillCheck(getRequiredSkill(), 0, sourceEntity);

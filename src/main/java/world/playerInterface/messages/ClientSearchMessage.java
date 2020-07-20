@@ -25,7 +25,7 @@ public class ClientSearchMessage extends ClientMessage {
 
     @Override
     public String getHelpText() {
-        return "Only a god notices all that is at a glance. Only a fool assumes they are a god. You are neither god nor fool, search your surroundings carefully. You never know what lies waiting to be found.";
+        return "Only a god notices all that is at a glance. Only a fool assumes they are a god. You are neither god nor fool, search your surroundings carefully. You never know what lies waiting to be found.\nThis command is useful for searching a room for hidden passageways.";
     }
 
     @Override

@@ -26,7 +26,7 @@ public class DeflectiveStance extends Stance{
 
         int damageReduction = (int) (degree / 10.0 * in.getAttemptedDamage());
         int staminaUsed = (int) (damageReduction * (10 - learnLevel) / 10.0);
-        if (sourceEntity.getPools().getStamina() >= staminaUsed) {
+        if (sourceEntity.getPools().getCurrentValues().getStamina() >= staminaUsed) {
             in.setAttemptedDamage(in.getAttemptedDamage() - damageReduction);
             sourceEntity.getPools().expendStamina(staminaUsed);
             in.setDidDeflect(true);

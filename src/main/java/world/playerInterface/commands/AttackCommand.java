@@ -96,7 +96,7 @@ public class AttackCommand extends EntityCommand {
     private void singleAttack(Weapon selectWeapon, Entity target, StatContainer stats, int bonus, double staminaMultiplier) {
         double rawStamina = selectWeapon.getStaminaUsage(stats.getStrength(), stats.getDexterity()) * staminaMultiplier;
         int staminaNeeded = (int) Math.ceil(rawStamina);
-        if (staminaNeeded > getSourceEntity().getPools().getStamina())
+        if (staminaNeeded > getSourceEntity().getPools().getCurrentValues().getStamina())
             getSourceClient().sendMessage("You are " + getMessageInColor("exhausted", STAMINA_COLOR) + " and cannot wield the " + selectWeapon.getDisplayableName());
         else {
             Attack attack = getSourceEntity().produceAttackWithWeapon(selectWeapon, bonus);

@@ -2,7 +2,8 @@ package main.java.world.playerInterface.commands;
 
 import main.java.client.Client;
 import main.java.world.WorldModel;
-import main.java.world.entity.pool.PoolContainer;
+import main.java.world.entity.pool.EntityPoolContainer;
+import main.java.world.entity.pool.PoolValueContainer;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -54,7 +55,7 @@ public class PoolsCommand extends EntityCommand {
 
     @Override
     protected void executeEntityCommand() {
-        PoolContainer pools = getSourceEntity().getPools();
+        PoolValueContainer pools = getSourceEntity().getPools().getCurrentValues();
         if (lastHP != pools.getHp() || lastBurn != pools.getBurnout() ||
                 lastMP != pools.getMp() || lastStam != pools.getStamina()) {
             lastHP = pools.getHp();
@@ -76,21 +77,22 @@ public class PoolsCommand extends EntityCommand {
     }
 
     private String getDisplayText() {
-        PoolContainer pools = getSourceEntity().getPools();
+        PoolValueContainer pools = getSourceEntity().getPools().getCurrentValues();
+        PoolValueContainer maxPools = getSourceEntity().getPools().getMaxValues();
         String hpBar = "", stamBar = "", mpBar = "", burnBar = "";
         if (useBars) {
-            hpBar = getBarForRatio(pools.getHp() / (double) pools.getMaxHP(), BAR_LENGTH);
-            stamBar = getBarForRatio(pools.getStamina() / (double) pools.getMaxStamina(), BAR_LENGTH);
-            mpBar = getBarForRatio(pools.getMp() / (double) pools.getMaxMP(), BAR_LENGTH);
-            burnBar = getBarForRatio(pools.getBurnout() / (double) pools.getMaxBurnout(), BAR_LENGTH);
+            hpBar = getBarForRatio(pools.getHp() / (double) maxPools.getHp(), BAR_LENGTH);
+            stamBar = getBarForRatio(pools.getStamina() / (double) maxPools.getStamina(), BAR_LENGTH);
+            mpBar = getBarForRatio(pools.getMp() / (double) maxPools.getMp(), BAR_LENGTH);
+            burnBar = getBarForRatio(pools.getBurnout() / (double) maxPools.getBurnout(), BAR_LENGTH);
         }
 
         return String.format(Locale.US,
                 "HP:    %4d/%-4d\t %s\nSTAM:  %4d/%-4d\t %s\nMP:    %4d/%-4d\t %s\nBURN:  %4d/%-4d\t %s\n",
-                pools.getHp(), pools.getMaxHP(), getMessageInColor(hpBar, HP_COLOR),
-                pools.getStamina(), pools.getMaxStamina(), getMessageInColor(stamBar,STAMINA_COLOR),
-                pools.getMp(), pools.getMaxMP(), getMessageInColor(mpBar, MP_COLOR),
-                pools.getBurnout(), pools.getMaxBurnout(), getMessageInColor(burnBar,BURNOUT_COLOR));
+                pools.getHp(), maxPools.getHp(), getMessageInColor(hpBar, HP_COLOR),
+                pools.getStamina(), maxPools.getStamina(), getMessageInColor(stamBar,STAMINA_COLOR),
+                pools.getMp(), maxPools.getMp(), getMessageInColor(mpBar, MP_COLOR),
+                pools.getBurnout(), maxPools.getBurnout(), getMessageInColor(burnBar,BURNOUT_COLOR));
 
     }
 

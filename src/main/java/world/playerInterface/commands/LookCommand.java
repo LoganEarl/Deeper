@@ -177,7 +177,7 @@ public class LookCommand extends EntityCommand {
                 Skill requiredSkill = connection.getTraverseSkill();
                 if (requiredSkill != null) {
                     int skillBonus = getSourceEntity().getSkills().getSkillBonus(requiredSkill);
-                    int statBase = getSourceEntity().getStats().getStat(requiredSkill.getAssociatedStat());
+                    int statBase = getSourceEntity().getStats().getStat(requiredSkill.getAssociatedStat(), getSourceEntity().getTransitiveTraits());
 
                     Color messageColor = ColorTheme.getColorOfRollDifficulty(skillBonus + statBase, connection.getTraverseDifficulty());
                     connectionPortion = ColorTheme.getMessageInColor(connectionPortion, messageColor);

@@ -13,7 +13,7 @@ import java.awt.*;
 import static main.java.world.playerInterface.ColorTheme.*;
 
 public class StabilizeCommand extends EntityCommand {
-    private String targetID;
+    private final String targetID;
     private boolean complete = false;
     private boolean usedStamina = false;
 
@@ -42,7 +42,7 @@ public class StabilizeCommand extends EntityCommand {
     @Override
     protected int getRequiredStamina() {
         if (usedStamina) {
-            int stat = getSourceEntity().getStats().getStat(getRequiredSkill().getAssociatedStat());
+            int stat = getSourceEntity().getStats().getStat(getRequiredSkill().getAssociatedStat(), getSourceEntity().getTransitiveTraits());
             int dex = getSourceEntity().getStats().getDexterity();
             //50-200 depending on primary stat and dex
             return 10 * (int) Math.ceil(20 - 7.5 * (stat / 100.0) - 7.5 * (dex / 100.0));
@@ -68,7 +68,7 @@ public class StabilizeCommand extends EntityCommand {
     @Override
     protected void setBalance() {
         if (usedStamina) {
-            int stat = getSourceEntity().getStats().getStat(getRequiredSkill().getAssociatedStat());
+            int stat = getSourceEntity().getStats().getStat(getRequiredSkill().getAssociatedStat(),getSourceEntity().getTransitiveTraits());
             //3000 to 6000 ms depending on dex
             long cooldown = (int) (stat / 100.0 * 3000 + 3000);
             getSourceEntity().setBalanceTime(cooldown, getSourceClient());
@@ -94,7 +94,7 @@ public class StabilizeCommand extends EntityCommand {
             if (target.equals(getSourceEntity()))
                 difficulty -= 20;
 
-            int statLevel = getSourceEntity().getStats().getStat(getRequiredSkill().getAssociatedStat());
+            int statLevel = getSourceEntity().getStats().getStat(getRequiredSkill().getAssociatedStat(), getSourceEntity().getTransitiveTraits());
 
             int result = getSourceEntity().getSkills().performSkillCheck(getRequiredSkill(), difficulty, statLevel);
 

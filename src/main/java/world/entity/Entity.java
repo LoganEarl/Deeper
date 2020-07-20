@@ -5,7 +5,7 @@ import main.java.database.DatabaseManager;
 import main.java.world.WorldModel;
 import main.java.world.entity.diplomacy.DiplomacyContainer;
 import main.java.world.entity.equipment.EquipmentContainer;
-import main.java.world.entity.pool.PoolContainer;
+import main.java.world.entity.pool.EntityPoolContainer;
 import main.java.world.entity.progression.ProgressionContainer;
 import main.java.world.entity.race.Race;
 import main.java.world.entity.skill.Skill;
@@ -18,7 +18,6 @@ import main.java.world.notification.Notification;
 import main.java.world.notification.NotificationSubscriber;
 import main.java.world.room.Domain;
 import main.java.world.room.Room;
-import main.java.world.room.RoomConnection;
 import main.java.world.trait.Trait;
 import main.java.world.trait.Traited;
 
@@ -75,7 +74,7 @@ public class Entity implements
     private Entity(ResultSet readEntry, WorldModel model, String databaseName) throws Exception {
         this.databaseName = databaseName;
 
-        extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(readEntry));
+        extenders.put(EntityPoolContainer.SIGNIFIER, new EntityPoolContainer(readEntry, this));
         extenders.put(StatContainer.SIGNIFIER, new StatContainer(readEntry));
         extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(readEntry, model.getItemCollection(), this));
         extenders.put(ProgressionContainer.SIGNIFIER, new ProgressionContainer(readEntry));
@@ -497,8 +496,8 @@ public class Entity implements
         return (EquipmentContainer)extenders.get(EquipmentContainer.SIGNIFIER);
     }
 
-    public PoolContainer getPools(){
-        return (PoolContainer) extenders.get(PoolContainer.SIGNIFIER);
+    public EntityPoolContainer getPools(){
+        return (EntityPoolContainer) extenders.get(EntityPoolContainer.SIGNIFIER);
     }
 
     public StatContainer getStats(){
@@ -592,7 +591,7 @@ public class Entity implements
         public Entity build(){
             Entity e = new Entity();
             LinkedHashMap<String,SqlExtender> extenders = new LinkedHashMap<>();
-            extenders.put(PoolContainer.SIGNIFIER, new PoolContainer(hp,maxHP,mp,maxMP,stamina,maxStamina,burnout,maxBurnout));
+            extenders.put(EntityPoolContainer.SIGNIFIER, new EntityPoolContainer(hp, maxHP, mp, maxMP, stamina, maxStamina, burnout, maxBurnout,e));
             extenders.put(StatContainer.SIGNIFIER,new StatContainer(strength,dexterity,intelligence,wisdom, toughness, fitness));
             extenders.put(EquipmentContainer.SIGNIFIER, new EquipmentContainer(model.getItemCollection(), e));
             extenders.put(ProgressionContainer.SIGNIFIER, new ProgressionContainer(e));

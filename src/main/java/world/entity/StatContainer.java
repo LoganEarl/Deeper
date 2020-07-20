@@ -1,24 +1,26 @@
 package main.java.world.entity;
 
+import main.java.world.trait.Trait;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 import static main.java.world.entity.EntityTable.*;
 
 public class StatContainer implements Entity.SqlExtender {
+    private static final Random RND = new Random(System.currentTimeMillis());
+
+    public static final String SIGNIFIER = "stats";
+    private static final String[] HEADERS = new String[]{STR, DEX, INT, WIS, TOUGH, FIT};
+
+
     private int strength;
     private int dexterity;
     private int intelligence;
     private int wisdom;
     private int toughness;
     private int fitness;
-
-    private static final Random RND = new Random(System.currentTimeMillis());
-
-    public static final String SIGNIFIER = "stats";
-    private static final String[] HEADERS = new String[]{STR, DEX, INT, WIS, TOUGH, FIT};
 
     public StatContainer() {
         this(0,0,0,0,0,0);
@@ -50,29 +52,39 @@ public class StatContainer implements Entity.SqlExtender {
      * @return the net stat, with 0 and up being a success
      * @throws IllegalArgumentException if you pass in a column name for stat that is not recognized
      */
-    public int preformStatCheck(String stat, int difficultyModifier) {
-        int baseStat = getStat(stat);
+    public int preformStatCheck(String stat, int difficultyModifier, Set<Trait> augmentations) {
+        int baseStat = getStat(stat, augmentations);
 
         return baseStat - RND.nextInt(100) + difficultyModifier;
     }
 
-    public int getStat(String columnName) {
+    public int getStat(String columnName, Set<Trait> augmentations) {
+        int sum = augmentations.stream().mapToInt(trait -> trait.getStatModifiers().getStat(columnName, Collections.emptySet())).sum();
+
         switch (columnName) {
             case STR:
-                return strength;
+                sum += strength;
+                break;
             case DEX:
-                return dexterity;
+                sum += dexterity;
+                break;
             case INT:
-                return intelligence;
+                sum += intelligence;
+                break;
             case WIS:
-                return wisdom;
+                sum += wisdom;
+                break;
             case TOUGH:
-                return toughness;
+                sum += toughness;
+                break;
             case FIT:
-                return fitness;
+                sum += fitness;
+                break;
             default:
                 throw new IllegalArgumentException("Column name " + columnName + " is not an entity stat");
         }
+
+        return sum;
     }
 
     public double getWeightSoftLimit() {

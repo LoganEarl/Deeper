@@ -37,7 +37,7 @@ public class ClientAttackMessage extends ClientMessage {
                 "of the defender. If the defender is deflecting the blow, damage is reduced depending on the stamina used in the deflect. There must" +
                 "be a weapon in either the right or left hand of the attacker. The right hand is used first in the case of both. Note, two weapon " +
                 "fighting is difficult, making scoring hits much harder without the proper training.\n" +
-                "To Hit: weapon stat - (1-100) + weapon hit bonus - defender armor. Must be > 0 to hit";
+                "To Hit: weapon stat - (0-99) + weapon hit bonus - defender armor. Must be > 0 to hit";
     }
 
     @Override
