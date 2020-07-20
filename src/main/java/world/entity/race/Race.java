@@ -26,7 +26,7 @@ public class Race implements TraitBestower {
             10,
             10,
             10,
-            10, Trait.testPools
+            10
     );
 
     private static final String INSERT_SQL = String.format(Locale.US, "REPLACE INTO %s(%s, %s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", RaceTable.TABLE_NAME, RaceTable.RACE_ID, RaceTable.DISPLAY_NAME, RaceTable.DESCRIPTION, RaceTable.BASE_INT, RaceTable.BASE_WIS, RaceTable.BASE_STR, RaceTable.BASE_DEX, RaceTable.BASE_TOUGH, RaceTable.BASE_FIT);

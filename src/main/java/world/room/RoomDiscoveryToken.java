@@ -21,7 +21,7 @@ public class RoomDiscoveryToken implements DatabaseManager.DatabaseEntry {
     private String connectionID;
     private DetectionStatus detectedStatus;
     private String databaseName;
-
+    //TODO set up a table for this with foreign keys
     public enum DetectionStatus {
         /**
          * Player has not seen it and has not had the opportunity to detect it

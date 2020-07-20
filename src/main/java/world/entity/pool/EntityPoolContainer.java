@@ -1,8 +1,9 @@
 package main.java.world.entity.pool;
 
 import main.java.world.entity.Entity;
-import main.java.world.entity.StatContainer;
+import main.java.world.entity.stat.EntityStatContainer;
 import main.java.world.entity.stance.BaseStance;
+import main.java.world.entity.stat.StatValueContainer;
 import main.java.world.trait.Trait;
 
 import java.sql.ResultSet;
@@ -93,7 +94,7 @@ public class EntityPoolContainer implements Entity.SqlExtender {
     /**
      * Recalculates the maximum hp/mp/stamina/burnout values based on the entity's stats
      */
-    public void calculatePoolMaxes(StatContainer stats) {
+    public void calculatePoolMaxes(StatValueContainer stats) {
         Set<Trait> traits = boundEntity.getTransitiveTraits();
         maxValues.setHp(traits.stream().mapToInt(trait -> trait.getPoolModifiers().getHp()).sum() + calculateBaseHp(stats));
         maxValues.setStamina(traits.stream().mapToInt(trait -> trait.getPoolModifiers().getStamina()).sum() + calculateBaseStamina(stats));
@@ -101,19 +102,19 @@ public class EntityPoolContainer implements Entity.SqlExtender {
         maxValues.setBurnout(traits.stream().mapToInt(trait -> trait.getPoolModifiers().getBurnout()).sum() + calculateBaseBurnout(stats));
     }
 
-    public static int calculateBaseHp(StatContainer stats){
+    public static int calculateBaseHp(StatValueContainer stats){
         return (stats.getStrength() / 2 + stats.getDexterity() / 2 + (int) (stats.getToughness() * 1.5) * 10);
     }
 
-    public static int calculateBaseStamina(StatContainer stats){
+    public static int calculateBaseStamina(StatValueContainer stats){
         return (stats.getDexterity() / 2 + stats.getStrength() / 2 + (int) (stats.getFitness() * 1.5) * 10);
     }
 
-    public static int calculateBaseMp(StatContainer stats){
+    public static int calculateBaseMp(StatValueContainer stats){
         return (stats.getIntelligence() * 2 + stats.getWisdom()) * 10;
     }
 
-    public static int calculateBaseBurnout(StatContainer stats){
+    public static int calculateBaseBurnout(StatValueContainer stats){
         return (stats.getWisdom() * 2 + stats.getIntelligence()) * 10;
     }
 

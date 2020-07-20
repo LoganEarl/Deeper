@@ -6,6 +6,7 @@ import main.java.world.WorldModel;
 import main.java.world.entity.Entity;
 import main.java.world.entity.skill.Skill;
 import main.java.world.entity.stance.StabilizedStance;
+import main.java.world.entity.stat.StatValueContainer;
 import main.java.world.notification.ConcreteNotification;
 
 import java.awt.*;
@@ -42,8 +43,9 @@ public class StabilizeCommand extends EntityCommand {
     @Override
     protected int getRequiredStamina() {
         if (usedStamina) {
-            int stat = getSourceEntity().getStats().getStat(getRequiredSkill().getAssociatedStat(), getSourceEntity().getTransitiveTraits());
-            int dex = getSourceEntity().getStats().getDexterity();
+            StatValueContainer stats = getSourceEntity().getStats().getAugmentedValues();
+            int stat = stats.getStat(getRequiredSkill().getAssociatedStat());
+            int dex = stats.getDexterity();
             //50-200 depending on primary stat and dex
             return 10 * (int) Math.ceil(20 - 7.5 * (stat / 100.0) - 7.5 * (dex / 100.0));
         }
@@ -68,7 +70,7 @@ public class StabilizeCommand extends EntityCommand {
     @Override
     protected void setBalance() {
         if (usedStamina) {
-            int stat = getSourceEntity().getStats().getStat(getRequiredSkill().getAssociatedStat(),getSourceEntity().getTransitiveTraits());
+            int stat = getSourceEntity().getStats().getAugmentedValues().getStat(getRequiredSkill().getAssociatedStat());
             //3000 to 6000 ms depending on dex
             long cooldown = (int) (stat / 100.0 * 3000 + 3000);
             getSourceEntity().setBalanceTime(cooldown, getSourceClient());
@@ -94,7 +96,7 @@ public class StabilizeCommand extends EntityCommand {
             if (target.equals(getSourceEntity()))
                 difficulty -= 20;
 
-            int statLevel = getSourceEntity().getStats().getStat(getRequiredSkill().getAssociatedStat(), getSourceEntity().getTransitiveTraits());
+            int statLevel = getSourceEntity().getStats().getAugmentedValues().getStat(getRequiredSkill().getAssociatedStat());
 
             int result = getSourceEntity().getSkills().performSkillCheck(getRequiredSkill(), difficulty, statLevel);
 

@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Logan Earl
  */
 public class Container extends Item {
-
+    //TODO set up a table for this with foreign keys
     public enum ContainerState implements Item.ItemState {
         locked, unlocked
     }

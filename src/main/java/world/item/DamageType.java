@@ -1,5 +1,6 @@
 package main.java.world.item;
 
+//TODO setup a table for this with foreign keys
 public enum DamageType{
     pierce,     //arrows, spears, bullets
     slash,      //default damage type

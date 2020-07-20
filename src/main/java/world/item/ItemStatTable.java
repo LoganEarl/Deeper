@@ -36,21 +36,26 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     /**The type of the item. Must be one of the TYPE_* constants defined in this class*/
     public static final String ITEM_TYPE = "itemType";
 
+    //TODO create a table for these and set up foreign keys
     public enum WeaponType{
         head, chest, legs, feet, hands
     }
 
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
-    public static final Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+    public final static Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
+
+    private final Set<String> CONSTRAINTS = new HashSet<>();
 
     public ItemStatTable(){
         TABLE_DEFINITION.put(ITEM_NAME, "VARCHAR(32) PRIMARY KEY NOT NULL COLLATE NOCASE");
         TABLE_DEFINITION.put(ITEM_DESCRIPTION, "TEXT");
         TABLE_DEFINITION.put(WEIGHT,"DECIMAL");
         TABLE_DEFINITION.put(VOLUME,"DECIMAL");
-        TABLE_DEFINITION.put(ITEM_TYPE,"VARCHAR(16)");
+        TABLE_DEFINITION.put(ITEM_TYPE,"VARCHAR(16) DEFAULT misc");
         TABLE_DEFINITION.put(GLOBAL_INHERENT_TRAITS, "TEXT");
         TABLE_DEFINITION.put(GLOBAL_BESTOWED_TRAITS, "TEXT");
+
+        CONSTRAINTS.add(String.format(Locale.US, "FOREIGN KEY %s REFERENCES %s(%s)", ITEM_NAME, ItemType.ItemTypeTable.TABLE_NAME, ItemType.ItemTypeTable.TYPE));
     }
 
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);
@@ -93,7 +98,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
 
     @Override
     public Set<String> getConstraints() {
-        return null;
+        return CONSTRAINTS;
     }
 
     public static Map<String,String> getStatsFromResultSet(ResultSet statEntry, Set<String> columns) throws SQLException{

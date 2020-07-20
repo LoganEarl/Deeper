@@ -44,11 +44,11 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     private Direction failureDirection;
     private final int detectCooldownSeconds;
     private final String linkedRoomConnectionIdentifier;
-
+    //TODO  set up a table for this with foreign keys
     public enum State {
         locked, unlocked, impassible
     }
-
+    //TODO set up a table for this with foreign keys
     public enum Direction {
         north, south, northeast, southwest, east, west, southeast, northwest, above(""), below("");
 

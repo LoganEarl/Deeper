@@ -2,6 +2,7 @@ package main.java.world.room;
 
 import java.util.*;
 
+//TODO set up a table for this with foreign keys
 public enum Domain {
     surface,
     air,

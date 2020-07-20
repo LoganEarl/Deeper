@@ -5,8 +5,8 @@ import main.java.client.ClientRegistry;
 import main.java.world.WorldModel;
 import main.java.world.entity.Attack;
 import main.java.world.entity.Entity;
-import main.java.world.entity.StatContainer;
 import main.java.world.entity.equipment.EquipmentContainer;
+import main.java.world.entity.stat.StatValueContainer;
 import main.java.world.item.Item;
 import main.java.world.item.ItemType;
 import main.java.world.item.armor.ArmorSlot;
@@ -54,7 +54,7 @@ public class AttackCommand extends EntityCommand {
             getSourceClient().sendMessage("There is " + getMessageInColor("nothing named " + targetID + " nearby", FAILURE));
         else {
             EquipmentContainer equipment = getSourceEntity().getEquipment();
-            StatContainer stats = getSourceEntity().getStats();
+            StatValueContainer stats = getSourceEntity().getStats().getAugmentedValues();
             Item rightHand = equipment.getEquippedItem(ArmorSlot.rightHand);
             Item leftHand = equipment.getEquippedItem(ArmorSlot.leftHand);
 
@@ -93,7 +93,7 @@ public class AttackCommand extends EntityCommand {
         return staminaUsed;
     }
 
-    private void singleAttack(Weapon selectWeapon, Entity target, StatContainer stats, int bonus, double staminaMultiplier) {
+    private void singleAttack(Weapon selectWeapon, Entity target, StatValueContainer stats, int bonus, double staminaMultiplier) {
         double rawStamina = selectWeapon.getStaminaUsage(stats.getStrength(), stats.getDexterity()) * staminaMultiplier;
         int staminaNeeded = (int) Math.ceil(rawStamina);
         if (staminaNeeded > getSourceEntity().getPools().getCurrentValues().getStamina())

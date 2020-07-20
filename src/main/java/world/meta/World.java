@@ -9,6 +9,7 @@ import main.java.world.entity.race.RaceTable;
 import main.java.world.entity.skill.SkillTable;
 import main.java.world.item.ItemInstanceTable;
 import main.java.world.item.ItemStatTable;
+import main.java.world.item.ItemType;
 import main.java.world.item.armor.ArmorStatTable;
 import main.java.world.item.consumable.ConsumableStatTable;
 import main.java.world.item.container.ContainerStatTable;
@@ -72,7 +73,7 @@ public class World implements DatabaseManager.DatabaseEntry {
     private int durationMinutes;
 
     public static final int MINIMUM_SIM_TIME_MINUTES = 30;
-
+    //TODO set up a table for this with foreign keys
     public enum Status{
         /**Value of getStatus() when the main.java.world is newly created and has not yet started*/
         fresh,
@@ -131,6 +132,7 @@ public class World implements DatabaseManager.DatabaseEntry {
 
     public static void initWorldSystem(){
         List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
+        tables.add(new ItemType.ItemTypeTable());
         tables.add(new ItemStatTable());
         tables.add(new ContainerStatTable());
         tables.add(new ArmorStatTable());
@@ -152,9 +154,11 @@ public class World implements DatabaseManager.DatabaseEntry {
 
         DatabaseManager.createNewTemplate(HUB_TEMPLATE_NAME + ".db");
         DatabaseManager.createTemplateTables(HUB_TEMPLATE_NAME + ".db",tables);
+        ItemType.writeItemTypesToDatabaseFile("template/" + HUB_TEMPLATE_NAME + ".db");
 
         DatabaseManager.createNewTemplate(LIMBO_TEMPLATE_NAME + ".db");
         DatabaseManager.createTemplateTables(LIMBO_TEMPLATE_NAME + ".db",tables);
+        ItemType.writeItemTypesToDatabaseFile("template/" + LIMBO_TEMPLATE_NAME + ".db");
 
         List<DatabaseManager.DatabaseTable> metaTables = new LinkedList<>();
         metaTables.add(new WorldTable());
@@ -166,8 +170,11 @@ public class World implements DatabaseManager.DatabaseEntry {
 
         hubWorld = getWorldByWorldID(HUB_WORLD_ID);
         Race.writePlayableRacesToDatabaseFile(hubWorld.getDatabaseName());
+        ItemType.writeItemTypesToDatabaseFile(hubWorld.getDatabaseName());
+
         limbo = getWorldByWorldID(LIMBO_WORLD_ID);
         Race.writePlayableRacesToDatabaseFile(limbo.getDatabaseName());
+        ItemType.writeItemTypesToDatabaseFile(limbo.getDatabaseName());
 
         for(World w : getAllWorlds()){
             DatabaseManager.createWorldTables(w.getDatabaseName(),tables);
@@ -233,6 +240,7 @@ public class World implements DatabaseManager.DatabaseEntry {
 
         if(newWorld != null) {
             List<DatabaseManager.DatabaseTable> tables = new LinkedList<>();
+            tables.add(new ItemType.ItemTypeTable());
             tables.add(new ItemStatTable());
             tables.add(new ContainerStatTable());
             tables.add(new ArmorStatTable());

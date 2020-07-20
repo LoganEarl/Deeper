@@ -28,11 +28,11 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
             TABLE_NAME, ITEM_ID);
     private final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
             TABLE_NAME, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, STATE, INHERENT_TRAITS, BESTOWED_TRAITS, ITEM_ID);
-    private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE %s=?",
+    private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s LEFT JOIN %s ON %s.%s=%s.%s WHERE %s=?",
             TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, ITEM_ID);
-    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE ((%s.%s=? OR %s=?) AND %s=?)",
+    private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s LEFT JOIN %s ON %s.%s=%s.%s WHERE ((%s.%s=? OR %s=?) AND %s=?)",
             TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, TABLE_NAME,ITEM_NAME,DISPLAY_NAME, ROOM_NAME);
-    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE (%s=?)",
+    private static final String GET_ROOM_SQL = String.format(Locale.US, "SELECT * FROM %s LEFT JOIN %s ON %s.%s=%s.%s WHERE (%s=?)",
             TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, ROOM_NAME);
     private static final String GET_OF_CONTAINER_ID_SQL = String.format(Locale.US, "SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE %s=?",
             TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, CONTAINER_ID);

@@ -1,8 +1,9 @@
 package main.java.world.entity.stance;
 
 import main.java.world.entity.Attack;
-import main.java.world.entity.StatContainer;
+import main.java.world.entity.stat.EntityStatContainer;
 import main.java.world.entity.skill.Skill;
+import main.java.world.entity.stat.StatValueContainer;
 
 public abstract class Stance implements Attack.AttackOffenceModifier, Attack.AttackDefenceModifier {
     private long lastUpdateTime = 0;
@@ -44,15 +45,17 @@ public abstract class Stance implements Attack.AttackOffenceModifier, Attack.Att
 
     public abstract boolean isLearnable();
 
-    public final RegenPacket receiveNextRegenPacket(StatContainer stats, long curTime){
+    public final RegenPacket receiveNextRegenPacket(EntityStatContainer stats, long curTime){
         if(lastUpdateTime == 0) lastUpdateTime = curTime;
 
         double elapsedSecs = (curTime - lastUpdateTime)/1000.0;
 
-        double hp = (stats.getToughness() * getBaseHpPerToughPerSec() + getFlatHpPerSec()) * elapsedSecs;
-        double stam = (stats.getFitness() * getBaseStamPerFitPerSec() + getFlatStamPerSec()) * elapsedSecs;
-        double mp = (stats.getIntelligence() * getMpPerIntPerSec() + stats.getWisdom() * getMpPerWisPerSec() + getFlatMpPerSec()) * elapsedSecs;
-        double burn = (stats.getWisdom() * getBurnPerWisPerSec() + stats.getIntelligence() * getBurnPerIntPerSec() + getFlatBurnPerSec()) * elapsedSecs;
+        StatValueContainer augmentedStats = stats.getAugmentedValues();
+
+        double hp = (augmentedStats.getToughness() * getBaseHpPerToughPerSec() + getFlatHpPerSec()) * elapsedSecs;
+        double stam = (augmentedStats.getFitness() * getBaseStamPerFitPerSec() + getFlatStamPerSec()) * elapsedSecs;
+        double mp = (augmentedStats.getIntelligence() * getMpPerIntPerSec() + augmentedStats.getWisdom() * getMpPerWisPerSec() + getFlatMpPerSec()) * elapsedSecs;
+        double burn = (augmentedStats.getWisdom() * getBurnPerWisPerSec() + augmentedStats.getIntelligence() * getBurnPerIntPerSec() + getFlatBurnPerSec()) * elapsedSecs;
 
         int calculatedHP = (int)(hp + carryoverHP);
         int calculatedStam = (int)(stam + carryOverStam);

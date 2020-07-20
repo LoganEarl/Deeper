@@ -1,6 +1,7 @@
 package main.java.world.item.weapon;
 
-import main.java.world.entity.StatContainer;
+import main.java.world.entity.stat.EntityStatContainer;
+import main.java.world.entity.stat.StatValueContainer;
 import main.java.world.item.DamageType;
 import main.java.world.item.Item;
 import main.java.world.item.ItemFactory;
@@ -15,7 +16,7 @@ import static main.java.world.item.weapon.WeaponStatTable.*;
 
 public class Weapon extends Item {
     private static final Random rnd = new Random();
-    private DamageScalarContainer damageScalarContainer;
+    private final DamageScalarContainer damageScalarContainer;
 
     public Weapon(ResultSet fromEntry, ItemFactory factory, String databaseName) throws Exception {
         super(fromEntry, factory, databaseName);
@@ -55,16 +56,16 @@ public class Weapon extends Item {
         return (base - strengthReduction - balanceReduction) * 10;
     }
 
-    public int rollDamage(StatContainer statContainer) {
+    public int rollDamage(StatValueContainer statContainer) {
         int dmgRange = getMaxBaseDamage() - getMinBaseDamage();
 
-        int rawDmg = rnd.nextInt(dmgRange) + getMinBaseDamage();
+        int rawDmg = rnd.nextInt(dmgRange+1) + getMinBaseDamage();
         rawDmg += damageScalarContainer.getDamageContribution(statContainer);
 
         return rawDmg;
     }
 
-    public int rollHit(StatContainer statContainer) {
+    public int rollHit(StatValueContainer statContainer) {
         int rawRoll = rnd.nextInt(100);
         rawRoll = modWithPrimaryStat(rawRoll, statContainer);
 
@@ -81,7 +82,7 @@ public class Weapon extends Item {
         return rawRoll;
     }
 
-    private int modWithPrimaryStat(int rawRoll, StatContainer statContainer) {
+    private int modWithPrimaryStat(int rawRoll, StatValueContainer statContainer) {
         int[] stats = {statContainer.getStrength(), statContainer.getDexterity(), statContainer.getIntelligence(), statContainer.getWisdom()};
         double[] scalars = {damageScalarContainer.getStrScalar(), damageScalarContainer.getDexScalar(), damageScalarContainer.getIntScalar(), damageScalarContainer.getWisScalar()};
         int bestIndex = 0;
@@ -138,7 +139,7 @@ public class Weapon extends Item {
         return DamageType.slash;
     }
 
-    private static ItemFactory.ItemParser parser = new ItemFactory.ItemParser() {
+    private static final ItemFactory.ItemParser parser = new ItemFactory.ItemParser() {
         @Override
         public ItemType getAssociatedType() {
             return ItemType.weapon;
@@ -187,7 +188,7 @@ public class Weapon extends Item {
             );
         }
 
-        public int getDamageContribution(StatContainer statContainer) {
+        public int getDamageContribution(StatValueContainer statContainer) {
             double strAddition = statContainer.getStrength() * getStrScalar();
             double dexAddition = statContainer.getDexterity() * getDexScalar();
             double intAddition = statContainer.getIntelligence() * getIntScalar();

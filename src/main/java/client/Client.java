@@ -41,7 +41,7 @@ public class Client {
             if(preexisting != null) {
                 preexisting.status = ClientStatus.UNAUTHENTICATED;
                 preexisting.associatedAccount = null;
-                preexisting.sendMessage(getMessageInColor("You have logged in from another location. You are now logged out",FAILURE));
+                preexisting.sendMessage("You have logged in from another location." + getMessageInColor(" You are now logged out",FAILURE));
             }
 
             associatedAccount = myAccount;

@@ -66,7 +66,7 @@ public class SkillContainer implements Entity.SqlExtender, TraitBestower {
     }
 
     public int performSkillCheck(Skill toCheck, int baseNumber, Entity sourceEntity){
-        int statLevel = sourceEntity.getStats().getStat(toCheck.getAssociatedStat(), sourceEntity.getTransitiveTraits());
+        int statLevel = sourceEntity.getStats().getAugmentedValues().getStat(toCheck.getAssociatedStat());
         return performSkillCheck(toCheck, baseNumber, statLevel);
     }
 

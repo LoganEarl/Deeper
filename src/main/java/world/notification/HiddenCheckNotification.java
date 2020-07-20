@@ -3,6 +3,7 @@ package main.java.world.notification;
 import main.java.client.ClientRegistry;
 import main.java.world.entity.Entity;
 import main.java.world.entity.skill.Skill;
+import main.java.world.entity.stat.StatValueContainer;
 
 import java.util.Locale;
 
@@ -40,6 +41,9 @@ public abstract class HiddenCheckNotification extends ConcreteNotification {
     public final String getAsMessage(Entity viewer) {
         String message;
         int relativeSuccess;
+        StatValueContainer viewerStats = viewer.getStats().getAugmentedValues();
+        StatValueContainer sourceStats = source.getStats().getAugmentedValues();
+
         if (isOpposed) {
             if (viewer.equals(source)){
                 message = "";
@@ -48,10 +52,10 @@ public abstract class HiddenCheckNotification extends ConcreteNotification {
             else {
                 int sourceRoll = source.getSkills().performSkillCheck(
                         sourceSkillToRoll, sourceDifficultyBonus,
-                        source.getStats().getStat(sourceSkillToRoll.getAssociatedStat(), source.getTransitiveTraits()));
+                        sourceStats.getStat(sourceSkillToRoll.getAssociatedStat()));
                 int viewerRoll = viewer.getSkills().performSkillCheck(
                         viewerSkillToRoll, viewerDifficultyBonus,
-                        viewer.getStats().getStat(viewerSkillToRoll.getAssociatedStat(), source.getTransitiveTraits()));
+                        viewerStats.getStat(viewerSkillToRoll.getAssociatedStat()));
                 relativeSuccess = viewerRoll - sourceRoll;
                 if(relativeSuccess < 0)
                     message = "";
@@ -63,7 +67,7 @@ public abstract class HiddenCheckNotification extends ConcreteNotification {
         } else {
             relativeSuccess = viewer.getSkills().performSkillCheck(
                     viewerSkillToRoll, viewerDifficultyBonus,
-                    viewer.getStats().getStat(viewerSkillToRoll.getAssociatedStat(), source.getTransitiveTraits()));
+                    viewerStats.getStat(viewerSkillToRoll.getAssociatedStat()));
             if(relativeSuccess < 0)
                 message = "";
             else{

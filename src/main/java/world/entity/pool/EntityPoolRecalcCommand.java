@@ -9,7 +9,7 @@ public class EntityPoolRecalcCommand implements CommandExecutor.Command {
     public void execute() {
         nextExecutionTime = System.currentTimeMillis() + 1000;
         for (Entity loadedEntity : Entity.getAllLoadedEntities()) {
-            loadedEntity.getPools().calculatePoolMaxes(loadedEntity.getStats());
+            loadedEntity.getPools().calculatePoolMaxes(loadedEntity.getStats().getAugmentedValues());
         }
     }
 
