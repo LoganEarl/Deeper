@@ -31,7 +31,7 @@ public class ClientMoveMessage extends ClientMessage {
 
     @Override
     public String getUsage() {
-        return "go (index of way to take)";
+        return "go (index of way to take or [north, northeast, east, south, above, below, ...etc])";
     }
 
     @Override

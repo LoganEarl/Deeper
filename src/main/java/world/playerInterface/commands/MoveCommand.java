@@ -1,5 +1,7 @@
 package main.java.world.playerInterface.commands;
 
+import java.util.List;
+
 import main.java.client.Client;
 import main.java.client.ClientRegistry;
 import main.java.world.WorldModel;
@@ -13,10 +15,12 @@ import main.java.world.room.Domain;
 import main.java.world.room.Room;
 import main.java.world.room.RoomConnection;
 import main.java.world.room.RoomConnection.Direction;
+import main.java.world.room.RoomDiscoveryToken;
 
 import java.awt.*;
 
 import static main.java.world.playerInterface.ColorTheme.*;
+import static main.java.world.room.RoomDiscoveryToken.DetectionStatus.known;
 
 public class MoveCommand extends EntityCommand {
     private final String direction;
@@ -40,15 +44,30 @@ public class MoveCommand extends EntityCommand {
         Entity sourceEntity = getSourceEntity();
         Room curRoom = Room.getByRoomName(sourceEntity.getRoomName(), sourceEntity.getDatabaseName());
         if (curRoom != null) {
+            RoomConnection connectionToUse = null;
             try {
                 int parsedIndex = Integer.parseInt(direction);
-                RoomConnection roomConnection = curRoom.getOutgoingConnectionByIndex(parsedIndex, getSourceEntity());
-                if (roomConnection != null) {
-                    travel(roomConnection);
-                } else
-                    getSourceClient().sendMessage(direction + " is not an option you can choose from. Please try again.");
+                connectionToUse = curRoom.getOutgoingConnectionByIndex(parsedIndex, getSourceEntity());
             } catch (NumberFormatException e) {
-                getSourceClient().sendMessage(direction + " is not an option you can choose from. Please try again.");
+                getSourceClient().sendMessage(getMessageInColor(direction + " is not an option", FAILURE) + " you can choose from. Please try again.");
+            }
+
+            if (connectionToUse == null) {
+                try {
+                    Direction direction = Direction.valueOf(this.direction.toLowerCase());
+                    List<RoomConnection> connections = curRoom.getOutgoingConnectionsFromPOV(sourceEntity, known);
+                    for (RoomConnection connection : connections)
+                        if (connection.getDirection() == direction)
+                            connectionToUse = connection;
+                    if (connectionToUse == null)
+                        getSourceClient().sendMessage("You see no ways to the " + direction);
+                } catch (IllegalArgumentException e) {
+                    getSourceClient().sendMessage(direction + " is not a valid option.");
+                }
+            }
+
+            if (connectionToUse != null) {
+                travel(connectionToUse);
             }
         } else
             getSourceClient().sendMessage("This is embarrassing. I regret to inform you that you do not currently have a location. Very strange. I suggest getting in contact with an admin. Weird");
@@ -70,7 +89,7 @@ public class MoveCommand extends EntityCommand {
         }
 
         Domain currentDomain = entity.getDomain();
-        if(!roomConnection.getSourceDomains().contains(currentDomain)){
+        if (!roomConnection.getSourceDomains().contains(currentDomain)) {
             String message = "That way is only accessible from the ";
             message += WorldUtils.commaSeparate(roomConnection.getSourceDomains());
 
@@ -96,34 +115,34 @@ public class MoveCommand extends EntityCommand {
 
             if (result < 0) {
                 //failed to travel
-                if(roomConnection.getFailureRoomName() != null){
-                    destinationRoom = Room.getByRoomName(roomConnection.getFailureRoomName(),roomConnection.getDatabaseName());
+                if (roomConnection.getFailureRoomName() != null) {
+                    destinationRoom = Room.getByRoomName(roomConnection.getFailureRoomName(), roomConnection.getDatabaseName());
                     moveDirection = roomConnection.getFailureDirection();
                     didMove = true;
-                }else
+                } else
                     didMove = false;
-            }else {
+            } else {
                 didMove = true;
                 moveDirection = roomConnection.getDirection();
             }
-        }else {
+        } else {
             didMove = true;
             moveDirection = roomConnection.getDirection();
         }
 
-        if(destinationRoom == null){
+        if (destinationRoom == null) {
             System.out.printf("Entity %s tried to move to nonexistent room with name %s\n", entity.getDatabaseName(), roomConnection.getDestRoomName());
             return;
         }
 
         staminaUsed = staminaNeeded;
-        if(didMove) {
-            if(!didGetCheckMessage)
+        if (didMove) {
+            if (!didGetCheckMessage)
                 notifyEntityRoom(new TransferRoomNotification(getSourceEntity(), false, roomConnection, moveDirection, getSourceEntity().getDomain(), getWorldModel().getRegistry()), getSourceEntity().getID());
             entity.setRoom(destinationRoom);
             entity.updateInDatabase(entity.getDatabaseName());
             notifyEntityRoom(new TransferRoomNotification(getSourceEntity(), true, roomConnection, moveDirection, getSourceEntity().getDomain(), getWorldModel().getRegistry()), getSourceEntity().getID());
-            new LookCommand("", false,false, getSourceClient(), getWorldModel()).execute();
+            new LookCommand("", false, false, getSourceClient(), getWorldModel()).execute();
         }
     }
 
@@ -192,7 +211,7 @@ public class MoveCommand extends EntityCommand {
         @Override
         public String getAsMessage(Entity viewer) {
             String arrives = didEnter ? " from " : " to ";
-            Direction directionViewed = didEnter? directionMoved.opposite(): directionMoved;
+            Direction directionViewed = didEnter ? directionMoved.opposite() : directionMoved;
             return getMessageInColor(getEntityColored(sourceEntity, viewer, getWorldModel()) + " " + sourceDomain.getTravelVerb() + arrives + directionViewed.toString(), INFORMATIVE);
         }
     }
