@@ -2,7 +2,6 @@ package main.java.world.room;
 
 import java.util.*;
 
-//TODO set up a table for this with foreign keys
 public enum Domain {
     surface,
     air,
@@ -12,6 +11,8 @@ public enum Domain {
     hyperspace,
     aether,
     grey; //empty space. Devoid of all creation.
+
+    public static final String TABLE_NAME = "domain";
 
     public static List<Domain> decodeDomains(String encodedDomains){
         if(encodedDomains == null || encodedDomains.isEmpty())

@@ -1,6 +1,7 @@
 package main.java.world.item;
 
 import main.java.database.DatabaseManager;
+import main.java.database.EnumTable;
 import main.java.world.meta.World;
 
 import java.sql.Connection;
@@ -36,11 +37,6 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
     /**The type of the item. Must be one of the TYPE_* constants defined in this class*/
     public static final String ITEM_TYPE = "itemType";
 
-    //TODO create a table for these and set up foreign keys
-    public enum WeaponType{
-        head, chest, legs, feet, hands
-    }
-
     /**A Map, containing the column names as keys and the associated data-type of the column as values*/
     public final static Map<String, String> TABLE_DEFINITION = new LinkedHashMap<>();
 
@@ -55,7 +51,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(GLOBAL_INHERENT_TRAITS, "TEXT");
         TABLE_DEFINITION.put(GLOBAL_BESTOWED_TRAITS, "TEXT");
 
-        CONSTRAINTS.add(String.format(Locale.US, "FOREIGN KEY (%s) REFERENCES %s(%s)", ITEM_NAME, ItemType.ItemTypeTable.TABLE_NAME, ItemType.ItemTypeTable.TYPE));
+        CONSTRAINTS.add(String.format(Locale.US, "FOREIGN KEY (%s) REFERENCES %s(%s)", ITEM_NAME, ItemType.TABLE_NAME, EnumTable.ENUM_NAME));
     }
 
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);

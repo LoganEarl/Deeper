@@ -1,7 +1,9 @@
 package main.java.world.entity;
 
 import main.java.database.DatabaseManager;
+import main.java.database.EnumTable;
 import main.java.world.entity.race.RaceTable;
+import main.java.world.room.Domain;
 import main.java.world.room.RoomTable;
 
 import java.util.*;
@@ -140,6 +142,8 @@ public class EntityTable implements DatabaseManager.DatabaseTable {
                 ROOM_NAME, RoomTable.TABLE_NAME, RoomTable.ROOM_NAME));
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 RACE_ID, RaceTable.TABLE_NAME, RaceTable.RACE_ID));
+        CONSTRAINTS.add(String.format(Locale.US, "FOREIGN KEY (%s) REFERENCES %s(%s)",
+                                      DOMAIN, Domain.TABLE_NAME, EnumTable.ENUM_NAME));
 
         //no constraints placed on equipment slots. The default value 0 means no item which fucks up foreign keys
     }

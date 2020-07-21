@@ -1,6 +1,7 @@
 package main.java.world.room;
 
 import main.java.database.DatabaseManager;
+import main.java.database.EnumTable;
 import main.java.world.entity.EntityTable;
 
 import java.sql.Connection;
@@ -31,6 +32,8 @@ public class RoomConnectionDiscoveryTable implements DatabaseManager.DatabaseTab
                 CONNECTION_ID, RoomConnectionTable.TABLE_NAME, RoomConnectionTable.CONNECTION_ID));
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ENTITY_ID, EntityTable.TABLE_NAME, EntityTable.ENTITY_ID));
+        CONSTRAINTS.add(String.format(Locale.US, "FOREIGN KEY (%s) REFERENCES %s(%s)",
+                                      DETECTION_STATUS, RoomDiscoveryToken.DetectionStatus.TABLE_NAME, EnumTable.ENUM_NAME));
     }
 
     private static final String GET_SQL = String.format(Locale.US,"SELECT * FROM %s WHERE %s=? AND %s=?",TABLE_NAME,CONNECTION_ID,ENTITY_ID);

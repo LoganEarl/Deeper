@@ -46,12 +46,14 @@ public class RoomConnection implements DatabaseManager.DatabaseEntry, Comparable
     private final String linkedRoomConnectionIdentifier;
     //TODO  set up a table for this with foreign keys
     public enum State {
-        locked, unlocked, impassible
+        locked, unlocked, impassible;
+        public static final String TABLE_NAME = "roomConnectionState";
     }
     //TODO set up a table for this with foreign keys
     public enum Direction {
         north, south, northeast, southwest, east, west, southeast, northwest, above(""), below("");
 
+        public static final String TABLE_NAME = "roomConnectionDirection";
         private String transitionWord = "the ";
 
         Direction() {

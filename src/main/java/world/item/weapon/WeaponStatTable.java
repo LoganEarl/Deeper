@@ -1,6 +1,8 @@
 package main.java.world.item.weapon;
 
 import main.java.database.DatabaseManager;
+import main.java.database.EnumTable;
+import main.java.world.item.DamageType;
 import main.java.world.item.ItemStatTable;
 import main.java.world.meta.World;
 
@@ -55,6 +57,8 @@ public class WeaponStatTable implements  DatabaseManager.DatabaseTable {
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME));
+        CONSTRAINTS.add(String.format(Locale.US, "FOREIGN KEY (%s) REFERENCES %s(%s)",
+                                      DAMAGE_TYPE, DamageType.TABLE_NAME, EnumTable.ENUM_NAME));
     }
 
     public static Map<String,String> getStatsForWeapon(String itemName, String databaseName){

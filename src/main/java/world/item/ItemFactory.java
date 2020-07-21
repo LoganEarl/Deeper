@@ -1,5 +1,7 @@
 package main.java.world.item;
 
+import main.java.database.EnumTable;
+
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +11,7 @@ public class ItemFactory {
 
     public Item parseFromResultSet(ResultSet resultSet, String databaseName){
         if(resultSet != null) {
-            ItemType type = ItemType.extractFromResultSet(resultSet);
+            ItemType type = EnumTable.extractFromResultSet(resultSet, ItemType.misc, ItemType.class);
             if (parsers.containsKey(type)) {
                 try {
                     Item i = parsers.get(type).parseFromResultSet(resultSet, this, databaseName);

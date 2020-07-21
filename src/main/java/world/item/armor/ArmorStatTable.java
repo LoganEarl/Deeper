@@ -1,6 +1,7 @@
 package main.java.world.item.armor;
 
 import main.java.database.DatabaseManager;
+import main.java.database.EnumTable;
 import main.java.world.item.ItemStatTable;
 import main.java.world.meta.World;
 
@@ -53,11 +54,15 @@ public class ArmorStatTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(ELECTRIC_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
         TABLE_DEFINITION.put(PLASMA_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
         TABLE_DEFINITION.put(OBLIVION_DEFENCE, "DECIMAL NOT NULL DEFAULT 0");
-        TABLE_DEFINITION.put(ARMOR_TYPE,"VARCHAR(16) NOT NULL");
-        TABLE_DEFINITION.put(ARMOR_SLOT,"VARCHAR(16) NOT NULL");
+        TABLE_DEFINITION.put(ARMOR_TYPE,"VARCHAR(32) NOT NULL");
+        TABLE_DEFINITION.put(ARMOR_SLOT,"VARCHAR(32) NOT NULL");
 
         CONSTRAINTS.add(String.format(Locale.US,"FOREIGN KEY (%s) REFERENCES %s(%s)",
                 ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME));
+        CONSTRAINTS.add(String.format(Locale.US, "FOREIGN KEY (%s) REFERENCES %s(%s)",
+                                      ARMOR_SLOT, ArmorSlot.TABLE_NAME, EnumTable.ENUM_NAME));
+        CONSTRAINTS.add(String.format(Locale.US, "FOREIGN KEY (%s) REFERENCES %s(%s)",
+                                      ARMOR_TYPE, ArmorType.TABLE_NAME, EnumTable.ENUM_NAME));
     }
 
     @Override

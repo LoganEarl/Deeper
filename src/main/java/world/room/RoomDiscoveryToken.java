@@ -21,7 +21,6 @@ public class RoomDiscoveryToken implements DatabaseManager.DatabaseEntry {
     private String connectionID;
     private DetectionStatus detectedStatus;
     private String databaseName;
-    //TODO set up a table for this with foreign keys
     public enum DetectionStatus {
         /**
          * Player has not seen it and has not had the opportunity to detect it
@@ -34,7 +33,9 @@ public class RoomDiscoveryToken implements DatabaseManager.DatabaseEntry {
         /**
          * Player detected the room, or traveled an unhidden connection
          */
-        known
+        known;
+
+        public static final String TABLE_NAME = "roomConnectionDiscoveryStatus";
     }
 
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=? AND %s=?", TABLE_NAME, ENTITY_ID, CONNECTION_ID);
