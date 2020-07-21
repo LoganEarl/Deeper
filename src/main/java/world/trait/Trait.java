@@ -26,12 +26,13 @@ public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceM
     barnDoor(0,200,0,0,0,"You are as easy to strike as the broad side of a barn. It is almost impossible to miss you"),
     testPools(new PoolValueContainer(1000,2000,3000,4000),"This is an OP test trait"),
     testStats(new StatValueContainer(100, 200, 300, 400, 500, 600), "This is an OP test trait"),
-    testDamageScalar(new DamageScalarContainer(1000,1000,1000,1000,0),0,0,0,0,0,"An OP test trait");
+    testDamageScalar(new DamageScalarContainer(1000,1000,1000,1000,0),0,0,0,0,0,"An OP test trait"),
+    testSkillBonus(Map.of(Skill.acrobatics1, 1000),"An op test trait that adds to acrobatics tests");
 
     private final StatValueContainer statModifiers;
     private final PoolValueContainer poolModifiers;
-    private final DamageScalarContainer damageScalarContainer; //TODO not implemented
-    private final Map<Skill, Integer> skillBonuses; //TODO not implemented
+    private final DamageScalarContainer damageScalarContainer;
+    private final Map<Skill, Integer> skillBonuses;
     private final int hitBonus;
     private final int toBeHitBonus;
     private final int damageBonus;
@@ -92,6 +93,12 @@ public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceM
 
     public String getDisplayableName(){
         return this.toString();
+    }
+
+    public int getBonusForSkillCheck(Skill skill){
+        if(skillBonuses.containsKey(skill))
+            return skillBonuses.get(skill);
+        return 0;
     }
 
     @Override

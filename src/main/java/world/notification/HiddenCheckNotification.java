@@ -52,10 +52,12 @@ public abstract class HiddenCheckNotification extends ConcreteNotification {
             else {
                 int sourceRoll = source.getSkills().performSkillCheck(
                         sourceSkillToRoll, sourceDifficultyBonus,
-                        sourceStats.getStat(sourceSkillToRoll.getAssociatedStat()));
+                        sourceStats.getStat(sourceSkillToRoll.getAssociatedStat()),
+                        source);
                 int viewerRoll = viewer.getSkills().performSkillCheck(
                         viewerSkillToRoll, viewerDifficultyBonus,
-                        viewerStats.getStat(viewerSkillToRoll.getAssociatedStat()));
+                        viewerStats.getStat(viewerSkillToRoll.getAssociatedStat()),
+                        source);
                 relativeSuccess = viewerRoll - sourceRoll;
                 if(relativeSuccess < 0)
                     message = "";
@@ -67,7 +69,8 @@ public abstract class HiddenCheckNotification extends ConcreteNotification {
         } else {
             relativeSuccess = viewer.getSkills().performSkillCheck(
                     viewerSkillToRoll, viewerDifficultyBonus,
-                    viewerStats.getStat(viewerSkillToRoll.getAssociatedStat()));
+                    viewerStats.getStat(viewerSkillToRoll.getAssociatedStat()),
+                    viewer);
             if(relativeSuccess < 0)
                 message = "";
             else{

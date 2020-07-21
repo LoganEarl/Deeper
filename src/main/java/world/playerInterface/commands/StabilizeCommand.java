@@ -98,7 +98,7 @@ public class StabilizeCommand extends EntityCommand {
 
             int statLevel = getSourceEntity().getStats().getAugmentedValues().getStat(getRequiredSkill().getAssociatedStat());
 
-            int result = getSourceEntity().getSkills().performSkillCheck(getRequiredSkill(), difficulty, statLevel);
+            int result = getSourceEntity().getSkills().performSkillCheck(getRequiredSkill(), difficulty, statLevel, getSourceEntity());
 
             if (result >= 0)
                 getSourceEntity().setStance(new StabilizedStance());

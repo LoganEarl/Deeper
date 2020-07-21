@@ -55,7 +55,7 @@ public class ItemStatTable implements DatabaseManager.DatabaseTable {
         TABLE_DEFINITION.put(GLOBAL_INHERENT_TRAITS, "TEXT");
         TABLE_DEFINITION.put(GLOBAL_BESTOWED_TRAITS, "TEXT");
 
-        CONSTRAINTS.add(String.format(Locale.US, "FOREIGN KEY %s REFERENCES %s(%s)", ITEM_NAME, ItemType.ItemTypeTable.TABLE_NAME, ItemType.ItemTypeTable.TYPE));
+        CONSTRAINTS.add(String.format(Locale.US, "FOREIGN KEY (%s) REFERENCES %s(%s)", ITEM_NAME, ItemType.ItemTypeTable.TABLE_NAME, ItemType.ItemTypeTable.TYPE));
     }
 
     private static final String GET_SQL = String.format(Locale.US, "SELECT * FROM %s WHERE %s=?", TABLE_NAME, ITEM_NAME);

@@ -13,7 +13,6 @@ import main.java.world.room.Room;
 import main.java.world.room.RoomConnection;
 import main.java.world.room.RoomDiscoveryToken;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
