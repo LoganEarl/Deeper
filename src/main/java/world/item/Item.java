@@ -3,6 +3,7 @@ package main.java.world.item;
 import main.java.database.DatabaseManager;
 import main.java.world.entity.Entity;
 import main.java.world.meta.World;
+import main.java.world.room.Domain;
 import main.java.world.trait.Trait;
 import main.java.world.trait.TraitBestower;
 import main.java.world.trait.Traited;
@@ -22,12 +23,12 @@ import static main.java.world.item.ItemInstanceTable.*;
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestower, Traited {
-    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            TABLE_NAME, ITEM_ID, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, STATE,INHERENT_TRAITS, BESTOWED_TRAITS);
+    private static final String CREATE_SQL = String.format(Locale.US,"INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            TABLE_NAME, ITEM_ID, ROOM_NAME, DOMAIN, ITEM_NAME, DISPLAY_NAME, STATE,INHERENT_TRAITS, BESTOWED_TRAITS);
     private static final String DELETE_SQL = String.format(Locale.US,"DELETE FROM %s WHERE %s=?",
             TABLE_NAME, ITEM_ID);
-    private final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
-            TABLE_NAME, ROOM_NAME, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, STATE, INHERENT_TRAITS, BESTOWED_TRAITS, ITEM_ID);
+    private final String UPDATE_SQL = String.format(Locale.US,"UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
+            TABLE_NAME, ROOM_NAME, DOMAIN, ITEM_NAME, DISPLAY_NAME, CONTAINER_ID, STATE, INHERENT_TRAITS, BESTOWED_TRAITS, ITEM_ID);
     private static final String GET_ID_SQL = String.format(Locale.US,"SELECT * FROM %s LEFT JOIN %s ON %s.%s=%s.%s WHERE %s=?",
             TABLE_NAME, ItemStatTable.TABLE_NAME, TABLE_NAME, ITEM_NAME, ItemStatTable.TABLE_NAME, ItemStatTable.ITEM_NAME, ITEM_ID);
     private static final String GET_NAME_SQL = String.format(Locale.US,"SELECT * FROM %s LEFT JOIN %s ON %s.%s=%s.%s WHERE ((%s.%s=? OR %s=?) AND %s=?)",
@@ -39,6 +40,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
 
     private int itemID;
     private String roomName;
+    private Domain domain;
     private String itemName;
     private String displayName;
     private String databaseName;
@@ -278,7 +280,9 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
             stateString = state.toString();
         if(item == null)
             return DatabaseManager.executeStatement(CREATE_SQL, databaseName,
-                    itemID, roomName, itemName, displayName, stateString,
+                    itemID, roomName,
+                    domain != null? domain.name(): null,
+                    itemName, displayName, stateString,
                     Trait.getSavableForm(inherentTraits),
                     Trait.getSavableForm(bestowedTraits)) > 0;
         else
@@ -297,7 +301,7 @@ public abstract class Item implements DatabaseManager.DatabaseEntry, TraitBestow
             stateString = state.toString();
 
         return DatabaseManager.executeStatement(UPDATE_SQL,databaseName,
-                roomName, itemName, displayName, containerID, stateString, itemID,
+                roomName, domain != null? domain.name(): null, itemName, displayName, containerID, stateString, itemID,
                 Trait.getSavableForm(inherentTraits),
                 Trait.getSavableForm(bestowedTraits)) > 0;
     }

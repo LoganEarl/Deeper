@@ -126,10 +126,12 @@ public enum Trait implements Attack.AttackDefenceModifier, Attack.AttackOffenceM
      * @return either the Trait or null if not found
      */
     public static Trait getTraitFromSavable(String rawTrait) {
-        try {
-            return valueOf(rawTrait);
-        } catch (EnumConstantNotPresentException e) {
-            System.out.println("Failed to parse non-existent Trait enum: " + rawTrait);
+        if(rawTrait != null) {
+            try {
+                return valueOf(rawTrait);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Failed to parse non-existent Trait enum: " + rawTrait);
+            }
         }
         return null;
     }

@@ -3,6 +3,8 @@ package main.java.database;
 import java.sql.ResultSet;
 import java.util.*;
 
+import static main.java.world.item.ItemStatTable.ITEM_TYPE;
+
 public class EnumTable<T extends Enum<T>> implements DatabaseManager.DatabaseTable {
     public static final String ENUM_NAME = "name";
 
@@ -44,7 +46,7 @@ public class EnumTable<T extends Enum<T>> implements DatabaseManager.DatabaseTab
 
     public static <E extends Enum<E>> E extractFromResultSet(ResultSet readFrom, E defaultValue, Class<E> classValue) {
         try{
-            return E.valueOf(classValue, readFrom.getString(ENUM_NAME));
+            return E.valueOf(classValue, readFrom.getString(ITEM_TYPE));
         }catch (Exception e){
             System.out.println("An enum had an un-parsable type and defaulted to " + defaultValue);
             return defaultValue;
